@@ -77,7 +77,7 @@ Open a terminal at the root of your project and simply execute the following com
 
 ## Configuration and environment variables
 
-The configuration is defined in file [application-ENV.conf](src/main/resources/application-cqdg-dev.conf).
+The configuration is defined in file [application-ENV.conf](src/main/resources/application-dev.conf).
 Some attributes can be overridden by environment variables. For instance :
 
 The configuration itself is loaded based on the environment. In order to switch environment, you need to provide the following environment variable:

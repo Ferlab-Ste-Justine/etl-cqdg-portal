@@ -7,7 +7,7 @@ import pureconfig.ConfigReader.Result
 import pureconfig._
 import pureconfig.generic.auto._
 
-case class AWSConfig(bucketName: String)
+case class AWSConfig(bucketName: String, endpoint: Option[String] = None, pathStyleAccess: Boolean =  false)
 
 case class KeycloakConfig(cookie: String)
 
