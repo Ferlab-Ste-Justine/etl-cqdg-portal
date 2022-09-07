@@ -1,13 +1,14 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
 val sparkDepsSetting = Seq(
-  libraryDependencies ++= Seq("bio.ferlab" %% "datalake-spark31" % "0.2.20",
-    "org.apache.spark" %% "spark-sql" % "3.1.2" % Provided,
-    "org.apache.spark" %% "spark-hive" % "3.1.2" % Provided,
-    "org.apache.hadoop" % "hadoop-client" % "3.2.0" % Provided,
-    "org.apache.hadoop" % "hadoop-aws" % "3.2.0" % Provided,
-    "io.delta" %% "delta-core" % "1.0.0" % Provided,
-    "org.scalatest" %% "scalatest" % "3.0.8" % Test
+  libraryDependencies ++= Seq("bio.ferlab" %% "datalake-spark31" % "0.2.46",
+    "org.apache.spark" %% "spark-sql" % "3.1.2",
+    "org.apache.spark" %% "spark-hive" % "3.1.2",
+    "org.apache.spark" %% "spark-avro" % "2.4.2",
+    "org.apache.hadoop" % "hadoop-client" % "3.2.0",
+    "org.apache.hadoop" % "hadoop-aws" % "3.2.0",
+    "io.delta" %% "delta-core" % "1.0.0",
+    "org.scalatest" %% "scalatest" % "3.2.9" % Test
   )
 )
 

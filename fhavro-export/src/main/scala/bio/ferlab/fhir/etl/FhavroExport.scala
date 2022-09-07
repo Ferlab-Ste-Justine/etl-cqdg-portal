@@ -18,13 +18,10 @@ object FhavroExport extends App {
     withSystemExit {
       withLog {
         withConfiguration(env) { configuration =>
-          println(configuration)
           implicit val s3Client: S3Client = buildS3Client(configuration)
           implicit val fhirClient: GenericClient = buildFhirClient(configuration)
 
           val fhavroExporter = new FhavroExporter(configuration.awsConfig.bucketName, releaseId, studyId)
-
-          println(configuration.fhirConfig.resources)
 
           configuration.fhirConfig.resources.foreach { fhirRequest =>
             val resources = fhavroExporter.requestExportFor(fhirRequest)

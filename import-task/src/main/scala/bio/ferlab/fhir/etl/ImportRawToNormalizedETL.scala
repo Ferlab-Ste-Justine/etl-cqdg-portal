@@ -28,18 +28,18 @@ class ImportRawToNormalizedETL(override val source: DatasetConf,
     )
   }
 
-  override def load(data: Map[String, DataFrame],
-                    lastRunDateTime: LocalDateTime = minDateTime,
-                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    data.map { case (dsid, df) =>
-      val ds = conf.getDataset(dsid)
-      val nbPartitions = 10
-      LoadResolver
-        .write(spark, conf)(ds.format -> ds.loadtype)
-        .apply(ds, df.coalesce(nbPartitions))
-      dsid -> ds.read
-    }
-
-  }
+//  override def load(data: Map[String, DataFrame],
+//                    lastRunDateTime: LocalDateTime = minDateTime,
+//                    currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+//    data.map { case (dsid, df) =>
+//      val ds = conf.getDataset(dsid)
+//      val nbPartitions = 10
+//      LoadResolver
+//        .write(spark, conf)(ds.format -> ds.loadtype)
+//        .apply(ds, df.coalesce(nbPartitions))
+//      dsid -> ds.read
+//    }
+//
+//  }
 
 }

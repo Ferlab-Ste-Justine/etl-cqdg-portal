@@ -20,6 +20,8 @@ object FhirUtils {
   }
 
   def replaceBaseUrl(url: String, replaceHost: String) = {
-    URIUtils.rewriteURI(URI.create(url), HttpHost.create(replaceHost)).toString
+    val pattern = """(^http[a-z]?:\/\/.*?)\/""".r
+    val cleanUrl = pattern.findAllIn(replaceHost).group(1)
+    URIUtils.rewriteURI(URI.create(url), HttpHost.create(cleanUrl)).toString
   }
 }

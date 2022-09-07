@@ -2,9 +2,10 @@ package bio.ferlab.fhir.etl
 
 import bio.ferlab.fhir.etl.Utils.{age_on_set, extractFirstForSystem, retrieveRepository, sanitizeFilename}
 import org.apache.spark.sql.functions.col
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.matchers.should._
+import org.scalatest.flatspec.AnyFlatSpec
 
-class UtilsSpec extends FlatSpec with Matchers with WithSparkSession {
+class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 

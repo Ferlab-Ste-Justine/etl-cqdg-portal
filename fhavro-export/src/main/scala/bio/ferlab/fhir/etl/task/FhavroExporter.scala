@@ -34,7 +34,7 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String)(imp
     val bundleEnriched = request.`type` match {
       case "ResearchStudy" => bundle.where(ResearchStudy.IDENTIFIER.exactly().identifier(studyId))
       case "Organization" => bundle
-      case _ => bundle.withTag(null, studyId)
+      case _ => bundle.withTag(null, s"study:$studyId")
     }
 
     request.profile.foreach(bundleEnriched.withProfile)
