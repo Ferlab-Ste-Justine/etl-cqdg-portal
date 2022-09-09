@@ -7,7 +7,8 @@ package object etl {
   val SYSTEM_URL = Seq(SYSTEM_URL_INCLUDE, SYSTEM_URL_KF)
 
   //ResearchStudy
-
+  val ACCESS_LIMITATIONS_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/limitation"
+  val ACCESS_REQUIREMENTS_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/requirement"
   val SYS_NCBI_URL = "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin"
 
   //Patient

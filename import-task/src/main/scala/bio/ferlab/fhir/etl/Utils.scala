@@ -1,10 +1,12 @@
 package bio.ferlab.fhir.etl
 
-//import bio.ferlab.fhir.etl.ImportTask.expReleaseId
-
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{ArrayType, DataType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Column, functions}
+
+import java.sql.{Date, Timestamp}
+
 
 object Utils {
 
@@ -14,8 +16,16 @@ object Utils {
   val dcfHost = "api.gdc.cancer.gov"
   val patternUrnUniqueIdStudy = "[A-Z][a-z]+-(SD_[0-9A-Za-z]+)-([A-Z]{2}_[0-9A-Za-z]+)"
   val documentReferenceExtract = "^DocumentReference\\/([0-9]+)$"
-  val specimenExtract = "^Specimen\\/([0-9]+)$"
+  val specimenExtract = "^Specimen\\/([A-Za-z0-9]+)$"
+  val patientExtract = "^Patient\\/([A-Za-z0-9]+)$"
   val phenotypeExtract = "^[A-Z]{2,}.[0-9]+$"
+
+  case class Coding(id: Option[String], system: Option[String], version: Option[String], code: Option[String],
+                    display: Option[String], userSelected: Option[String])
+
+  case class ValueCodeableConcept(coding: Seq[Coding])
+
+  case class ValueAge(id: Option[String], value: Long, comparator: String, unit: String, system: String, code: String)
 
 
   private def codingSystemClassify(url: String) = {
@@ -60,6 +70,21 @@ object Utils {
     udf(
       (arr: Seq[(Option[String], Seq[(Option[String], Option[String], Option[String], Option[String], Option[String], Option[Boolean])], Option[String])])
       => arr.map(r => r._2.head._5 -> r._3).toMap)
+
+  val extractValueAge: UserDefinedFunction =
+    udf(
+      (arr: Seq[(Option[String], Option[ValueAge])])
+      => arr)
+
+  val extractKeywords: UserDefinedFunction =
+    udf(
+      (arr: Seq[(Option[String], Seq[Coding], Option[String])])
+      => arr.map(_._3))
+
+  val extractValueCodeableConcept: String => UserDefinedFunction = (filter: String) =>
+    udf((arr: Seq[(Option[String], ValueCodeableConcept)]) =>
+      arr.filter(e => e._1.getOrElse("") == filter).flatMap(e => e._2.coding.map(c => (c.code, c.system)))
+    )
 
   val retrieveIsHarmonized: Column => Column = url => url.isNotNull && (url like "harmonized-data")
 
