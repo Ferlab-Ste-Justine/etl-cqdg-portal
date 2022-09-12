@@ -74,7 +74,16 @@ object Utils {
   val extractValueAge: UserDefinedFunction =
     udf(
       (arr: Seq[(Option[String], Option[ValueAge])])
-      => arr)
+      => arr
+        .find(c => c._1.getOrElse("") == "https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")
+        .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
+
+  val extactSubmitterParticipantID: UserDefinedFunction =
+    udf(
+      (arr: Seq[(Option[String], Option[ValueAge])])
+      => arr
+        .find(c => c._1.getOrElse("") == "https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")
+        .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
 
   val extractKeywords: UserDefinedFunction =
     udf(
