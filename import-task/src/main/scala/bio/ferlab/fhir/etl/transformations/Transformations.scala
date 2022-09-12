@@ -99,25 +99,16 @@ object Transformations {
 
   val conditionDiagnosisMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "release_id", "identifier", "code", "bodySite", "subject", "verificationStatus", "_recordedDate")
-      .withColumn("diagnosis_id", officialIdentifier)
-      .withColumn("condition_coding", codingClassify(col("code")("coding")).cast("array<struct<category:string,code:string>>"))
-      .withColumn("source_text", col("code")("text"))
-      .withColumn("participant_fhir_id", extractReferenceId(col("subject")("reference")))
-      .withColumn("source_text_tumor_location", col("bodySite")("text"))
-      .withColumn("uberon_id_tumor_location", flatten(transform(col("bodySite")("coding"), c => c("display"))))
-      .withColumn("affected_status", col("verificationStatus")("text").cast(BooleanType))
-      .withColumn("affected_status_text", col("verificationStatus")("coding")("display")(0))
-      .withColumn("down_syndrome_diagnosis", col("verificationStatus")("text"))
-      .withColumn("age_at_event", struct(
-        col("_recordedDate")("recordedDate")("offset")("value") as "value",
-        col("_recordedDate")("recordedDate")("offset")("unit") as "units",
-        extractFirstForSystem(col("_recordedDate")("recordedDate")("event")("coding"), Seq("http://snomed.info/sct"))("display") as "from"
-      ))
-      // TODO external_id
-      // TODO diagnosis_category
+      .select("identifier", "code", "subject", "onsetAge", "study_id", "release_id", "fhir_id")
+      .withColumn("diagnosis_source_text", col("code")("text"))
+      .withColumn("diagnosis_mondo_code",
+        firstNonNull(filter(col("code")("coding"), col => col("system").equalTo("http://purl.obolibrary.org/obo/mondo.owl"))("code")))
+      .withColumn("diagnosis_ICD_code", firstNonNull(filter(col("code")("coding"), col => col("system").isNull)("code")))
+      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      //todo fix value or age (in bytes)
+      .withColumn("age_at_diagnosis", struct(col("onsetAge")("value") as "value", col("onsetAge")("unit") as "unit"))
     ),
-    Drop("identifier", "code", "subject", "verificationStatus", "_recordedDate", "bodySite")
+    Drop("identifier", "code", "onsetAge")
   )
 
   val conditionPhenotypeMappings: List[Transformation] = List(
