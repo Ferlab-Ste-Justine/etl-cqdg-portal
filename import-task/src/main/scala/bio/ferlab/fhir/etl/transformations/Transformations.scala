@@ -113,23 +113,15 @@ object Transformations {
 
   val conditionPhenotypeMappings: List[Transformation] = List(
     Custom(_
-//      .select("fhir_id", "study_id", "release_id", "identifier", "code", "subject", "verificationStatus", "_recordedDate")
-      .select("fhir_id", "study_id", "release_id", "identifier", "code", "subject")
-      .withColumn("phenotype_id", officialIdentifier)
-      .withColumn("condition_coding", codingClassify(col("code")("coding")).cast("array<struct<category:string,code:string>>"))
-      .withColumn("source_text", col("code")("text"))
-      .withColumn("participant_fhir_id", extractReferenceId(col("subject")("reference")))
-//      .withColumn("observed", col("verificationStatus")("coding")(0)("code"))
-//      .withColumn("age_at_event", struct(
-//        col("_recordedDate")("recordedDate")("offset")("value") as "value",
-//        col("_recordedDate")("recordedDate")("offset")("unit") as "units",
-//        //todo same for include?
-//        extractFirstForSystem(col("_recordedDate")("recordedDate")("event")("coding"), Seq("http://snomed.info/sct"))("display") as "from"
-//      ))
-      // TODO snomed_id_phenotype
-      // TODO external_id
+      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject")
+      .where(col("code")("coding")(0)("code") === "PHEN")
+      .withColumn("phenotype_source_text", col("code")("text"))
+      .withColumn("phenotype_HPO_code",
+         firstNonNull(transform(col("valueCodeableConcept")("coding"), col => struct(col("system") as "system", col("code") as "code")))
+      )
+      .withColumn("cqdg_participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
     ),
-//    Drop("identifier", "code", "subject", "verificationStatus", "_recordedDate")
+    Drop("code", "valueCodeableConcept", "subject")
   )
 
   val organizationMappings: List[Transformation] = List(
