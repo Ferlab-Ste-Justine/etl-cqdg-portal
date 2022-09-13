@@ -83,18 +83,14 @@ object Transformations {
 
   val observationFamilyRelationshipMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "release_id", "subject", "identifier", "focus", "valueCodeableConcept", "meta")
-      .withColumn("study_id", col("meta")("tag")(0)("code"))
-      .withColumn("observation_id", officialIdentifier)
-      .withColumn("participant1_fhir_id", extractReferenceId(col("subject")("reference")))
-      .withColumn("participant2_fhir_id", extractReferencesId(col("focus")("reference"))(0))
-      .withColumn(
-        "participant1_to_participant_2_relationship",
-        extractFirstForSystem(col("valueCodeableConcept")("coding"), ROLE_CODE_URL)("display")
-      )
-      // TODO external_id
+      .select("study_id", "release_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
+      .where(col("code")("coding")(0)("code") === "FAMM")
+      .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("focus", firstNonNull(transform(col("focus"),  col => regexp_extract(col("reference"), patientExtract, 1))))
+      .withColumn("relationship_to_proband", firstNonNull(transform(col("valueCodeableConcept")("coding"), col => col("code"))))
+      .withColumn("category", col("category")(0)("coding")(0)("code"))
     ),
-    Drop("subject", "identifier", "focus", "valueCodeableConcept", "meta")
+    Drop("code", "valueCodeableConcept")
   )
 
   val conditionDiagnosisMappings: List[Transformation] = List(
@@ -205,21 +201,13 @@ object Transformations {
 
   val groupMappings: List[Transformation] = List(
     Custom(_
-      .select("*")
-      .where(exists(col("identifier"), identifier => identifier("system") === "https://kf-api-dataservice.kidsfirstdrc.org/families/" ) || exists(col("code.coding"), code => code("code") === "FAMMEMB"  ) )
-      .withColumn("external_id", filter(col("identifier"), c => c("system").isNull)(0)("value"))
-      .withColumn("family_id", officialIdentifier)
-      .withColumn("exploded_member", explode(col("member")))
-      .withColumn("exploded_member_entity", extractReferenceId(col("exploded_member")("entity")("reference")))
-      .withColumn("exploded_member_inactive", col("exploded_member")("inactive"))
-      .withColumn("family_members", struct("exploded_member_entity", "exploded_member_inactive"))
-      .groupBy("fhir_id", "study_id", "family_id", "external_id", "type", "release_id")
-      .agg(
-        collect_list("family_members") as "family_members",
-        collect_list("exploded_member_entity") as "family_members_id"
-      )
+      .select("study_id", "release_id", "fhir_id", "code", "member", "identifier")
+      .withColumn("family_type", firstNonNull(transform(col("code")("coding"), col => col("code"))))
+      .withColumn("family_members", transform(col("member"), col => regexp_extract(col("entity")("reference"), patientExtract, 1)))
+      .withColumn("submitter_family_id", col("identifier")(0)("value"))
+      //fixme missing 'cqdg_participant_id' (see xls file) ?? clarify...
     ),
-    Drop()
+    Drop("code", "member", "identifier")
   )
 
   val extractionMappings: Map[String, List[Transformation]] = Map(
