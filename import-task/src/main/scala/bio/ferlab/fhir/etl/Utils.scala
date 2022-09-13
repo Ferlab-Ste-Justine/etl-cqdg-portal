@@ -2,10 +2,7 @@ package bio.ferlab.fhir.etl
 
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types.{ArrayType, DataType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Column, functions}
-
-import java.sql.{Date, Timestamp}
 
 
 object Utils {
@@ -25,18 +22,8 @@ object Utils {
 
   case class ValueCodeableConcept(coding: Seq[Coding])
 
-  case class ValueAge(id: Option[String], value: Long, comparator: String, unit: String, system: String, code: String)
+  case class ValueAge(id: Option[String], value: Option[Long], comparator: Option[String], unit: Option[String], system: Option[String], code: Option[String])
 
-
-  private def codingSystemClassify(url: String) = {
-    url match {
-      case "http://purl.obolibrary.org/obo/mondo.owl" => "MONDO"
-      case "https://www.who.int/classifications/classification-of-diseases" => "ICD"
-      case "http://purl.obolibrary.org/obo/hp.owl" => "HPO"
-      case "http://purl.obolibrary.org/obo/ncit.owl" => "NCIT"
-      case _ => "Unknown"
-    }
-  }
 
   val extractAclFromList: UserDefinedFunction =
     udf((arr: Seq[String], studyId: String) => arr.filter(e => e != null && ((e matches actCodeR) || (e == studyId))))
@@ -56,14 +43,6 @@ object Utils {
   val extractOfficial: Column => Column = (identifiers: Column) => coalesce(filter(identifiers, identifier => identifier("use") === "official")(0)("value"), identifiers(0)("value"))
 
 
-  val codingClassify: UserDefinedFunction =
-    udf((arr: Seq[(String, String, String, String, String, String)]) =>
-      arr.map(
-        r => (codingSystemClassify(r._2),
-          if (r._4.matches(phenotypeExtract)) r._4.replace("_", ":") else r._4)
-      )
-    )
-
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
 
   val extractHashes: UserDefinedFunction =
@@ -71,12 +50,13 @@ object Utils {
       (arr: Seq[(Option[String], Seq[(Option[String], Option[String], Option[String], Option[String], Option[String], Option[Boolean])], Option[String])])
       => arr.map(r => r._2.head._5 -> r._3).toMap)
 
-  val extractValueAge: UserDefinedFunction =
+  val extractValueAge: String => UserDefinedFunction = (url: String) =>
     udf(
       (arr: Seq[(Option[String], Option[ValueAge])])
       => arr
-        .find(c => c._1.getOrElse("") == "https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")
+        .find(c => c._1.getOrElse("") == url)
         .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
+
 
   val extactSubmitterParticipantID: UserDefinedFunction =
     udf(

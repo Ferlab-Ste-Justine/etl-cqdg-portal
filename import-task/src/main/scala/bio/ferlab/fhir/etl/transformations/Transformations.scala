@@ -1,42 +1,30 @@
 package bio.ferlab.fhir.etl.transformations
 
 import bio.ferlab.datalake.spark3.transformation.{Custom, Drop, Transformation}
-import bio.ferlab.fhir.etl.Utils.{extractFirstForSystem, _}
+import bio.ferlab.fhir.etl.Utils._
 import bio.ferlab.fhir.etl._
 import org.apache.spark.sql.Column
-import org.apache.spark.sql.functions.{col, collect_list, explode, filter, regexp_extract, struct, when, _}
-import org.apache.spark.sql.types.BooleanType
+import org.apache.spark.sql.functions.{col, _}
 
 object Transformations {
-
-  val patternPractitionerRoleResearchStudy = "PractitionerRole\\/([0-9]+)"
-  val conditionTypeR = "^https:\\/\\/[A-Za-z0-9-_.\\/]+\\/([A-Za-z0-9]+)"
 
   val officialIdentifier: Column = extractOfficial(col("identifier"))
 
   val patientMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "release_id", "gender", "ethnicity", "identifier", "race")
-      .withColumn("external_id", filter(col("identifier"), c => c("system").isNull)(0)("value"))
-      // TODO is_proband
-      .withColumn("participant_id", officialIdentifier)
-      .withColumn("race_omb", ombCategory(col("race.ombCategory")))
-      .withColumn("ethnicity", ombCategory(col("ethnicity.ombCategory")))
-      .withColumn("race", when(col("race_omb").isNull && lower(col("race.text")) === "more than one race", upperFirstLetter(col("race.text"))).otherwise(col("race_omb")))
-    ),
-    Drop("identifier", "race_omb")
-  )
+      .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
+      .withColumn("age_at_recruitment", firstNonNull(transform(
+        filter(col("extension"),col => col("url") === SYS_AGE_AT_RECRUITMENT)("valueAge"),
+        col => struct(col("value") as "value", col("unit") as "unit")
+      )))
+      .withColumn("ethnicity",
+        firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === SYS_ETHNICITY_URL)("valueCodeableConcept"))("coding"))("code")
+      )
+      .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
 
-  val researchSubjectMappings: List[Transformation] = List(
-    Custom(_
-      .select("fhir_id", "release_id", "identifier", "study_id")
-      .withColumn("external_id", filter(col("identifier"), c => c("system").isNull)(0)("value"))
-      .withColumn("participant_id", officialIdentifier)
     ),
-    Drop("identifier")
+    Drop("identifier", "extension")
   )
-
-  val age_at_bio_collection_on_set_intervals = Seq((0, 5), (5, 10), (10, 20), (20, 30), (30, 40), (40, 50), (50, 60), (60, 70), (70, 80))
 
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
@@ -46,7 +34,7 @@ object Transformations {
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
       //todo fix value or age (in bytes)
-      .withColumn("age_biospecimen_collection", extractValueAge(col("extension")).cast("struct<value:long,unit:string>"))
+      .withColumn("age_biospecimen_collection", extractValueAge("https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
     Drop("type", "extension", "identifier")
@@ -63,22 +51,6 @@ object Transformations {
       .withColumn("parent", firstNonNull(transform(col("parent"),  col => regexp_extract(col("reference"), specimenExtract, 1))))
     },
     Drop("identifier", "type")
-  )
-
-  val observationVitalStatusMappings: List[Transformation] = List(
-    Custom(_
-      .select("fhir_id", "release_id", "subject", "valueCodeableConcept", "identifier", "_effectiveDateTime", "study_id")
-      .withColumn("participant_fhir_id", extractReferenceId(col("subject")("reference")))
-      .withColumn("vital_status", col("valueCodeableConcept")("text"))
-      .withColumn("observation_id", officialIdentifier)
-      .withColumn("age_at_event_days", struct(
-        col("_effectiveDateTime")("effectiveDateTime")("offset")("value") as "value",
-        col("_effectiveDateTime")("effectiveDateTime")("offset")("unit") as "units",
-        extractFirstForSystem(col("_effectiveDateTime")("effectiveDateTime")("event")("coding"), Seq("http://snomed.info/sct"))("display") as "from"
-      ))
-      // TODO external_id
-    ),
-    Drop("subject", "valueCodeableConcept", "identifier", "_effectiveDateTime", "parent_0")
   )
 
   val observationFamilyRelationshipMappings: List[Transformation] = List(
@@ -118,15 +90,6 @@ object Transformations {
       .withColumn("cqdg_participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
     ),
     Drop("code", "valueCodeableConcept", "subject")
-  )
-
-  val organizationMappings: List[Transformation] = List(
-    Custom(_
-      .select("fhir_id", "release_id", "study_id", "identifier", "name")
-      .withColumn("organization_id", officialIdentifier)
-      .withColumn("institution", col("name"))
-    ),
-    Drop("identifier", "name")
   )
 
 
@@ -214,15 +177,12 @@ object Transformations {
     "patient" -> patientMappings,
     "biospecimen" -> biospecimenMappings,
     "sample_registration" -> sampleRegistrationMappings,
-    "vital_status" -> observationVitalStatusMappings,
     "family_relationship" -> observationFamilyRelationshipMappings,
     "phenotype" -> conditionPhenotypeMappings,
     "diagnosis" -> conditionDiagnosisMappings,
-    "research_subject" -> researchSubjectMappings,
     "research_study" -> researchstudyMappings,
     "group" -> groupMappings,
     "document_reference" -> documentreferenceMappings,
-    "organization" -> organizationMappings
   )
 
 }

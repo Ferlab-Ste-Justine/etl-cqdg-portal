@@ -383,6 +383,108 @@
       "default": []
     },
     {
+      "name": "extension",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Extension",
+          "doc": "An Extension",
+          "namespace": "bio.ferlab.fhir",
+          "fields": [
+            {
+              "name": "url",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            },
+            {
+              "name":"valueAge",
+              "type":{
+                "type":"record",
+                "name":"Age",
+                "doc":"A duration of time during which an organism (or a process) has existed.",
+                "namespace":"bio.ferlab.fhir",
+                "fields":[
+                  {
+                    "name":"id",
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  },
+                  {
+                    "name":"value",
+                    "type":[
+                      "null",
+                      {
+                        "type":"bytes",
+                        "logicalType":"decimal",
+                        "precision":18,
+                        "scale":0
+                      }
+                    ],
+                    "default":null
+                  },
+                  {
+                    "name":"comparator",
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  },
+                  {
+                    "name":"unit",
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  },
+                  {
+                    "name":"system",
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  },
+                  {
+                    "name":"code",
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  }
+                ],
+                "default":{
+
+                }
+              },
+              "default":{
+
+              }
+            },
+            {
+              "type":"bio.ferlab.fhir.CodeableConcept",
+              "name":"valueCodeableConcept",
+              "default":{
+
+              }
+            }
+          ],
+          "default": {}
+        },
+        "default": []
+      },
+      "default": []
+    },
+    {
       "name": "active",
       "type": [
         "null",

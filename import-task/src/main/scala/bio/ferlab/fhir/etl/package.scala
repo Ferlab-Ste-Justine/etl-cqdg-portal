@@ -14,7 +14,8 @@ package object etl {
   //Patient
   val SYS_DATASERVICE_URL = Seq(s"$SYSTEM_URL_KF/participants", s"$SYSTEM_URL_INCLUDE/patient")
   val SYS_US_CORE_RACE_URL = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
-  val SYS_US_CORE_ETHNICITY_URL = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity"
+  val SYS_AGE_AT_RECRUITMENT = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment"
+  val SYS_ETHNICITY_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/Ethnicity"
 
   //Observation
   //TODO same for include and KF?
