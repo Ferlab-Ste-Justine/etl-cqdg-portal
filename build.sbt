@@ -41,3 +41,4 @@ val commonSettings = Seq(
 lazy val config = project in file("config")
 lazy val fhavro_export = project in file("fhavro-export")
 lazy val import_task = (project in file("import-task")).settings(commonSettings ++ sparkDepsSetting)
+lazy val prepare_index = (project in file("prepare-index")).settings(commonSettings ++ sparkDepsSetting)
