@@ -620,6 +620,44 @@
                     "default":null
                   },
                   {
+                    "name": "extension",
+                    "type": {
+                      "type": "array",
+                      "items": {
+                        "type": "record",
+                        "name": "DocumentReference.extension",
+                        "doc": "An Extension",
+                        "namespace": "bio.ferlab.fhir",
+                        "fields": [
+                          {
+                            "name": "url",
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "default": null
+                          },
+                          {
+                            "name": "valueDecimal",
+                            "type": [
+                              "null",
+                              {
+                                "type": "bytes",
+                                "logicalType": "decimal",
+                                "precision": 18,
+                                "scale": 0
+                              }
+                            ],
+                            "default": null
+                          }
+                        ],
+                        "default": {}
+                      },
+                      "default": []
+                    },
+                    "default": []
+                  },
+                  {
                     "name":"contentType",
                     "type":[
                       "null",

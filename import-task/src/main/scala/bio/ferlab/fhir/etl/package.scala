@@ -17,6 +17,9 @@ package object etl {
   val SYS_AGE_AT_RECRUITMENT = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment"
   val SYS_ETHNICITY_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/Ethnicity"
 
+  //DocumentReference
+  val DOCUMENT_SIZE = "https://fhir.cqdg.ferlab.bio/StructureDefinition/full-size"
+
   //Observation
   //TODO same for include and KF?
   val ROLE_CODE_URL = Seq("http://terminology.hl7.org/CodeSystem")
@@ -28,5 +31,7 @@ package object etl {
   val SYS_DATA_CATEGORIES = "https://includedcc.org/fhir/code-systems/data_categories"
   val SYS_PROGRAMS = "https://includedcc.org/fhir/code-systems/programs"
   val SYS_DATA_ACCESS_TYPES = "https://includedcc.org/fhir/code-systems/data_access_types"
+  val DOCUMENT_DATA_TYPE = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
+  val DOCUMENT_DATA_CATEGORY = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
 
 }

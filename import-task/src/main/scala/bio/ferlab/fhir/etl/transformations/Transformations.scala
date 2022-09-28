@@ -56,7 +56,7 @@ object Transformations {
   val observationFamilyRelationshipMappings: List[Transformation] = List(
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
-      .where(col("code")("coding")(0)("code") === "FAMM")
+      .where(col("code")("coding")(0)("code") === "Family Relationship")
       .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("focus", firstNonNull(transform(col("focus"),  col => regexp_extract(col("reference"), patientExtract, 1))))
       .withColumn("relationship_to_proband", firstNonNull(transform(col("valueCodeableConcept")("coding"), col => col("code"))))
@@ -82,7 +82,7 @@ object Transformations {
   val conditionPhenotypeMappings: List[Transformation] = List(
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject")
-      .where(col("code")("coding")(0)("code") === "PHEN")
+      .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("phenotype_source_text", col("code")("text"))
       .withColumn("phenotype_HPO_code",
          firstNonNull(transform(col("valueCodeableConcept")("coding"), col => struct(col("system") as "system", col("code") as "code")))
@@ -106,60 +106,45 @@ object Transformations {
       .withColumn("access_limitations",
         extractValueCodeableConcept(ACCESS_LIMITATIONS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
       )
-      .withColumn("access_requirements",
-        extractValueCodeableConcept(ACCESS_REQUIREMENTS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
-      )
+      //      .withColumn("access_limitations",
+      //        extractValueCodeableConcept(ACCESS_LIMITATIONS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
+      //      )
+      //      .withColumn("access_requirements",
+      //        extractValueCodeableConcept(ACCESS_REQUIREMENTS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
+      //      )
     ),
-    Drop("extension")
+    Drop()
+    //    Drop("extension")
   )
 
   val documentreferenceMappings: List[Transformation] = List(
     Custom { input =>
+      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id")
       val df = input
-        .select("fhir_id", "study_id", "release_id", "category", "securityLabel", "content", "type", "identifier", "subject", "context", "docStatus", "relatesTo")
-        .withColumn("access_urls", col("content")("attachment")("url")(0))
-        .withColumn("acl", extractAclFromList(col("securityLabel")("text"), col("study_id")))
-        .withColumn("controlled_access", firstSystemEquals(flatten(col("securityLabel.coding")), SYS_DATA_ACCESS_TYPES)("display"))
-        .withColumn("data_type", firstSystemEquals(col("type")("coding"), SYS_DATA_TYPES)("display"))
-        .withColumn("data_category", firstSystemEquals(flatten(col("category")("coding")), SYS_DATA_CATEGORIES)("display"))
-        .withColumn("experiment_strategy", firstSystemEquals(flatten(col("category")("coding")), SYS_EXP_STRATEGY)("display"))
-        .withColumn("external_id", col("content")(0)("attachment")("url"))
-        .withColumn("file_format", firstNonNull(col("content")("format")("display")))
-        .withColumn("file_name", sanitizeFilename(firstNonNull(col("content")("attachment")("title"))))
-        .withColumn("file_id", officialIdentifier)
-        .withColumn("hashes", extractHashes(col("content")(0)("attachment")("hashes")))
-        .withColumn("is_harmonized", retrieveIsHarmonized(col("content")(0)("attachment")("url")))
-        .withColumn("latest_did", split(col("content")("attachment")("url")(0), "\\/\\/")(2))
-        .withColumn("repository", retrieveRepository(col("content")("attachment")("url")(0)))
-        .withColumn("size", retrieveSize(col("content")(0)("attachment")("fileSize")))
-        .withColumn("urls", col("content")(0)("attachment")("url"))
-        .withColumn("participant_fhir_id", extractReferenceId(col("subject")("reference")))
-        .withColumn("specimen_fhir_ids", extractReferencesId(col("context")("related")("reference")))
-        .withColumnRenamed("docStatus", "status")
-        .withColumn("relate_to", extractReferencesId(col("relatesTo.target.reference"))(0))
-
-      val indexes = df.as("index").where(col("file_format").isin("crai", "tbi", "bai"))
-      val files = df.as("file").where(not(col("file_format").isin("crai", "tbi", "bai")))
-
-      files
-        .join(indexes, col("index.relate_to") === col("file.fhir_id"), "left_outer")
-        .select(
-          col("file.*"),
-          when(
-            col("index.relate_to").isNull, lit(null)
-          )
-            .otherwise(
-              struct(col("index.fhir_id") as "fhir_id", col("index.file_name") as "file_name",
-                col("index.file_id") as "file_id", col("index.hashes") as "hashes",
-                col("index.urls") as "urls", col("index.file_format") as "file_format",
-                col("index.size") as "size"
-              )
-            ) as "index"
+        .select(columns.head, columns.tail: _*)
+        .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
+        .withColumn("biospecimen_reference", regexp_extract(col("context")("related")(0)("reference"), specimenExtract, 1))
+        .withColumn("data_type", filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)("code"))
+        .withColumn("data_category", filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)("code"))
+        .withColumn("content_exp", explode(col("content")))
+        .withColumn("file_size", firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE))("valueDecimal"))
+        .withColumn("ferload_url", col("content_exp")("attachment")("url"))
+        .withColumn("file_name", col("content_exp")("attachment")("title"))
+        .withColumn("file_format", col("content_exp")("format")("code"))
+        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category"): _*)
+        .agg(
+          collect_list(
+            struct(
+              col("file_name"),
+              col("file_format"),
+              col("file_size"),
+              col("ferload_url"),
+            )
+          ) as "files",
         )
-
-    }
-    ,
-    Drop("securityLabel", "content", "type", "identifier", "subject", "context", "relates_to", "relate_to")
+      df
+    },
+    Drop("id", "type", "category", "subject", "content", "context")
   )
 
   val groupMappings: List[Transformation] = List(

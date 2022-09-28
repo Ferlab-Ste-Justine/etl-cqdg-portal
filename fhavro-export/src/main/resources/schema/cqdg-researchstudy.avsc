@@ -195,6 +195,11 @@
                 "default": {}
               },
               "default": {}
+            },
+            {
+              "type": "bio.ferlab.fhir.Coding",
+              "name": "valueCoding",
+              "default": {}
             }
           ],
           "default": {}

@@ -65,6 +65,11 @@ object Utils {
         .find(c => c._1.getOrElse("") == "https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")
         .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
 
+  val extactByURL: UserDefinedFunction =
+    udf((arr: Seq[(Option[String], Option[ValueAge])]) => arr
+      .find(c => c._1.getOrElse("") == "https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")
+      .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
+
   val extractKeywords: UserDefinedFunction =
     udf(
       (arr: Seq[(Option[String], Seq[Coding], Option[String])])
@@ -83,10 +88,6 @@ object Utils {
 
   val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
 
-  val extractStudyVersion: UserDefinedFunction = udf((s: Option[String]) => s.map(_.split('.').tail.mkString(".")))
-
-  val extractStudyExternalId: UserDefinedFunction = udf((s: Option[String]) => s.map(_.split('.').head))
-
   val sanitizeFilename: Column => Column = fileName => slice(split(fileName, "/"), -1, 1)(0)
 
   val age_on_set: (Column, Seq[(Int, Int)]) => Column = (c, intervals) => {
@@ -95,10 +96,4 @@ object Utils {
       column.when(c >= low && c < high, s"$low - $high")
     }
   }
-
-  val upperFirstLetter: Column => Column = c => concat(upper(substring(c, 1, 1)), lower(substring(c, 2, 10000)))
-
-  val ignoredOmbCategoryCodes = Seq("UNK", "NAVU", "NI")
-
-  val ombCategory: Column => Column = c => when(c("code").isin(ignoredOmbCategoryCodes: _*), lit(null)).otherwise(c("display"))
 }
