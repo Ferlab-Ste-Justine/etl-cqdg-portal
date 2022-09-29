@@ -9,13 +9,15 @@ package object etl {
   //ResearchStudy
   val ACCESS_LIMITATIONS_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/limitation"
   val ACCESS_REQUIREMENTS_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/requirement"
+  val POPULATION_URL = "https://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/population"
   val SYS_NCBI_URL = "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin"
 
   //Patient
   val SYS_DATASERVICE_URL = Seq(s"$SYSTEM_URL_KF/participants", s"$SYSTEM_URL_INCLUDE/patient")
   val SYS_US_CORE_RACE_URL = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race"
-  val SYS_AGE_AT_RECRUITMENT = "http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment"
-  val SYS_ETHNICITY_URL = "http://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/Ethnicity"
+  val SYS_AGE_AT_RECRUITMENT = "https://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment"
+  val SYS_ETHNICITY_URL = "https://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/Ethnicity"
+  val SYS_AGE_OF_DEATH_URL = "https://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/age-of-death"
 
   //DocumentReference
   val DOCUMENT_SIZE = "https://fhir.cqdg.ferlab.bio/StructureDefinition/full-size"

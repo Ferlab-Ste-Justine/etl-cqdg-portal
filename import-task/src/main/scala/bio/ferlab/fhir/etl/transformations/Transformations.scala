@@ -21,7 +21,8 @@ object Transformations {
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === SYS_ETHNICITY_URL)("valueCodeableConcept"))("coding"))("code")
       )
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
-
+      .withColumnRenamed("deceasedBoolean", "vital_status")
+      .withColumn("age_of_death", filter(col("extension"), col => col("url") === SYS_AGE_OF_DEATH_URL)(0)("valueAge")("value"))
     ),
     Drop("identifier", "extension")
   )
@@ -51,6 +52,13 @@ object Transformations {
       .withColumn("parent", firstNonNull(transform(col("parent"),  col => regexp_extract(col("reference"), specimenExtract, 1))))
     },
     Drop("identifier", "type")
+  )
+
+  val observationCauseOfDeathMappings: List[Transformation] = List(
+    Custom(_
+      .select("*")
+    ),
+    Drop()
   )
 
   val observationFamilyRelationshipMappings: List[Transformation] = List(
@@ -101,20 +109,13 @@ object Transformations {
         "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
       )
       .withColumn(
-        "category", transform(col("category"), col => struct(col("coding")(0)("system") as "system", col("coding")(0)("code") as "code"))
+        "domain", transform(col("category"), col => struct(col("coding")(0)("system") as "system", col("coding")(0)("code") as "code"))
       )
-      .withColumn("access_limitations",
-        extractValueCodeableConcept(ACCESS_LIMITATIONS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
-      )
-      //      .withColumn("access_limitations",
-      //        extractValueCodeableConcept(ACCESS_LIMITATIONS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
-      //      )
-      //      .withColumn("access_requirements",
-      //        extractValueCodeableConcept(ACCESS_REQUIREMENTS_URL)(col("extension")).cast("array<struct<code:string,system:string>>")
-      //      )
+      .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_URL)(0)("valueCodeableConcept")("coding")("code"))
+      .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_URL)(0)("valueCodeableConcept")("coding")("code"))
+      .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_URL)(0)("valueCoding")("code"))
     ),
-    Drop()
-    //    Drop("extension")
+    Drop("extension")
   )
 
   val documentreferenceMappings: List[Transformation] = List(
@@ -168,6 +169,7 @@ object Transformations {
     "research_study" -> researchstudyMappings,
     "group" -> groupMappings,
     "document_reference" -> documentreferenceMappings,
+    "cause_of_death" -> observationCauseOfDeathMappings,
   )
 
 }

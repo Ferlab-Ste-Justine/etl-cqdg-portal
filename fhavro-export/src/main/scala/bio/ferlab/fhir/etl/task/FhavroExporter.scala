@@ -9,7 +9,7 @@ import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
-import org.hl7.fhir.r4.model.{Bundle, DomainResource, Patient, ResearchStudy}
+import org.hl7.fhir.r4.model.{Bundle, DomainResource, Observation, Patient, ResearchStudy}
 import org.slf4j.{Logger, LoggerFactory}
 import software.amazon.awssdk.services.s3.S3Client
 
@@ -33,7 +33,6 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String)(imp
       .returnBundle(classOf[Bundle])
 
     val bundleEnriched = request.`type` match {
-      case "ResearchStudy" => bundle.where(ResearchStudy.IDENTIFIER.exactly().identifier(studyId))
       case "Organization" => bundle
       case _ => bundle.withTag(null, s"study:$studyId")
     }
