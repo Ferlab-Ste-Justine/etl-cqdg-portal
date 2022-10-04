@@ -56,9 +56,32 @@ object Transformations {
 
   val observationCauseOfDeathMappings: List[Transformation] = List(
     Custom(_
-      .select("*")
+      .select("study_id", "release_id", "fhir_id", "code", "subject")
+      .filter(array_contains(col("code")("coding")("system"),"https://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death"))
+      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("cause_of_death", col("code")("coding")("code")(0))
     ),
-    Drop()
+    Drop("code")
+  )
+
+  val observationDiseaseStatus: List[Transformation] = List(
+    Custom(_
+      .select("study_id", "release_id", "fhir_id", "code", "subject", "valueCodeableConcept")
+      .filter(array_contains(col("code")("coding")("code"),"Disease Status"))
+      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("disease_status", col("valueCodeableConcept")("coding")("code")(0))
+    ),
+    Drop("code", "valueCodeableConcept")
+  )
+
+  val observationTumorNormalDesignation: List[Transformation] = List(
+    Custom(_
+      .select("study_id", "release_id", "fhir_id", "code", "subject", "valueCodeableConcept")
+      .filter(array_contains(col("code")("coding")("code"),"Tumor Normal Designation"))
+      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("tumor_normal_designation", col("valueCodeableConcept")("coding")("code")(0))
+    ),
+    Drop("code", "valueCodeableConcept")
   )
 
   val observationFamilyRelationshipMappings: List[Transformation] = List(
@@ -87,17 +110,25 @@ object Transformations {
     Drop("identifier", "code", "onsetAge")
   )
 
-  val conditionPhenotypeMappings: List[Transformation] = List(
+  val conditionAgeAtPhenotype: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject")
+      .select("*")
+    ),
+    Drop()
+  )
+
+  val observationPhenotypeMappings: List[Transformation] = List(
+    Custom(_
+      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation")
       .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("phenotype_source_text", col("code")("text"))
       .withColumn("phenotype_HPO_code",
          firstNonNull(transform(col("valueCodeableConcept")("coding"), col => struct(col("system") as "system", col("code") as "code")))
       )
       .withColumn("cqdg_participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("phenotype_observed", col("interpretation")(0)("coding")(0)("code"))
     ),
-    Drop("code", "valueCodeableConcept", "subject")
+    Drop("code", "valueCodeableConcept", "subject", "interpretation")
   )
 
 
@@ -163,13 +194,16 @@ object Transformations {
     "patient" -> patientMappings,
     "biospecimen" -> biospecimenMappings,
     "sample_registration" -> sampleRegistrationMappings,
-    "family_relationship" -> observationFamilyRelationshipMappings,
-    "phenotype" -> conditionPhenotypeMappings,
-    "diagnosis" -> conditionDiagnosisMappings,
     "research_study" -> researchstudyMappings,
     "group" -> groupMappings,
     "document_reference" -> documentreferenceMappings,
+    "diagnosis" -> conditionDiagnosisMappings,
+    //todo "age_at_phenotype" -> conditionAgeAtPhenotype,
+    "phenotype" -> observationPhenotypeMappings,
+    "family_relationship" -> observationFamilyRelationshipMappings,
     "cause_of_death" -> observationCauseOfDeathMappings,
+    "disease_status" -> observationDiseaseStatus,
+    "tumor_normal_designation" -> observationTumorNormalDesignation,
   )
 
 }
