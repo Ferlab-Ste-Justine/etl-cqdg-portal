@@ -16,7 +16,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
   val normalized_drs_document_reference: DatasetConf = conf.getDataset("normalized_document_reference")
   val normalized_patient: DatasetConf = conf.getDataset("normalized_patient")
   val normalized_group: DatasetConf = conf.getDataset("normalized_group")
-  val normalized_specimen: DatasetConf = conf.getDataset("normalized_specimen")
+  val normalized_specimen: DatasetConf = conf.getDataset("normalized_biospecimen")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -32,33 +32,33 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val studyDF = data(normalized_researchstudy.id)
 
-    val countPatientDf = data(normalized_patient.id).groupBy("study_id").count().withColumnRenamed("count", "participant_count")
+    val countPatientDf = data(normalized_patient.id)//.groupBy("study_id").count().withColumnRenamed("count", "participant_count")
 //    val countFileDf = data(normalized_drs_document_reference.id).groupBy("study_id").count().withColumnRenamed("count", "file_count")
-    val countFamilyDf = data(normalized_group.id).groupBy("study_id").count().withColumnRenamed("count", "family_count")
+//    val countFamilyDf = data(normalized_group.id).groupBy("study_id").count().withColumnRenamed("count", "family_count")
 
-    val countFileDf = data(normalized_drs_document_reference.id).groupBy("study_id")
-      .agg( count(lit(1)) as "file_count",
-        collect_set(col("experiment_strategy")) as "experimental_strategy",
-        collect_set(col("data_category")) as "data_category",
-        collect_set(col("controlled_access")) as "controlled_access"
-    )
+//    val countFileDf = data(normalized_drs_document_reference.id).groupBy("study_id")
+//      .agg( count(lit(1)) as "file_count",
+//        collect_set(col("experiment_strategy")) as "experimental_strategy",
+//        collect_set(col("data_category")) as "data_category",
+//        collect_set(col("controlled_access")) as "controlled_access"
+//    )
 
-    val countBiospecimenDf = data(normalized_specimen.id)
-      .groupBy("study_id")
-      .agg(
-        count(lit(1)) as "biospecimen_count",
-      )
+//    val countBiospecimenDf = data(normalized_specimen.id)
+//      .groupBy("study_id")
+//      .agg(
+//        count(lit(1)) as "biospecimen_count",
+//      )
 
     val transformedStudyDf = studyDF
       .withColumnRenamed("name", "study_name")
-      .join(countPatientDf, Seq("study_id"), "left_outer")
-      .withColumn("participant_count", coalesce(col("participant_count"), lit(0)))
-      .join(countFileDf, Seq("study_id"), "left_outer")
-      .join(countBiospecimenDf, Seq("study_id"), "left_outer")
-      .withColumn("file_count", coalesce(col("file_count"), lit(0)))
-      .join(countFamilyDf, Seq("study_id"), "left_outer")
-      .withColumn("family_count", coalesce(col("family_count"), lit(0)))
-      .withColumn("family_data", col("family_count").gt(0))
+//      .join(countPatientDf, Seq("study_id"), "left_outer")
+//      .withColumn("participant_count", coalesce(col("participant_count"), lit(0)))
+//      .join(countFileDf, Seq("study_id"), "left_outer")
+//      .join(countBiospecimenDf, Seq("study_id"), "left_outer")
+//      .withColumn("file_count", coalesce(col("file_count"), lit(0)))
+//      .join(countFamilyDf, Seq("study_id"), "left_outer")
+//      .withColumn("family_count", coalesce(col("family_count"), lit(0)))
+//      .withColumn("family_data", col("family_count").gt(0))
 
     Map(mainDestination.id -> transformedStudyDf)
   }

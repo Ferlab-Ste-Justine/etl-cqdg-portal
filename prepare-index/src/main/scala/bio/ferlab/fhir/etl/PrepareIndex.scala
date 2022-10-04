@@ -15,7 +15,9 @@ object PrepareIndex extends SparkApp {
   val studyList = studyIds.split(",").toList
 
   jobName match {
-    case "study_centric" => new StudyCentric(releaseId, studyList).run()
+    case "study_centric" =>
+//      new SimpleParticipant(releaseId, studyList).run()
+      new StudyCentric(releaseId, studyList).run()
     case "participant_centric" =>
       new StudyCentric(releaseId, studyList).run()
       new SimpleParticipant(releaseId, studyList).run()

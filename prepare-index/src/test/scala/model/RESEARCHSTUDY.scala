@@ -1,15 +1,23 @@
 package model
 
 case class RESEARCHSTUDY(
-                          `fhir_id`: String = "42776",
-                          `name`: String = "Kids First: Genomic Analysis of Congenital Heart Defects and Acute Lymphoblastic Leukemia in Children with Down Syndrome",
+                          `fhir_id`: String = "STU0000001",
+                          `keyword`: Seq[String] = Seq("genomics", "chronic conditions", "population-based cohort", "survey data"),
+                          `description`: String = "CARTaGENE",
+                          `contact`: CONTACT = CONTACT(),
                           `status`: String = "completed",
-                          `attribution`: String = "phs002330.v1.p1",
-                          `external_id`: String = "phs002330",
-                          `version`: String = "v1.p1",
-                          `investigator_id`: String = "123456",
-                          `study_code`: String = "KF-CHDALL",
-                          `program`: String = "Kids First",
-                          `study_id`: String = "SD_Z6MWD3H0",
-                          `release_id`: String = "re_000001"
+                          `title`: String = "CARTaGENE",
+                          `domain`: Seq[DOMAIN] = Nil,
+                          `access_limitations`: Seq[String] = Seq("DUO:0000005"),
+                          `access_requirements`: Seq[String] = Seq("DUO:0000019", "DUO:0000021"),
                         )
+
+case class CONTACT(
+                    `type`: String = "url",
+                    `value`: String = "https://sdas.cartagene.qc.ca",
+                  )
+
+case class DOMAIN(
+                   `system`: String = "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain",
+                   `code`: String = "General health",
+                 )

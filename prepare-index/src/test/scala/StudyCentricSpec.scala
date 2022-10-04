@@ -9,21 +9,25 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-include.conf")
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-cqdg.conf")
 
   "transform" should "prepare index study_centric" in {
     val data: Map[String, DataFrame] = Map(
       "normalized_research_study" -> Seq(RESEARCHSTUDY()).toDF(),
-      "normalized_patient" -> Seq(PATIENT(), PATIENT()).toDF(),
-      "normalized_document_reference" -> Seq(DOCUMENTREFERENCE(), DOCUMENTREFERENCE(), DOCUMENTREFERENCE()).toDF(),
-      "normalized_group" -> Seq(GROUP(), GROUP()).toDF(),
-      "normalized_specimen" -> Seq(
-        BIOSPECIMEN(fhir_id = "1", `specimen_id` = "id1"),
-        BIOSPECIMEN(fhir_id = "2", `specimen_id` = "id2")
-      ).toDF()
+      "normalized_patient" -> Seq(
+        PATIENT(),
+        PATIENT( `fhir_id` = "PRT0000002",`gender` = "male", `age_at_recruitment` = AGE_AT_RECRUITMENT("215640979761"), `submitter_participant_id` = "35849419216"),
+        PATIENT( `fhir_id` = "PRT0000003",`gender` = "male", `age_at_recruitment` = AGE_AT_RECRUITMENT("215557091632"), `ethnicity` = "aboriginal" ,`submitter_participant_id` = "35849430470", `age_of_death` = "3223600")
+      ).toDF(),
+//      "normalized_document_reference" -> Seq(DOCUMENTREFERENCE(), DOCUMENTREFERENCE(), DOCUMENTREFERENCE()).toDF(),
+//      "normalized_group" -> Seq(GROUP(), GROUP()).toDF(),
+//      "normalized_specimen" -> Seq(
+//        BIOSPECIMEN(fhir_id = "1", `specimen_id` = "id1"),
+//        BIOSPECIMEN(fhir_id = "2", `specimen_id` = "id2")
+//      ).toDF()
     )
 
-    val output = new StudyCentric("re_000001", List("SD_Z6MWD3H0"))(conf).transform(data)
+    val output = new StudyCentric("5", List("STU0000001"))(conf).transform(data)
 
     output.keys should contain("es_index_study_centric")
 

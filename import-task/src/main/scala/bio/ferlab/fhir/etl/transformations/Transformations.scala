@@ -146,7 +146,7 @@ object Transformations {
       .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_URL)(0)("valueCodeableConcept")("coding")("code"))
       .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_URL)(0)("valueCoding")("code"))
     ),
-    Drop("extension")
+    Drop("extension", "category")
   )
 
   val documentreferenceMappings: List[Transformation] = List(

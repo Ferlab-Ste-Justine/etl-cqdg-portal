@@ -1,12 +1,18 @@
 package model
 
 case class PATIENT(
-                    `fhir_id`: String = "38734",
-                    `gender`: String = "male",
-                    `ethnicity`: String = "Not Reported",
-                    `race`: String = "Not Reported",
-                    `external_id`: String = "PAVKKD",
-                    `participant_id`: String = "PT_48DYT4PP",
-                    `study_id`: String = "SD_Z6MWD3H0",
-                    `release_id`: String = "re_000001"
+                    `fhir_id`: String = "PRT0000001",
+                    `study_id`: String = "STU0000001",
+                    `release_id`: String = "5",
+                    `gender`: String = "female",
+                    `vital_status`: Boolean = false,
+                    `age_at_recruitment`: AGE_AT_RECRUITMENT = AGE_AT_RECRUITMENT(),
+                    `ethnicity`: String = "french canadian",
+                    `submitter_participant_id`: String = "35849409716",
+                    `age_of_death`: String = null,
                   )
+
+case class AGE_AT_RECRUITMENT(
+                               `value`: String = "215574198069",
+                               `unit`: String = "days",
+                             )

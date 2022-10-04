@@ -85,10 +85,10 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   "addFamily" should "add families to patients" in {
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "MTH", `participant_id` = "P2"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P3"),
-      PATIENT(`fhir_id` = "44", `participant_id` = "P4")
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "MTH", `submitter_participant_id` = "P2"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P3"),
+      PATIENT(`fhir_id` = "44", `submitter_participant_id` = "P4")
 
     ).toDF()
 
@@ -133,8 +133,8 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "return duo" in {
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P2"),
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P2"),
 
     ).toDF()
 
@@ -156,9 +156,9 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "return duo+" in {
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P2"),
-      PATIENT(`fhir_id` = "SON2", `participant_id` = "P3")
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P2"),
+      PATIENT(`fhir_id` = "SON2", `submitter_participant_id` = "P3")
 
     ).toDF()
 
@@ -184,9 +184,9 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   it should "return duo+ if there is not a participant with a mother and a father" in {
     //Grand=Father -> Father -> Son = duo+
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "GFTH", `participant_id` = "P2"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P3")
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "GFTH", `submitter_participant_id` = "P2"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P3")
 
     ).toDF()
 
@@ -211,9 +211,9 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "return trio" in {
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "MTH", `participant_id` = "P2"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P3")
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "MTH", `submitter_participant_id` = "P2"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P3")
 
     ).toDF()
 
@@ -238,10 +238,10 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "return trio+" in {
     val inputPatients = Seq(
-      PATIENT(`fhir_id` = "FTH", `participant_id` = "P1"),
-      PATIENT(`fhir_id` = "MTH", `participant_id` = "P2"),
-      PATIENT(`fhir_id` = "SON", `participant_id` = "P3"),
-      PATIENT(`fhir_id` = "SON2", `participant_id` = "P4")
+      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
+      PATIENT(`fhir_id` = "MTH", `submitter_participant_id` = "P2"),
+      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P3"),
+      PATIENT(`fhir_id` = "SON2", `submitter_participant_id` = "P4")
 
     ).toDF()
 
@@ -273,8 +273,8 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   "addDiagnosisPhenotypes" should "group phenotypes by observed or non-observed" in {
 
     val inputParticipants = Seq(
-      PATIENT(participant_id = "A", fhir_id = "A"),
-      PATIENT(participant_id = "B", fhir_id = "B")
+      PATIENT(submitter_participant_id = "A", fhir_id = "A"),
+      PATIENT(submitter_participant_id = "B", fhir_id = "B")
     ).toDF()
 
     val inputPhenotypes = Seq(
@@ -298,8 +298,8 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "map diseases to participants" in {
     val inputParticipants = Seq(
-      PATIENT(participant_id = "A", fhir_id = "A"),
-      PATIENT(participant_id = "B", fhir_id = "B")
+      PATIENT(submitter_participant_id = "A", fhir_id = "A"),
+      PATIENT(submitter_participant_id = "B", fhir_id = "B")
     ).toDF()
 
     val inputPhenotypes = Seq.empty[CONDITION_PHENOTYPE].toDF()
@@ -328,7 +328,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "generate observed_phenotypes and non_observed_phenotypes" in {
     val inputParticipants = Seq(
-      PATIENT(participant_id = "A", fhir_id = "A")
+      PATIENT(submitter_participant_id = "A", fhir_id = "A")
     ).toDF()
 
     val inputPhenotypes = Seq(
@@ -373,7 +373,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   it should "group diagnosis by age at event days" in {
     val inputParticipants = Seq(
-      PATIENT(participant_id = "A", fhir_id = "A")
+      PATIENT(submitter_participant_id = "A", fhir_id = "A")
     ).toDF()
 
     val inputPhenotypes = Seq.empty[CONDITION_PHENOTYPE].toDF()
