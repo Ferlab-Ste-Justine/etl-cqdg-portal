@@ -7,17 +7,14 @@ case class RESEARCHSTUDY(
                           `contact`: CONTACT = CONTACT(),
                           `status`: String = "completed",
                           `title`: String = "CARTaGENE",
-                          `domain`: Seq[DOMAIN] = Nil,
+                          `domain`: Seq[String] = Seq("Cancer"),
                           `access_limitations`: Seq[String] = Seq("DUO:0000005"),
                           `access_requirements`: Seq[String] = Seq("DUO:0000019", "DUO:0000021"),
+                          `population`: String = "Adult",
+                          `study_version`: String = "1",
                         )
 
 case class CONTACT(
                     `type`: String = "url",
                     `value`: String = "https://sdas.cartagene.qc.ca",
                   )
-
-case class DOMAIN(
-                   `system`: String = "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain",
-                   `code`: String = "General health",
-                 )

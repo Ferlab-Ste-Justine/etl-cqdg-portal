@@ -134,19 +134,19 @@ object Transformations {
 
   val researchstudyMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "keyword", "release_id", "study_id", "description", "contact", "category", "status", "title", "extension")
+      .select("fhir_id", "keyword", "release_id", "study_id", "description", "contact", "category", "status", "title", "extension", "meta")
       .withColumn("keyword", extractKeywords(col("keyword")))
       .withColumn(
         "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
       )
-      .withColumn(
-        "domain", transform(col("category"), col => struct(col("coding")(0)("system") as "system", col("coding")(0)("code") as "code"))
-      )
+      .withColumn("domain", col("category")("coding")(0)("code"))
+
       .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_URL)(0)("valueCodeableConcept")("coding")("code"))
       .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_URL)(0)("valueCodeableConcept")("coding")("code"))
       .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_URL)(0)("valueCoding")("code"))
+      .withColumn("study_version", regexp_extract(filter(col("meta")("tag"), col => col("code").contains("study_version"))(0)("code"), versionExtract, 1))
     ),
-    Drop("extension", "category")
+    Drop("extension", "category", "meta")
   )
 
   val documentreferenceMappings: List[Transformation] = List(
