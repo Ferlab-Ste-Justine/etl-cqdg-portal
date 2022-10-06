@@ -15,7 +15,7 @@ object Transformations {
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
       .withColumn("age_at_recruitment", firstNonNull(transform(
         filter(col("extension"),col => col("url") === SYS_AGE_AT_RECRUITMENT)("valueAge"),
-        col => struct(col("value") as "value", col("unit") as "unit")
+        col => col("value")
       )))
       .withColumn("ethnicity",
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === SYS_ETHNICITY_URL)("valueCodeableConcept"))("coding"))("code")
@@ -58,10 +58,10 @@ object Transformations {
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "subject")
       .filter(array_contains(col("code")("coding")("system"),"https://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death"))
-      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("submitter_participant_ids", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("cause_of_death", col("code")("coding")("code")(0))
     ),
-    Drop("code")
+    Drop("code", "subject")
   )
 
   val observationDiseaseStatus: List[Transformation] = List(
@@ -87,13 +87,14 @@ object Transformations {
   val observationFamilyRelationshipMappings: List[Transformation] = List(
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
+      .withColumnRenamed("fhir_id", "internal_family_relationship_id")
       .where(col("code")("coding")(0)("code") === "Family Relationship")
-      .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("focus", firstNonNull(transform(col("focus"),  col => regexp_extract(col("reference"), patientExtract, 1))))
+      .withColumn("submitter_participant_id",  regexp_extract(col("subject")("reference"), patientExtract, 1))
+      .withColumn("focus_participant_id", firstNonNull(transform(col("focus"),  col => regexp_extract(col("reference"), patientExtract, 1))))
       .withColumn("relationship_to_proband", firstNonNull(transform(col("valueCodeableConcept")("coding"), col => col("code"))))
       .withColumn("category", col("category")(0)("coding")(0)("code"))
     ),
-    Drop("code", "valueCodeableConcept")
+    Drop("code", "valueCodeableConcept", "subject", "focus")
   )
 
   val conditionDiagnosisMappings: List[Transformation] = List(
@@ -182,6 +183,7 @@ object Transformations {
   val groupMappings: List[Transformation] = List(
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "member", "identifier")
+      .withColumnRenamed("fhir_id", "internal_family_id")
       .withColumn("family_type", firstNonNull(transform(col("code")("coding"), col => col("code"))))
       .withColumn("family_members", transform(col("member"), col => regexp_extract(col("entity")("reference"), patientExtract, 1)))
       .withColumn("submitter_family_id", col("identifier")(0)("value"))

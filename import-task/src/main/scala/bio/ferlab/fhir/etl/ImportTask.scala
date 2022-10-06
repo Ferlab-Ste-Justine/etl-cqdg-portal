@@ -18,6 +18,6 @@ object ImportTask extends SparkApp {
     .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, releaseId, studyList) }
 
 //    jobs.map(_.extract()).foreach(e => e.foreach(r => r._2.show(false)))
-    jobs.foreach(_.run().foreach(e => e._2.printSchema()))
+//    jobs.foreach(_.run().foreach(e => e._2.printSchema()))
     jobs.foreach(_.run().foreach(e => e._2.show(false)))
 }

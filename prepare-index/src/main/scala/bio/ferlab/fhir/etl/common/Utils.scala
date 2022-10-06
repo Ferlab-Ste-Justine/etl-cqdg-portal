@@ -154,6 +154,31 @@ object Utils {
 
     }
 
+    def addGroup(group: DataFrame): DataFrame = {
+      val explodedGroupDf = group
+        .withColumn("family_member", explode(col("family_members")))
+        .drop("study_id", "release_id")
+
+      df
+        .join(explodedGroupDf, col("family_member") === col("submitter_participant_id"), "left_outer")
+        .select("internal_family_id", "submitter_family_id", "submitter_participant_id", "focus_participant_id", "relationship_to_proband", "family_type")
+    }
+
+    def addFamilyRelationshipToParticipant(familyRelationship: DataFrame): DataFrame = {
+
+      val groupedFamilyDf = familyRelationship
+      .withColumn("family_relationship", struct(familyRelationship.columns.map(col): _*))
+        .groupBy("submitter_family_id")
+        .agg(
+          collect_list(col("submitter_participant_id")) as "submitter_participant_ids",
+          collect_list(col("family_relationship")) as "family_relationships"
+        )
+        .withColumn("submitter_participant_ids", explode(col("submitter_participant_ids")))
+        .drop("submitter_family_id")
+
+      df.join(groupedFamilyDf, groupedFamilyDf.col("submitter_participant_ids") === df.col("fhir_id"), "left_outer")
+    }
+
     def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame): DataFrame = {
       val biospecimenDfReformat = reformatBiospecimen(biospecimensDf)
 
