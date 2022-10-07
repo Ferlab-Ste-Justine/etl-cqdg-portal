@@ -15,6 +15,8 @@ object Utils {
   val documentReferenceExtract = "^DocumentReference\\/([0-9]+)$"
   val specimenExtract = "^Specimen\\/([A-Za-z0-9]+)$"
   val patientExtract = "^Patient\\/([A-Za-z0-9]+)$"
+  val organizationExtract = "^Organization\\/([A-Za-z0-9]+)$"
+  val documentExtract = "^DocumentReference\\/([A-Za-z0-9]+)$"
   val versionExtract = "^study_version:(.+)$"
   val phenotypeExtract = "^[A-Z]{2,}.[0-9]+$"
 

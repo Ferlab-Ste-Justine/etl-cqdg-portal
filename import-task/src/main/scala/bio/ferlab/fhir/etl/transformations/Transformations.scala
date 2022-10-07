@@ -27,6 +27,37 @@ object Transformations {
     Drop("identifier", "extension")
   )
 
+  val taskMappings: List[Transformation] = List(
+    Custom(_
+      .select("fhir_id", "study_id", "release_id", "output", "code", "for", "owner", "extension")
+      .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("code"))
+      .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT)(0))
+      .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW)(0))
+      .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
+      .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
+      .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
+      .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueString"))
+      .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
+      .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
+      .withColumn("experimental_strategy", transform(
+        filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy") , col => col("valueCoding")("code")
+      ))
+      .withColumn("sequencer_id", filter(col("seq_exp")("extension"), col => col("url") === "sequencerId")(0)("valueString"))
+      .withColumn("workflow_name", filter(col("workflow")("extension"), col => col("url") === "workflowName")(0)("valueString"))
+      .withColumn("workflow_version", filter(col("workflow")("extension"), col => col("url") === "workflowVersion")(0)("valueString"))
+      .withColumn("genome_build", filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code"))
+      .withColumn("for", regexp_extract(col("for")("reference"), patientExtract, 1))
+      .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
+      .withColumn("clean_output", transform(col("output"), col => struct(col("type")("coding")(0) as "code", col("valueReference") as "value")))
+      .withColumn("alir", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "ALIR")(0)("value")("reference"), documentExtract, 1))
+      .withColumn("snv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "SNV")(0)("value")("reference"), documentExtract, 1))
+      .withColumn("gcnv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "GCNV")(0)("value")("reference"), documentExtract, 1))
+      .withColumn("gsv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "GSV")(0)("value")("reference"), documentExtract, 1))
+      .withColumn("ssup", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "SSUP")(0)("value")("reference"), documentExtract, 1))
+    ),
+    Drop("seq_exp", "extension", "workflow", "code", "output", "clean_output")
+  )
+
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
       .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type")
@@ -194,6 +225,7 @@ object Transformations {
 
   val extractionMappings: Map[String, List[Transformation]] = Map(
     "patient" -> patientMappings,
+    "task" -> taskMappings,
     "biospecimen" -> biospecimenMappings,
     "sample_registration" -> sampleRegistrationMappings,
     "research_study" -> researchstudyMappings,

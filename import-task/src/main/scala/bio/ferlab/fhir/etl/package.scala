@@ -36,4 +36,9 @@ package object etl {
   val DOCUMENT_DATA_TYPE = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
   val DOCUMENT_DATA_CATEGORY = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
 
+  //Task
+  val TASK_BIO_INFO = "https://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+  val SEQUENCING_EXPERIMENT = "https://fhir.cqdg.ferlab.bio/StructureDefinition/sequencing-experiment"
+  val WORKFLOW = "https://fhir.cqdg.ferlab.bio/StructureDefinition/workflow"
+
 }

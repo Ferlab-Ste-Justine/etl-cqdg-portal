@@ -13,13 +13,13 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   "transform" should "prepare index file_centric" in {
     val data: Map[String, DataFrame] = Map(
-      "normalized_document_reference" -> Seq(
-        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
-        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
-        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222")),
-        DOCUMENTREFERENCE(`fhir_id` = "33", `participant_fhir_id` = null, `specimen_fhir_ids` = Seq("111","112", "222")),
-        DOCUMENTREFERENCE(`fhir_id` = "44", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111","112", "222"))
-      ).toDF(),
+//      "normalized_document_reference" -> Seq(
+//        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
+//        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
+//        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222")),
+//        DOCUMENTREFERENCE(`fhir_id` = "33", `participant_fhir_id` = null, `specimen_fhir_ids` = Seq("111","112", "222")),
+//        DOCUMENTREFERENCE(`fhir_id` = "44", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111","112", "222"))
+//      ).toDF(),
       "normalized_specimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "111", `participant_fhir_id` = "1", container_id=Some("1")),
         BIOSPECIMEN_INPUT(`fhir_id` = "111", `participant_fhir_id` = "1", container_id=Some("2")),
@@ -189,10 +189,10 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   "transform" should "ignore file linked to no participant" in {
     val data: Map[String, DataFrame] = Map(
-      "normalized_document_reference" -> Seq(
-        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
-        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
-        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222"))).toDF(),
+//      "normalized_document_reference" -> Seq(
+//        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
+//        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
+//        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222"))).toDF(),
       "normalized_specimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "111", `participant_fhir_id` = "1"),
         BIOSPECIMEN_INPUT(`fhir_id` = "222", `participant_fhir_id` = "2")

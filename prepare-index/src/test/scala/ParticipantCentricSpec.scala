@@ -17,12 +17,12 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         SIMPLE_PARTICIPANT(`fhir_id` = "1", participant_facet_ids = PARTICIPANT_FACET_IDS(participant_fhir_id_1 = "1", participant_fhir_id_2 = "1")),
         SIMPLE_PARTICIPANT(`fhir_id` = "2", participant_facet_ids = PARTICIPANT_FACET_IDS(participant_fhir_id_1 = "2", participant_fhir_id_2 = "2"))
       ).toDF(),
-      "normalized_document_reference" -> Seq(
-        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
-        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
-        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222")),
-        DOCUMENTREFERENCE(`fhir_id` = "33", `participant_fhir_id` = null, `specimen_fhir_ids` = Seq("111","222"))
-      ).toDF(),
+//      "normalized_document_reference" -> Seq(
+//        DOCUMENTREFERENCE(`fhir_id` = "11", `participant_fhir_id` = "1", `specimen_fhir_ids` = Seq("111")),
+//        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_fhir_id` = "1"),
+//        DOCUMENTREFERENCE(`fhir_id` = "21", `participant_fhir_id` = "2", `specimen_fhir_ids` = Seq("222")),
+//        DOCUMENTREFERENCE(`fhir_id` = "33", `participant_fhir_id` = null, `specimen_fhir_ids` = Seq("111","222"))
+//      ).toDF(),
 
       "normalized_specimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "111", `participant_fhir_id` = "1"),

@@ -30,8 +30,10 @@ case class STUDY_CENTRIC (
                            `title`: String = "CARTaGENE",
                            `domain`: Seq[String] = Seq("Cancer"),
                            `data_access_codes`: DATA_ACCESS_CODES = DATA_ACCESS_CODES(),
-//                           `participants`: Seq[PATIENT] = Nil,
-//                           `files`: Seq[DOCUMENTREFERENCE] = Nil,
+                           `file_count`: Int = 1,
+                           `participant_count`: Int = 1,
+//                           `family_count`: Int = 1,
+                           `family_data`: Boolean = true,
                            `study_version`: String = "1",
                          )
 case class DATA_ACCESS_CODES(

@@ -3710,6 +3710,85 @@
       "default":[
 
       ]
+    },
+    {
+      "name":"extension",
+      "type":{
+        "type":"array",
+        "items":{
+          "type":"record",
+          "name":"Extension",
+          "doc":"An Extension",
+          "namespace":"bio.ferlab.fhir",
+          "fields":[
+            {
+              "name":"url",
+              "type":[
+                "null",
+                "string"
+              ],
+              "default":null
+            },
+            {
+              "name": "extension",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "record",
+                  "name": "Extension",
+                  "doc": "An Extension",
+                  "namespace": "bio.ferlab.fhir1",
+                  "fields": [
+                    {
+                      "name": "url",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "default": null
+                    },
+                    {
+                      "name":"valueString",
+                      "type":[
+                        "null",
+                        "string"
+                      ],
+                      "default":null
+                    },
+                    {
+                      "type":"bio.ferlab.fhir.Coding",
+                      "name":"valueCoding",
+                      "default":{
+
+                      }
+                    }
+                  ],
+                  "default": {}
+                },
+                "default": []
+              },
+              "default": []
+            },
+            {
+              "name":"valueString",
+              "type":[
+                "null",
+                "string"
+              ],
+              "default":null
+            }
+          ],
+          "default":{
+
+          }
+        },
+        "default":[
+
+        ]
+      },
+      "default":[
+
+      ]
     }
   ],
   "default":null
