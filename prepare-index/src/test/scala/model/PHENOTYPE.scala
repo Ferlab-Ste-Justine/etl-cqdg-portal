@@ -1,11 +1,13 @@
 package model
 
 case class PHENOTYPE(
-                      `fhir_id`: String = "678509",
-                      `hpo_phenotype_observed`: String = "Acute lymphoblastic leukemia (HP:0001631)",
-                      `hpo_phenotype_not_observed`: String = null,
-                      `is_observed`: Boolean = false,
-                      `age_at_event_days`: Int = 0
+                      `study_id`: String = "STU0000001",
+                      `release_id`: String = "5",
+                      `fhir_id`: String = "PHE0000001",
+                      `phenotype_source_text`: String = null,
+                      `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
+                      `cqdg_participant_id`: String = "PRT0000003",
+                      `phenotype_observed`: String = null,
                     )
 
 case class PHENOTYPE_ENRICHED(
@@ -15,3 +17,9 @@ case class PHENOTYPE_ENRICHED(
                             `is_leaf`: Boolean = false,
                             `age_at_event_days`: Seq[Int] = Seq.empty
                           )
+
+
+case class PHENOTYPE_HPO_CODE(
+                               `system`: String = "http://purl.obolibrary.org/obo/hp.owl",
+                               `code`: String = "HP:0003124",
+                             )

@@ -79,11 +79,11 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
     simple_participant.find(_.fhir_id === "P1") shouldBe Some(SIMPLE_PARTICIPANT(
       fhir_id = "P1",
       participant_facet_ids = PARTICIPANT_FACET_IDS(participant_fhir_id_1 = "P1", participant_fhir_id_2 = "P1"),
-      phenotype = Seq(PHENOTYPE(fhir_id = "CP1", is_observed = true)),
+//      phenotype = Seq(PHENOTYPE(fhir_id = "CP1", is_observed = true)),
       observed_phenotype = expectedHPOTree,
       non_observed_phenotype = null,
       mondo = expectedMondoTree,
-      diagnosis = Set(DIAGNOSIS(fhir_id = "CD3", mondo_id_diagnosis = "Down syndrome (MONDO:0008608)"), DIAGNOSIS(fhir_id = "CD1", icd_id_diagnosis = "Q90.9")),
+//      diagnosis = Set(DIAGNOSIS(fhir_id = "CD3", mondo_id_diagnosis = "Down syndrome (MONDO:0008608)"), DIAGNOSIS(fhir_id = "CD1", icd_id_diagnosis = "Q90.9")),
       outcomes = Seq(OUTCOME(fhir_id = "O1", participant_fhir_id = "P1")),
       family = FAMILY(fhir_id = "G1", family_relations = Seq(FAMILY_RELATIONS(related_participant_fhir_id = "P3", relation = "son"))),
       family_type = "trio",
@@ -95,11 +95,11 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
       SIMPLE_PARTICIPANT(
         fhir_id = "P2",
         participant_facet_ids = PARTICIPANT_FACET_IDS(participant_fhir_id_1 = "P2", participant_fhir_id_2 = "P2"),
-        phenotype = Seq(PHENOTYPE(fhir_id = "CP2", is_observed = true)),
+//        phenotype = Seq(PHENOTYPE(fhir_id = "CP2", is_observed = true)),
         observed_phenotype = expectedHPOTree,
         non_observed_phenotype = null,
         mondo = null,
-        diagnosis = Set(DIAGNOSIS(fhir_id = "CD2", icd_id_diagnosis = "Q90.9")),
+//        diagnosis = Set(DIAGNOSIS(fhir_id = "CD2", icd_id_diagnosis = "Q90.9")),
         outcomes = Seq(OUTCOME(fhir_id = "O2", participant_fhir_id = "P2")),
         family = FAMILY(fhir_id = "G1", family_relations = Seq(FAMILY_RELATIONS(related_participant_fhir_id = "P3", relation = "son"))),
         family_type = "trio"

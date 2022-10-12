@@ -30,10 +30,10 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         BIOSPECIMEN_INPUT(`fhir_id` = "222", `participant_fhir_id` = "2", container_id=Some("2")),
         BIOSPECIMEN_INPUT(`fhir_id` = "333", `participant_fhir_id` = "1")
       ).toDF(),
-      "normalized_task" -> Seq(
-        TASK(fhir_id = "1", biospecimen_fhir_ids = Seq("111"), document_reference_fhir_ids = Seq("11", "12")),
-        TASK(fhir_id = "2", biospecimen_fhir_ids = Seq("222"), document_reference_fhir_ids = Seq("21"))
-      ).toDF(),
+//      "normalized_task" -> Seq(
+//        TASK(fhir_id = "1", biospecimen_fhir_ids = Seq("111"), document_reference_fhir_ids = Seq("11", "12")),
+//        TASK(fhir_id = "2", biospecimen_fhir_ids = Seq("222"), document_reference_fhir_ids = Seq("21"))
+//      ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
     )
 

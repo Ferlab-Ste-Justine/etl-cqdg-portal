@@ -3,8 +3,8 @@ package bio.ferlab.fhir.etl.centricTypes
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
-import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.{col, collect_list, collect_set, count, explode, size, struct}
+import bio.ferlab.fhir.etl.common.OntologyUtils.displayTerm
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
@@ -15,18 +15,27 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
   val normalized_researchstudy: DatasetConf = conf.getDataset("normalized_research_study")
   val normalized_drs_document_reference: DatasetConf = conf.getDataset("normalized_document_reference")
   val normalized_patient: DatasetConf = conf.getDataset("normalized_patient")
-  val normalized_family_relationship: DatasetConf = conf.getDataset("normalized_family_relationship")
   val normalized_group: DatasetConf = conf.getDataset("normalized_group")
-  val normalized_specimen: DatasetConf = conf.getDataset("normalized_biospecimen")
-  val normalized_cause_of_death: DatasetConf = conf.getDataset("normalized_cause_of_death")
   val normalized_diagnosis: DatasetConf = conf.getDataset("normalized_diagnosis")
+  val normalized_task: DatasetConf = conf.getDataset("normalized_task")
+  val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
+  val hpo_terms: DatasetConf = conf.getDataset("hpo_terms")
+  val mondo_terms: DatasetConf = conf.getDataset("mondo_terms")
+  val icd_terms: DatasetConf = conf.getDataset("icd_terms")
+  val duo_terms: DatasetConf = conf.getDataset("duo_terms")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    Seq(normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group, normalized_specimen, normalized_family_relationship, normalized_cause_of_death, normalized_diagnosis)
+    (Seq(
+      normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group, normalized_diagnosis, normalized_task, normalized_phenotype)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
-      ).toMap
+      ) ++ Seq(
+      hpo_terms.id -> hpo_terms.read,
+      mondo_terms.id -> mondo_terms.read,
+      icd_terms.id -> icd_terms.read,
+      duo_terms.id -> duo_terms.read,
+    )).toMap
 
   }
 
@@ -34,15 +43,47 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
-        data(normalized_researchstudy.id).show(false)
-        data(normalized_patient.id).show(false)
-        data(normalized_cause_of_death.id).show(false)
-        data(normalized_family_relationship.id).show(false)
-        data(normalized_group.id).show(false)
-        data(normalized_drs_document_reference.id).show(false)
-
-
     val studyDF = data(normalized_researchstudy.id)
+
+    data(normalized_drs_document_reference.id).show(false)
+
+    val duoTerms = data(duo_terms.id).withColumn("duo_term", displayTerm(col("id"), col("name")))
+
+    val accessLimitationsMap =
+      studyDF
+        .withColumn("access_limitations_exp", explode(col("access_limitations")))
+        .join(duoTerms, col("access_limitations_exp") === col("id"), "left_outer")
+        .groupBy("study_id")
+        .agg(collect_list(col("duo_term")) as "access_limitations")
+
+    val accessRequirementsMap =
+      studyDF
+        .withColumn("access_requirements_exp", explode(col("access_requirements")))
+        .join(duoTerms, col("access_requirements_exp") === col("id"), "left_outer")
+        .groupBy("study_id")
+        .agg(collect_list(col("duo_term")) as "access_requirements")
+
+    val filesExplodedDF = data(normalized_drs_document_reference.id)
+      .withColumn("files_exp", explode(col("files")))
+      .drop("study_id")
+
+    val participantsWithFilesDF = data(normalized_patient.id)
+      .withColumnRenamed("fhir_id", "participant_id")
+      .join(filesExplodedDF, Seq("participant_id"), "left_outer")
+
+    val dataTypesCount = participantsWithFilesDF
+      .na.drop(Seq("data_type"))
+      .groupBy("study_id", "data_type")
+      .agg(size(collect_set(col("participant_id"))) as "participant_count")
+      .groupBy("study_id")
+      .agg(collect_list(struct(col("data_type"), col("participant_count"))) as "data_types")
+
+    val dataCategoryCount = participantsWithFilesDF
+      .na.drop(Seq("data_category"))
+      .groupBy("study_id", "data_category")
+      .agg(size(collect_set(col("participant_id"))) as "participant_count")
+      .groupBy("study_id")
+      .agg(collect_list(struct(col("data_category"), col("participant_count"))) as "data_categories")
 
     val participantCount =
       data(normalized_patient.id)
@@ -54,48 +95,63 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       data(normalized_drs_document_reference.id)
         .withColumn("files_exploded", explode(col("files")))
         .groupBy("study_id")
-        .agg(size(collect_set(
-          struct(
-            col("files_exploded")("file_name"),
-            col("files_exploded")("file_format"),
-            col("files_exploded")("ferload_url"))
+        .agg(
+          size(collect_set(
+            struct(
+              col("files_exploded")("file_name"),
+              col("files_exploded")("file_format"),
+              col("files_exploded")("ferload_url"))
+          )) as "file_count",
+          collect_set(col("data_category")) as "data_category"
         )
-        ) as "file_count")
 
     val familyCount = data(normalized_group.id)
       .where(size(col("family_members")).gt(1))
       .groupBy("study_id")
       .agg(size(collect_set(col("internal_family_id"))) as "family_count")
 
-//    val familyRelationshipDf = data(normalized_family_relationship.id)
-//      .addGroup(data(normalized_group.id))
+    val experimentalStrategyGrouped = data(normalized_task.id)
+      .withColumn("experimental_strategy_exp", explode(col("experimental_strategy")))
+      .groupBy("study_id")
+      .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategy")
 
-//    val patientDf = data(normalized_patient.id)
-//      .addFamilyRelationshipToParticipant(familyRelationshipDf)
-//      .join(data(normalized_cause_of_death.id).drop("study_id", "release_id", "fhir_id"), Seq("submitter_participant_ids"), "left_outer")
+    val phenotypeGrouped = data(normalized_phenotype.id)
+      .withColumn("phenotype", col("phenotype_HPO_code")("code"))
+      .join(data(hpo_terms.id), col("phenotype") === col("id"), "left_outer")
+      .withColumn("hpo_term", displayTerm(col("id"), col("name")))
+      .groupBy("study_id")
+      .agg(collect_set(col("hpo_term")) as "hpo_terms")
 
-//    val patientsPerStudy =
-//      patientDf
-//        .groupBy("study_id", "release_id")
-//        .agg(
-//          collect_list(struct(patientDf.columns.filter(c => !Seq("fhir_id", "study_id").contains(c)).map(col): _*)) as "participants"
-//        )
-//        .drop("release_id")
-
+    // the id is of the from id|chapter. See why it was done like this, and if still required
+    val icdSplitId = data(icd_terms.id)
+      .withColumn("splitId", split(col("id"), "\\|")(0))
+    val diagnosisGrouped = data(normalized_diagnosis.id)
+      .join(data(mondo_terms.id), col("diagnosis_mondo_code") === col("id"), "left_outer")
+      .withColumn("mondo_term", displayTerm(col("id"), col("name")))
+      .drop("id", "name")
+      .join(icdSplitId, col("diagnosis_ICD_code") === col("splitId"), "left_outer")
+      .withColumn("icd_term", displayTerm(col("splitId"), col("name")))
+      .groupBy("study_id")
+      .agg(collect_set(col("mondo_term")) as "mondo_terms", collect_set(col("icd_term")) as "icd_terms")
 
     val transformedStudyDf = studyDF
-      .withColumn("data_access_codes", struct(col("access_limitations") as "access_limitations", col("access_requirements") as "access_requirements"))
-      .withColumnRenamed("fhir_id", "internal_study_id")
-//      .join(patientsPerStudy, col("study_id") === col("internal_study_id"), "left_outer")
-//      .join(countPatientDf, Seq("study_id"), "left_outer")
-//      .withColumn("participant_count", coalesce(col("participant_count"), lit(0)))
-//      .join(countFileDf, Seq("study_id"), "left_outer")
-//      .join(countBiospecimenDf, Seq("study_id"), "left_outer")
-//      .withColumn("file_count", coalesce(col("file_count"), lit(0)))
-//      .join(countFamilyDf, Seq("study_id"), "left_outer")
-//      .withColumn("family_count", coalesce(col("family_count"), lit(0)))
-//      .withColumn("family_data", col("family_count").gt(0))
-      .drop("study_id", "access_requirements", "access_limitations")
+      .join(dataTypesCount, Seq("study_id"), "left_outer")
+      .join(dataCategoryCount, Seq("study_id"), "left_outer")
+      .join(participantCount, Seq("study_id"), "left_outer")
+      .join(fileCount, Seq("study_id"), "left_outer")
+      .join(familyCount, Seq("study_id"), "left_outer")
+      .join(experimentalStrategyGrouped, Seq("study_id"), "left_outer")
+      .join(phenotypeGrouped, Seq("study_id"), "left_outer")
+      .join(diagnosisGrouped, Seq("study_id"), "left_outer")
+      .withColumn("family_data", col("family_count").gt(0))
+      .drop("access_limitations", "access_requirements")
+      .join(accessLimitationsMap, Seq("study_id"), "left_outer")
+      .join(accessRequirementsMap, Seq("study_id"), "left_outer")
+      .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
+      .withColumnRenamed("study_id", "internal_study_id")
+      .drop("fhir_id", "access_requirements", "access_limitations")
+
+    transformedStudyDf.show(false)
 
     Map(mainDestination.id -> transformedStudyDf)
   }

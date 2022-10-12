@@ -24,19 +24,32 @@ case class LIGHT_STUDY_CENTRIC (
 case class STUDY_CENTRIC (
                            `internal_study_id`: String = "STU0000001",
                            `keyword`: Seq[String] = Seq("genomics", "chronic conditions", "population-based cohort", "survey data"),
+                           `release_id`: String = "5",
                            `description`: String = "CARTaGENE",
                            `contact`: CONTACT = CONTACT(),
                            `status`: String = "completed",
                            `title`: String = "CARTaGENE",
-                           `domain`: Seq[String] = Seq("Cancer"),
-                           `data_access_codes`: DATA_ACCESS_CODES = DATA_ACCESS_CODES(),
-                           `file_count`: Int = 1,
-                           `participant_count`: Int = 1,
-//                           `family_count`: Int = 1,
-                           `family_data`: Boolean = true,
+                           `domain`: Seq[String] = Seq("General health"),
+                           `population`: String = "Adult",
                            `study_version`: String = "1",
+                           `data_types`: Seq[(String, String)] = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","1"), ("ALIR","2"), ("GSV","1")),
+                           `data_categories`: Seq[(String, String)] = Seq(("GENO","1")),
+                           `participant_count`: Int = 3,
+                           `file_count`: Int = 6,
+                           `family_count`: Int = 1,
+                           `experimental_strategy`: Seq[String] = Seq("WXS"),
+                           `hpo_terms`: Seq[String] = Seq("Hypercholesterolemia (HP:0003124)", "Hypertension (HP:0000822)"),
+                           `mondo_terms`: Seq[String] = Seq("atopic eczema (MONDO:0004980)"),
+                           `icd_terms`: Seq[String] = Seq("Tinnitus, unspecified ear (H93.19)", "Atopic dermatitis, unspecified (L20.9)", "Hyperchylomicronemia (E78.3)"),
+                           `family_data`: Boolean = true,
+                           `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                          )
 case class DATA_ACCESS_CODES(
-                              access_limitations: Seq[String] = Seq("DUO:0000005"),
-                              access_requirements: Seq[String] = Seq("DUO:0000019", "DUO:0000021")
+                              `access_limitations`: Seq[String] = Seq("DUO:0000005"),
+                              `access_requirements`: Seq[String] = Seq("DUO:0000019", "DUO:0000021")
                             )
+
+case class ACCESS_REQUIREMENTS(
+                              `access_requirements`: Seq[String] = Seq("publication required (DUO:0000019)", "ethics approval required (DUO:0000021)", "time limit on use (DUO:0000025)", "user-specific restriction (DUO:0000026)", "project-specific restriction (DUO:0000027)", "return to database/resource (DUO:0000029)"),
+                              `access_limitations`: Seq[String] = Seq("obsolete general research use and clinical care (DUO:0000005)")
+                              )

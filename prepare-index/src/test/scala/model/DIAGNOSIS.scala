@@ -1,15 +1,17 @@
 package model
 
 case class DIAGNOSIS(
-                      `fhir_id`: String = "438351",
-                      `diagnosis_id`: String = "DG_KG6TQWCT",
-                      `source_text`: String = "Acute lymphoblastic leukemia",
-                      `source_text_tumor_location`: Seq[String] = Seq.empty,
-                      `uberon_id_tumor_location`: Seq[String] = Seq.empty,
-                      `affected_status`: Boolean = false,
-                      `affected_status_text`: String = null,
-                      `age_at_event_days`: Int = 0,
-                      `icd_id_diagnosis`: String = null,
-                      `mondo_id_diagnosis`: String = null,
-                      `ncit_id_diagnosis`: String = null
+                      `subject`: String = "PRT0000003",
+                      `study_id`: String = "STU0000001",
+                      `release_id`: String = "5",
+                      `fhir_id`: String = "DIA0000001",
+                      `diagnosis_source_text`: String = "Hypercholesterolemia",
+                      `diagnosis_mondo_code`: String = null,
+                      `diagnosis_ICD_code`: String = "E78.3",
+                      `age_at_diagnosis`: AGE_AT_DIAGNOSIS = AGE_AT_DIAGNOSIS(),
                     )
+
+case class AGE_AT_DIAGNOSIS(
+                             value: Long = 825505328,
+                             unit: String = "days",
+                           )

@@ -30,7 +30,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         BIOSPECIMEN_INPUT(`fhir_id` = "222", `participant_fhir_id` = "2")
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
-      "normalized_task" -> Seq(TASK(`fhir_id` = "1", `document_reference_fhir_ids` = Seq("11", "21"))).toDF(),
+//      "normalized_task" -> Seq(TASK(`fhir_id` = "1", `document_reference_fhir_ids` = Seq("11", "21"))).toDF(),
     )
 
     val output = new BiospecimenCentric("re_000001", List("SD_Z6MWD3H0"))(conf).transform(data)
