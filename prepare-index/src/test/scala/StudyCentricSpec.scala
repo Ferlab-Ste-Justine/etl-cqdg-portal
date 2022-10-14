@@ -58,8 +58,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     output.keys should contain("es_index_study_centric")
 
     val study_centric = output("es_index_study_centric")
-    study_centric.show(false)
-    study_centric.printSchema()
 
     val studyCentricOutput = STUDY_CENTRIC()
 

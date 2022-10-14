@@ -72,86 +72,26 @@ object Utils {
 
     }
 
-    def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame): DataFrame = {
-      val phenotypes = addPhenotypes(phenotypeDF)
-      val phenotypesWithHPOTerms =
-        mapObservableTerms(phenotypes, "observable_term")(hpoTerms)
-          .groupBy("participant_fhir_id")
-          .agg(
-            collect_list(struct(
-              col("fhir_id"),
-              col("hpo_phenotype_observed"),
-              col("hpo_phenotype_not_observed"),
-              col("age_at_event_days"),
-              col("is_observed")
-            )) as "phenotype",
-            collect_list(
-              when(col("is_observed"), col("observable_with_ancestors"))
-            ) as "observed_phenotype",
-            collect_list(
-              when(not(col("is_observed")), col("observable_with_ancestors"))
-            ) as "non_observed_phenotype"
-          )
+    def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {
+      val (observedPhenotypes, nonObservedPhenotypes, observedPhenotypesWithAncestors) = getTaggedPhenotypes(phenotypeDF, hpoTerms)
 
-      val phenotypesWithHPOTermsObsExploded =
-        phenotypesWithHPOTerms
-          .withColumn(s"observed_phenotype_exp", explode(col("observed_phenotype")))
-          .withColumn("observed_phenotype", explode(col("observed_phenotype_exp")))
-
-      val phenotypesWithHPOTermsNonObsExploded =
-        phenotypesWithHPOTerms
-          .withColumn(s"non_observed_phenotype_exp", explode(col("non_observed_phenotype")))
-          .withColumn("non_observed_phenotype", explode(col("non_observed_phenotype_exp")))
-
-
-      val observedPhenotypes = groupObservableTermsByAge(phenotypesWithHPOTermsObsExploded, "observed_phenotype")
-      val nonObservedPhenotypes = groupObservableTermsByAge(phenotypesWithHPOTermsNonObsExploded, "non_observed_phenotype")
-
-      val phenotypesWithHPOTermsGroupedByEvent =
-        phenotypesWithHPOTerms
-          .drop("observed_phenotype", "non_observed_phenotype")
-          .join(observedPhenotypes, Seq("participant_fhir_id"), "left_outer")
-          .join(nonObservedPhenotypes, Seq("participant_fhir_id"), "left_outer")
-
-      val diseases = addDiseases(diagnosesDF, mondoTerms)
-      val commonColumns = Seq("participant_fhir_id", "study_id")
-
-      val diseaseColumns = diseases.columns.filter(col => !commonColumns.contains(col))
-
-      val diseasesWithMondoTerms =
-        mapObservableTerms(diseases, "mondo_id")(mondoTerms)
-          .withColumn("mondo", explode_outer(col("observable_with_ancestors")))
-          .drop("observable_with_ancestors", "study_id")
-          .groupBy("participant_fhir_id")
-          .agg(
-            collect_set(
-              struct(
-                diseaseColumns.head,
-                diseaseColumns.tail: _*
-              )
-            ) as "diagnosis",
-            collect_set(col("mondo")) as "mondo"
-          ).drop("mondo_id")
-
-      val diseasesExplodedWithMondoTerms = diseasesWithMondoTerms
-        .withColumn("mondo", explode(col("mondo")))
-
-      val diseasesWithMondoTermsGrouped = {
-        groupObservableTermsByAge(diseasesExplodedWithMondoTerms, "mondo")
-      }
-
-      val diseasesWithReplacedMondoTerms =
-        diseasesWithMondoTerms
-          .drop("mondo")
-          .join(diseasesWithMondoTermsGrouped, Seq("participant_fhir_id"), "left_outer")
-          .drop("mondo_down_syndrome_id", "mondo_down_syndrome_name", "mondo_id")
+      val (diagnosis, mondoWithAncestors) = getDiagnosis(diagnosesDF, mondoTerms, icdTerms)
 
       df
-        .join(phenotypesWithHPOTermsGroupedByEvent, col("fhir_id") === col("participant_fhir_id"), "left_outer")
-        .drop("participant_fhir_id")
-        .join(diseasesWithReplacedMondoTerms, col("fhir_id") === col("participant_fhir_id"), "left_outer")
-        .drop("participant_fhir_id")
+        .join(diagnosis, col("fhir_id") === col("cqdg_participant_id"), "left_outer")
+        .join(mondoWithAncestors, Seq("cqdg_participant_id"), "left_outer")
+        .join(observedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
+        .join(nonObservedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
+        .join(observedPhenotypesWithAncestors, Seq("cqdg_participant_id"), "left_outer")
+    }
 
+    def addCauseOfDeath(causeOfDeath: DataFrame): DataFrame = {
+      val cleanCauseOfDeath = causeOfDeath
+        .drop("study_id","release_id", "fhir_id")
+
+      df
+        .join(cleanCauseOfDeath, col("submitter_participant_ids") === col("fhir_id"), "left_outer")
+        .drop("submitter_participant_ids")
     }
 
     def addGroup(group: DataFrame): DataFrame = {

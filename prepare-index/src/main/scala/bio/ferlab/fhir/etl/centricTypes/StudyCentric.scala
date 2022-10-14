@@ -45,8 +45,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
 
     val studyDF = data(normalized_researchstudy.id)
 
-    data(normalized_drs_document_reference.id).show(false)
-
     val duoTerms = data(duo_terms.id).withColumn("duo_term", displayTerm(col("id"), col("name")))
 
     val accessLimitationsMap =
@@ -150,8 +148,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("study_id", "internal_study_id")
       .drop("fhir_id", "access_requirements", "access_limitations")
-
-    transformedStudyDf.show(false)
 
     Map(mainDestination.id -> transformedStudyDf)
   }
