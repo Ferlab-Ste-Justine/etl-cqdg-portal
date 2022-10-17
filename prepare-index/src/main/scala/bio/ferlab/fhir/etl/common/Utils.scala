@@ -94,6 +94,16 @@ object Utils {
         .drop("submitter_participant_ids")
     }
 
+    def addDiseaseStatus(diseaseStatus: DataFrame): DataFrame = {
+      val cleanDiseaseStatus = diseaseStatus
+        .drop("study_id","release_id", "fhir_id")
+        .withColumnRenamed("disease_status", "is_affected")
+
+      df
+        .join(cleanDiseaseStatus, col("subject") === col("fhir_id"), "left_outer")
+        .drop("subject")
+    }
+
     def addGroup(group: DataFrame): DataFrame = {
       val explodedGroupDf = group
         .withColumn("family_member", explode(col("family_members")))
@@ -217,61 +227,35 @@ object Utils {
     }
 
     def addFamily(familyDf: DataFrame, familyRelationshipDf: DataFrame): DataFrame = {
+      val explodedFamilyDF = familyDf
+        .withColumn("family_members_exp", explode(col("family_members")))
+        .drop("study_id", "release_id")
 
-      val participantIdMapping = df.select(col("fhir_id") as "participant_fhir_id", col("participant_id"))
+      val isProbandDf = familyRelationshipDf
+        .select("submitter_participant_id", "relationship_to_proband")
+        .withColumn("is_a_proband", when(col("relationship_to_proband") === "Is the proband", lit(true)).otherwise(lit(false)))
+        .drop("relationship_to_proband")
 
-      val reformatFamilyRelationship = familyRelationshipDf
-        .join(participantIdMapping, col("participant1_fhir_id") === col("participant_fhir_id"))
-        .withColumnRenamed("participant_id", "participant1_id")
-        .select("participant1_fhir_id", "participant1_id", "participant2_fhir_id", "participant1_to_participant_2_relationship")
-
-      val reformatFamily = familyDf
-        .select(col("family_members_id"), col("fhir_id") as "family_fhir_id", col("family_id"))
-
-      val joinFamily = reformatFamily.join(reformatFamilyRelationship, array_contains(col("family_members_id"), col("participant1_fhir_id")), "left_outer")
-
-      val windowSpec = Window.partitionBy("family_id")
-
-      val family = joinFamily.groupBy("participant2_fhir_id", "family_id").agg(
-        collect_list(
-          struct(
-            col("participant1_fhir_id") as "related_participant_fhir_id",
-            col("participant1_id") as "related_participant_id",
-            col("participant1_to_participant_2_relationship") as "relation"
-          )
-        ) as "relations",
-        first("family_members_id") as "family_members_id",
-        first("family_fhir_id") as "family_fhir_id"
-      )
-        .withColumn("all_relations", collect_set(col("relations.relation")).over(windowSpec))
-        .withColumn("has_father", exists(col("all_relations"), relation => array_contains(relation, "father")))
-        .withColumn("has_mother", exists(col("all_relations"), relation => array_contains(relation, "mother")))
-        .withColumn("has_both_parent", exists(col("all_relations"), relation => array_contains(relation, "father") && array_contains(relation, "mother")))
-        .withColumn("nb_members", size(col("family_members_id")))
-        .withColumn("family_type",
-          when(col("has_both_parent") && col("nb_members") >= 3,
-            when(col("nb_members") === 3, "trio").otherwise("trio+")
-          ).when((col("has_father") || col("has_mother")) && col("nb_members") >= 2,
-            when(col("nb_members") === 2, "duo").otherwise("duo+")
-          ).when(col("nb_members") === 0, "proband-only")
-            .otherwise("other")
+      val familyWithGroup = familyRelationshipDf
+        .join(explodedFamilyDF, col("family_members_exp") === col("submitter_participant_id"), "left_outer")
+        .groupBy("study_id", "release_id", "internal_family_id", "submitter_family_id")
+        .agg(collect_list(struct(
+          col("submitter_participant_id"),
+          col("focus_participant_id"),
+          col("relationship_to_proband"),
+          col("internal_family_id") as "internal_familyrelationship_id",
+          col("family_type"),
+          col("submitter_family_id") as "family_id",
+        )) as "familyRelationships",
+          first(col("family_members")) as "family_members",
         )
-        .withColumn("family", struct(
-          filter(col("relations"), c => c("relation") === "father")(0)("related_participant_id") as "father_id",
-          filter(col("relations"), c => c("relation") === "mother")(0)("related_participant_id") as "mother_id",
-          col("relations") as "family_relations",
-          col("family_fhir_id") as "fhir_id",
-          col("family_id") as "family_id"
-        ))
-        .select("family_type", "family","participant2_fhir_id")
+        .withColumn("family_members_exp", explode(col("family_members")))
+        .join(isProbandDf, col("submitter_participant_id") === col("family_members_exp"))
+        .drop("submitter_participant_id", "family_members", "study_id", "release_id", "internal_family_id", "submitter_family_id")
 
-      df.join(family, col("fhir_id") === col("participant2_fhir_id"), "left_outer")
-        .drop("participant2_fhir_id")
-        .withColumn("family_type", coalesce(col("family_type"), lit("proband-only")))
-        .join(reformatFamily, array_contains(col("family_members_id"), col("fhir_id")), "left_outer")
-        .drop("family_fhir_id", "family_members_id")
-        .withColumnRenamed("family_id", "families_id")
-
+      df
+        .join(familyWithGroup, col("cqdg_participant_id") === col("family_members_exp"), "left_outer")
+        .drop("family_members_exp")
     }
   }
 }
