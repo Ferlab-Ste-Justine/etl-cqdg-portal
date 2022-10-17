@@ -32,7 +32,7 @@ class BiospecimenCentric(releaseId: String, studyIds: List[String])(implicit con
     val specimenDF = data(normalized_specimen.id)
     val transformedBiospecimen =
       specimenDF
-        .addStudy(data(es_index_study_centric.id))
+//        .addStudy(data(es_index_study_centric.id))
         .addBiospecimenParticipant(data(simple_participant.id))
         .addBiospecimenFiles(data(normalized_drs_document_reference.id))
         .withColumn("biospecimen_facet_ids", struct(col("fhir_id") as "biospecimen_fhir_id_1", col("fhir_id") as "biospecimen_fhir_id_2"))

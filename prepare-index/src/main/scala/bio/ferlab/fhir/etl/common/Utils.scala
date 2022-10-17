@@ -32,11 +32,13 @@ object Utils {
 
   implicit class DataFrameOperations(df: DataFrame) {
     def addStudy(studyDf: DataFrame): DataFrame = {
-      val reformatStudy: DataFrame = studyDf
-        .withColumn("study", struct(studyDf.columns.filter(!_.equals("release_id")).map(col): _*))
-        .select("study_id", "study")
+      val cols = studyDf.columns.filterNot(Seq("release_id").contains(_))
 
-      df.join(reformatStudy, "study_id")
+      val refactorStudyDf = studyDf
+        .withColumn("study", struct(cols.map(col): _*))
+        .drop(studyDf.columns.filterNot(c => c == "study_id"): _*)
+
+      df.join(refactorStudyDf, Seq("study_id"), "left_outer")
     }
 
     def addOutcomes(vitalStatusDf: DataFrame): DataFrame = {
@@ -129,7 +131,7 @@ object Utils {
       df.join(groupedFamilyDf, groupedFamilyDf.col("submitter_participant_ids") === df.col("fhir_id"), "left_outer")
     }
 
-    def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame): DataFrame = {
+    def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
       val biospecimenDfReformat = reformatBiospecimen(biospecimensDf)
 
       val filesWithSeqExpDF = reformatSequencingExperiment(filesDf)

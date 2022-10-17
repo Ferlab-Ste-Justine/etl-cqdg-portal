@@ -146,7 +146,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .join(accessLimitationsMap, Seq("study_id"), "left_outer")
       .join(accessRequirementsMap, Seq("study_id"), "left_outer")
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
-      .withColumnRenamed("study_id", "internal_study_id")
       .drop("fhir_id", "access_requirements", "access_limitations")
 
     Map(mainDestination.id -> transformedStudyDf)
