@@ -19,12 +19,12 @@ object PrepareIndex extends SparkApp {
 //      new SimpleParticipant(releaseId, studyList).run()
       new StudyCentric(releaseId, studyList).run()
     case "participant_centric" =>
-//      new StudyCentric(releaseId, studyList).run()
-      new SimpleParticipant(releaseId, studyList).run()
-//      new ParticipantCentric(releaseId, studyList).run()
-    case "file_centric" =>
       new StudyCentric(releaseId, studyList).run()
       new SimpleParticipant(releaseId, studyList).run()
+      new ParticipantCentric(releaseId, studyList).run()
+    case "file_centric" =>
+//      new StudyCentric(releaseId, studyList).run()
+//      new SimpleParticipant(releaseId, studyList).run()
       new FileCentric(releaseId, studyList).run()
     case "biospecimen_centric" =>
       new StudyCentric(releaseId, studyList).run()
