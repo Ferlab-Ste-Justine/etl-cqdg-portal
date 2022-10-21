@@ -174,8 +174,7 @@ object Utils {
       df.join(groupedFamilyDf, groupedFamilyDf.col("submitter_participant_ids") === df.col("fhir_id"), "left_outer")
     }
 
-    def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
-
+    def addSampleRegistration(sampleRegistrationDF: DataFrame): DataFrame = {
       val cleanSampleRegistration = sampleRegistrationDF
         .withColumn("sample_type", col("sample_type")("code"))
         .withColumn("sample", struct(
@@ -189,8 +188,14 @@ object Utils {
             .filterNot(Seq("parent", "sample").contains(_)): _*
         )
 
+      df.join(cleanSampleRegistration, col("fhir_id") === col("parent"), "left_outer")
+        .drop("parent")
+    }
+
+    def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
+
       val biospecimenWithSample = biospecimensDf
-        .join(cleanSampleRegistration, col("fhir_id") === col("parent"), "left_outer")
+        .addSampleRegistration(sampleRegistrationDF)
         .groupBy(biospecimensDf.columns.map(col): _*)
         .agg(collect_list(col("sample")) as "samples")
         .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
@@ -256,32 +261,21 @@ object Utils {
 
     }
 
-    def addBiospecimenFiles(filesDf: DataFrame): DataFrame = {
-      val filesWithSeqExperiments = reformatSequencingExperiment(filesDf)
+    def addBiospecimenFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
+      val cleanSeqExperiment = seqExperiment
+        .withColumnRenamed("for", "subject")
+        .drop("fhir_id", "study_id", "release_id")
 
-      val fileColumns = filesWithSeqExperiments.columns.collect { case c if c != "specimen_fhir_ids" => col(c) }
-      val reformatFile = filesWithSeqExperiments
-        .withColumn("biospecimen_fhir_id", explode(col("specimen_fhir_ids")))
-        .drop("document_reference_fhir_id")
-        .withColumn("file", struct(fileColumns: _*))
-        .select("biospecimen_fhir_id", "file")
-        .groupBy("biospecimen_fhir_id")
-        .agg(collect_list(col("file")) as "files")
-
-      df
-        .join(reformatFile, df("fhir_id") === reformatFile("biospecimen_fhir_id"), "left_outer")
-        .withColumn("files", coalesce(col("files"), array()))
-        .withColumn("nb_files", coalesce(size(col("files")), lit(0)))
-        .drop("biospecimen_fhir_id")
+      df.join(cleanSeqExperiment, Seq("subject"), "left_outer")
     }
 
     def addBiospecimenParticipant(participantsDf: DataFrame): DataFrame = {
       val reformatParticipant: DataFrame = participantsDf
-        .withColumn("participant", struct(participantsDf.columns.map(col): _*))
-        .withColumn("participant_fhir_id", col("fhir_id"))
-        .select("participant_fhir_id", "participant")
+              .withColumn("participant", struct(participantsDf.columns.map(col): _*))
+              .withColumn("subject", col("fhir_id"))
+              .select("subject", "participant")
 
-      df.join(reformatParticipant, "participant_fhir_id")
+      df.join(reformatParticipant, Seq("subject"))
     }
 
     def addFamily(familyDf: DataFrame, familyRelationshipDf: DataFrame): DataFrame = {
