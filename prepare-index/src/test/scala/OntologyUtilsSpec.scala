@@ -1,9 +1,8 @@
-import bio.ferlab.fhir.etl.common.OntologyUtils.{addDiseases, firstCategory}
-import model.AGE_AT_EVENT
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.functions.col
-import org.scalatest.matchers.should.Matchers
+import bio.ferlab.datalake.spark3.loader.GenericLoader.read
+import bio.ferlab.fhir.etl.common.OntologyUtils.getTaggedPhenotypes
+import model.{PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS}
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
@@ -11,27 +10,46 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
   import spark.implicits._
 
 
-  val SCHEMA_CONDITION_CODING = "array<struct<category:string,code:string>>"
+  "getTaggedPhenotypes" should "return tagged phenotypes and tagged phenotypes with ancestors" in {
 
-  "addDiseases" should "add diseases to dataframe" in {
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1")
+    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1")
+    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG")
 
-    val df = Seq(
-      ("part1", "diag1", "disease", Seq(("ICD", "icd")), Some("mondo"), AGE_AT_EVENT()),
-      ("part1", "diag2", "disease", Seq(("ICD", "icd")), None, AGE_AT_EVENT()),
-      ("part2", "diag3", "disease", Seq(("ICD", "icd")), None, AGE_AT_EVENT()),
-    ).toDF("participant_id", "diagnosis_id", "condition_profile", "condition_coding", "mondo_id", "age_at_event")
-      .withColumn("condition_coding", col("condition_coding").cast(SCHEMA_CONDITION_CODING))
+    val hpo_terms = read(getClass.getResource("/ontology_terms_test.json").toString, "Json", Map(), None, None)
 
-    val mondoTerms = Seq(("mondo", "Mondo")).toDF("id", "name")
-    val result = addDiseases(df, mondoTerms)
-    val resultParticipant1 = result.filter(col("diagnosis_id") === "diag1").select("icd_id_diagnosis", "mondo_id_diagnosis").collect().head
+    val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 
-    resultParticipant1 shouldBe Row("icd", "Mondo (mondo)")
+    val (t1, t2, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+
+    //observed phenotypes tagged
+    val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+
+    taggedPhenotypes shouldBe
+      ("1", Seq(
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `phenotype_id` = "HP:G", `is_leaf` = true, `name` = "G Name", `parents` = Seq("B Name (HP:B)"), `age_at_event` = 0, `display_name` = "G Name (HP:G)"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `phenotype_id` = "HP:E", `is_leaf` = true, `name` = "E Name", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = 0, `display_name` = "E Name (HP:E)"),
+      ))
+
+    //observed phenotypes tagged
+    val notTaggedPhenotypes = t2.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+
+    notTaggedPhenotypes shouldBe
+      ("1", Seq(
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "3", `phenotype_id` = "HP:C", `name` = "C Name", `parents` = Seq("A Name (HP:A)"), `display_name` = "C Name (HP:C)"),
+      ))
+
+    //observed phenotypes with ancestors
+    val taggedPhenotypesWithAncestors = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
+
+    taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
+      Seq(
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`phenotype_id` = "HP:C", `name` = "C Name", `parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(0), `display_name` = "C Name (HP:C)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`phenotype_id` = "HP:E", `is_leaf` = true, `is_tagged` = true,`name` = "E Name", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq(0), `display_name` = "E Name (HP:E)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`phenotype_id` = "HP:G", `is_leaf` = true, `is_tagged` = true,`name` = "G Name", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Seq(0), `display_name` = "G Name (HP:G)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`phenotype_id` = "HP:B", `name` = "B Name", `parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(0), `display_name` = "B Name (HP:B)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`phenotype_id` = "HP:A", `name` = "A Name", `parents` = Nil, `age_at_event` = Seq(0), `display_name` = "A Name (HP:A)"),
+      )
   }
 
-  "firstCategory" should "return the first found category" in {
-    val df = Seq(Seq(("ICD", "icd"))).toDF("condition_coding").withColumn("condition_coding", col("condition_coding").cast(SCHEMA_CONDITION_CODING))
-    df.withColumn("cat_icd", firstCategory("ICD", col("condition_coding"))).select("cat_icd").collect().head shouldBe Row("icd")
-    df.withColumn("cat_icd", firstCategory("NotFound", col("condition_coding"))).select("cat_icd").collect().head shouldBe Row(null)
-  }
 }

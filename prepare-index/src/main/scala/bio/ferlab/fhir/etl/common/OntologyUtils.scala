@@ -56,7 +56,7 @@ object OntologyUtils {
         col("name"),
         col("parents"),
         col("age_at_event"),
-        displayTerm(col("id"), col("name")) as "display_name",
+        displayTerm(col("phenotype_id"), col("name")) as "display_name",
       )) as colName)
   }
 
@@ -65,15 +65,15 @@ object OntologyUtils {
       .withColumn("ancestors_exp", explode(col("ancestors")))
       .withColumn("age_at_event", lit(0))  ///fixme - replace with real value when available
       .withColumn("term", struct(
-        col("id"),
+        col("phenotype_id"),
         col("name"),
         col("parents"),
         col("is_leaf"),
         lit(true) as "is_tagged",
-        displayTerm(col("id"), col("name")) as "display_name",
+        displayTerm(col("phenotype_id"), col("name")) as "display_name",
       ))
       .withColumn("ancestors_with_age", struct(
-        col("ancestors_exp.id"),
+        col("ancestors_exp.id") as "phenotype_id",
         col("ancestors_exp.name"),
         col("ancestors_exp.parents"),
         lit(false) as "is_leaf",
@@ -90,7 +90,7 @@ object OntologyUtils {
       .withColumn("all_terms_grouped_exp", explode(col("all_terms_grouped")))
       .groupBy("study_id", "cqdg_participant_id", "all_terms_grouped_exp")
       .agg(struct(
-        col("all_terms_grouped_exp.id") as "id",
+        col("all_terms_grouped_exp.phenotype_id") as "phenotype_id",
         col("all_terms_grouped_exp.name") as "name",
         col("all_terms_grouped_exp.parents") as "parents",
         col("all_terms_grouped_exp.is_leaf") as "is_leaf",
@@ -106,7 +106,7 @@ object OntologyUtils {
     val phenotypesWithTerms = phenotypesDF
       .withColumn("phenotype_id", col("phenotype_HPO_code")("code"))
       .join(hpoTerms, col("phenotype_id") === col("id"), "left_outer")
-
+      .drop(col("id"))
 
     val observedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").equalTo("POS"))
