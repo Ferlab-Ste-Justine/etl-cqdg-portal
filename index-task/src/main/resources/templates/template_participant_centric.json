@@ -1,0 +1,494 @@
+{
+  "index_patterns": [
+    "participant_centric*"
+  ],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "number_of_shards": 5,
+      "analysis": {
+        "normalizer": {
+          "custom_normalizer": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": "lowercase"
+          }
+        }
+      }
+    },
+    "mappings": {
+      "properties": {
+        "cqdg_participant_id": {
+          "type": "keyword"
+        },
+        "fhir_id": {
+          "type": "keyword"
+        },
+        "gender": {
+          "type": "keyword"
+        },
+        "vital_status": {
+          "type": "boolean"
+        },
+        "age_at_recruitment": {
+          "type": "long"
+        },
+        "ethnicity": {
+          "type": "keyword"
+        },
+        "submitter_participant_id": {
+          "type": "keyword"
+        },
+        "age_of_death": {
+          "type": "long"
+        },
+        "study": {
+          "type": "nested",
+          "properties": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "description": {
+              "type": "keyword"
+            },
+            "contact": {
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                },
+                "value": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "status": {
+              "type": "keyword"
+            },
+            "title": {
+              "type": "keyword"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "population" : {
+              "type" : "keyword"
+            },
+            "study_version" : {
+              "type" : "keyword"
+            },
+            "data_types": {
+              "type": "nested",
+              "properties": {
+                "data_type": {
+                  "type": "keyword"
+                },
+                "participant_count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "data_categories": {
+              "type": "nested",
+              "properties": {
+                "data_category": {
+                  "type": "keyword"
+                },
+                "participant_count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "participant_count" : {
+              "type" : "integer"
+            },
+            "file_count" : {
+              "type" : "integer"
+            },
+            "data_category" : {
+              "type" : "keyword"
+            },
+            "family_count" : {
+              "type" : "integer"
+            },
+            "experimental_strategy" : {
+              "type" : "keyword"
+            },
+            "hpo_terms" : {
+              "type" : "keyword"
+            },
+            "mondo_terms" : {
+              "type" : "keyword"
+            },
+            "icd_terms" : {
+              "type" : "keyword"
+            },
+            "family_data" : {
+              "type" : "boolean"
+            },
+            "data_access_codes": {
+              "type": "nested",
+              "properties": {
+                "access_requirements": {
+                  "type": "keyword"
+                },
+                "access_limitations": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "internal_study_id" : {
+              "type" : "keyword"
+            },
+            "study_id" : {
+              "type" : "keyword"
+            },
+            "release_id" : {
+              "type" : "keyword"
+            }
+          }
+        },
+        "cause_of_death": {
+          "type": "keyword"
+        },
+        "is_affected": {
+          "type": "keyword"
+        },
+        "internal_diagnosis_id": {
+          "type": "keyword"
+        },
+        "diagnosis_source_text": {
+          "type": "keyword"
+        },
+        "diagnosis_mondo_code": {
+          "type": "keyword"
+        },
+        "diagnosis_ICD_code": {
+          "type": "keyword"
+        },
+        "age_at_diagnosis": {
+          "type": "long"
+        },
+        "tagged_icd": {
+          "type": "nested",
+          "properties": {
+            "internal_phenotype_id": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "phenotype_id": {
+              "type": "boolean"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            },
+            "display_name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "tagged_mondo": {
+          "type": "nested",
+          "properties": {
+            "internal_phenotype_id": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "phenotype_id": {
+              "type": "boolean"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            },
+            "display_name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "mondo": {
+          "type": "nested",
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "display_name": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            }
+          }
+        },
+        "observed_phenotype_tagged": {
+          "type": "nested",
+          "properties": {
+            "internal_phenotype_id": {
+              "type": "keyword"
+            },
+            "phenotype_id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "display_name": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            }
+          }
+        },
+        "non_observed_phenotype_tagged": {
+          "type": "nested",
+          "properties": {
+            "internal_phenotype_id": {
+              "type": "keyword"
+            },
+            "phenotype_id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "display_name": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            }
+          }
+        },
+        "observed_phenotypes": {
+          "type": "nested",
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parents": {
+              "type": "keyword"
+            },
+            "is_leaf": {
+              "type": "boolean"
+            },
+            "is_tagged": {
+              "type": "boolean"
+            },
+            "display_name": {
+              "type": "keyword"
+            },
+            "age_at_event": {
+              "type": "long"
+            }
+          }
+        },
+        "familyRelationships": {
+          "type": "nested",
+          "properties": {
+            "submitter_participant_id": {
+              "type": "keyword"
+            },
+            "focus_participant_id": {
+              "type": "keyword"
+            },
+            "relationship_to_proband": {
+              "type": "keyword"
+            },
+            "internal_familyrelationship_id": {
+              "type": "keyword"
+            },
+            "family_type": {
+              "type": "keyword"
+            },
+            "family_id": {
+              "type": "keyword"
+            }
+          }
+        },
+        "is_a_proband": {
+          "type": "boolean"
+        },
+        "files": {
+          "type": "nested",
+          "properties": {
+            "study_id": {
+              "type": "keyword"
+            },
+            "release_id": {
+              "type": "keyword"
+            },
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "biospecimen_reference": {
+              "type": "keyword"
+            },
+            "data_type": {
+              "type": "keyword"
+            },
+            "data_category": {
+              "type": "keyword"
+            },
+            "owner": {
+              "type": "keyword"
+            },
+            "bio_informatic_analysis": {
+              "type": "keyword"
+            },
+            "labAliquotID": {
+              "type": "keyword"
+            },
+            "run_name": {
+              "type": "keyword"
+            },
+            "run_alias": {
+              "type": "keyword"
+            },
+            "run_date": {
+              "type": "keyword"
+            },
+            "capture_kit": {
+              "type": "keyword"
+            },
+            "platform": {
+              "type": "keyword"
+            },
+            "experimental_strategy": {
+              "type": "keyword"
+            },
+            "sequencer_id": {
+              "type": "keyword"
+            },
+            "workflow_name": {
+              "type": "keyword"
+            },
+            "workflow_version": {
+              "type": "keyword"
+            },
+            "genome_build": {
+              "type": "keyword"
+            },
+            "alir": {
+              "type": "keyword"
+            },
+            "snv": {
+              "type": "keyword"
+            },
+            "gcnv": {
+              "type": "keyword"
+            },
+            "gsv": {
+              "type": "keyword"
+            },
+            "ssup": {
+              "type": "keyword"
+            },
+            "file_name": {
+              "type": "keyword"
+            },
+            "file_format": {
+              "type": "keyword"
+            },
+            "file_size": {
+              "type": "keyword"
+            },
+            "ferload_url": {
+              "type": "keyword"
+            },
+            "biospecimens": {
+              "type": "nested",
+              "properties": {
+                "biospecimen_tissue_source": {
+                  "type": "keyword"
+                },
+                "age_biospecimen_collection": {
+                  "type": "long"
+                },
+                "submitter_participant_id": {
+                  "type": "keyword"
+                },
+                "samples": {
+                  "type": "nested",
+                  "properties": {
+                    "subject": {
+                      "type": "keyword"
+                    },
+                    "internal_sampleregistration_id": {
+                      "type": "keyword"
+                    },
+                    "sample_type": {
+                      "type": "keyword"
+                    },
+                    "submitter_participant_id": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "release_id": {
+          "type": "keyword"
+        },
+        "study_id": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

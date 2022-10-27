@@ -1,0 +1,539 @@
+{
+  "index_patterns": [
+    "file_centric*"
+  ],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "number_of_shards": 5,
+      "analysis": {
+        "normalizer": {
+          "custom_normalizer": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": "lowercase"
+          }
+        }
+      }
+    },
+    "mappings": {
+      "properties": {
+        "access": {
+          "type": "keyword"
+        },
+        "controlled_access": {
+          "type": "keyword"
+        },
+        "access_urls" : {
+          "type": "keyword"
+        },
+        "acl" : {
+          "type": "keyword"
+        },
+        "data_category": {
+          "type": "keyword"
+        },
+        "data_type": {
+          "type": "keyword"
+        },
+        "external_id" : {
+          "type": "keyword"
+        },
+        "fhir_id" : {
+          "type": "keyword"
+        },
+        "file_facet_ids": {
+          "properties": {
+            "file_fhir_id_1": {
+              "type": "keyword"
+            },
+            "file_fhir_id_2": {
+              "type": "keyword"
+            }
+          }
+        },
+        "file_format": {
+          "type": "keyword"
+        },
+        "file_id": {
+          "type" : "keyword",
+          "normalizer" : "custom_normalizer"
+        },
+        "fhir_document_reference": {
+          "type": "keyword"
+        },
+        "file_name" : {
+          "type": "keyword"
+        },
+        "hashes" : {
+          "properties" : {
+            "etag" : {
+              "type": "keyword"
+            },
+            "md5" : {
+              "type": "keyword"
+            }
+          }
+        },
+        "index": {
+          "properties": {
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "file_format": {
+              "type": "keyword"
+            },
+            "file_id": {
+              "type": "keyword"
+            },
+            "file_name": {
+              "type": "keyword"
+            },
+            "hashes": {
+              "properties": {
+                "etag": {
+                  "type": "keyword"
+                },
+                "md5": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "urls" : {
+              "type": "keyword"
+            },
+            "size": {
+              "type": "long"
+            }
+          }
+        },
+        "is_harmonized" : {
+          "type" : "boolean"
+        },
+        "participant_fhir_ids" : {
+          "type": "keyword"
+        },
+        "nb_participants": {
+          "type": "integer"
+        },
+        "nb_biospecimens": {
+          "type": "integer"
+        },
+        "participants": {
+          "type": "nested",
+          "properties": {
+            "age_at_data_collection": {
+              "type": "integer"
+            },
+            "biospecimens": {
+              "type": "nested",
+              "properties": {
+                "age_at_biospecimen_collection": {
+                  "type": "integer"
+                },
+                "age_at_biospecimen_collection_years": {
+                  "type": "integer"
+                },
+                "age_at_biospecimen_collection_onset": {
+                  "type": "keyword"
+                },
+                "sample_id": {
+                  "type": "keyword"
+                },
+                "sample_type": {
+                  "type": "keyword"
+                },
+                "parent_sample_id": {
+                  "type": "keyword"
+                },
+                "parent_sample_type": {
+                  "type": "keyword"
+                },
+                "collection_sample_id": {
+                  "type": "keyword"
+                },
+                "collection_sample_type": {
+                  "type": "keyword"
+                },
+                "container_id" : {
+                  "type": "keyword"
+                },
+                "volume_ul": {
+                  "type": "float"
+                },
+                "volume_unit": {
+                  "type": "keyword"
+                },
+                "laboratory_procedure" : {
+                  "type": "keyword"
+                },
+                "biospecimen_storage" : {
+                  "type": "keyword"
+                },
+                "fhir_id" : {
+                  "type": "keyword"
+                },
+                "biospecimen_facet_ids": {
+                  "properties": {
+                    "biospecimen_fhir_id_1": {
+                      "type": "keyword"
+                    },
+                    "biospecimen_fhir_id_2": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "status" : {
+                  "type": "keyword"
+                }
+              }
+            },
+            "diagnosis": {
+              "type": "nested",
+              "properties": {
+                "affected_status" : {
+                  "type" : "boolean"
+                },
+                "affected_status_text" : {
+                  "type": "keyword"
+                },
+                "age_at_event_days" : {
+                  "type" : "long"
+                },
+                "diagnosis_id" : {
+                  "type": "keyword"
+                },
+                "fhir_id" : {
+                  "type": "keyword"
+                },
+                "icd_id_diagnosis" : {
+                  "type": "keyword"
+                },
+                "mondo_id_diagnosis" : {
+                  "type": "keyword"
+                },
+                "ncit_id_diagnosis": {
+                  "type": "keyword"
+                },
+                "source_text" : {
+                  "type": "keyword"
+                },
+                "source_text_tumor_location" : {
+                  "type": "keyword"
+                },
+                "uberon_id_tumor_location" : {
+                  "type": "keyword"
+                }
+              }
+            },
+            "down_syndrome_diagnosis": {
+              "type": "keyword"
+            },
+            "ethnicity": {
+              "type": "keyword"
+            },
+            "external_id" : {
+              "type": "keyword"
+            },
+            "family": {
+              "properties": {
+                "fhir_id": {
+                  "type": "keyword"
+                },
+                "family_id": {
+                  "type": "keyword"
+                },
+                "father_id": {
+                  "type": "keyword"
+                },
+                "mother_id": {
+                  "type": "keyword"
+                },
+                "family_relations": {
+                  "type": "nested",
+                  "properties": {
+                    "related_participant_id": {
+                      "type": "keyword"
+                    },
+                    "related_participant_fhir_id": {
+                      "type": "keyword"
+                    },
+                    "relation": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "families_id" : {
+              "type": "keyword"
+            },
+            "family_type": {
+              "type": "keyword"
+            },
+            "fhir_id" : {
+              "type": "keyword"
+            },
+            "participant_facet_ids": {
+              "properties": {
+                "participant_fhir_id_1": {
+                  "type": "keyword"
+                },
+                "participant_fhir_id_2": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "is_proband": {
+              "type": "boolean"
+            },
+            "down_syndrome_status": {
+              "type": "keyword"
+            },
+            "mondo" : {
+              "type": "nested",
+              "properties" : {
+                "age_at_event_days" : {
+                  "type" : "long"
+                },
+                "is_leaf" : {
+                  "type" : "boolean"
+                },
+                "is_tagged" : {
+                  "type" : "boolean"
+                },
+                "name" : {
+                  "type": "keyword"
+                },
+                "parents" : {
+                  "type": "keyword"
+                }
+              }
+            },
+            "observed_phenotype" : {
+              "type" : "nested",
+              "properties" : {
+                "age_at_event_days" : {
+                  "type" : "long"
+                },
+                "is_leaf" : {
+                  "type" : "boolean"
+                },
+                "is_tagged" : {
+                  "type" : "boolean"
+                },
+                "name" : {
+                  "type": "keyword"
+                },
+                "parents" : {
+                  "type": "keyword"
+                }
+              }
+            },
+            "participant_id": {
+              "type": "keyword"
+            },
+            "phenotype": {
+              "type": "nested",
+              "properties": {
+                "age_at_event_days" : {
+                  "type" : "long"
+                },
+                "fhir_id" : {
+                  "type": "keyword"
+                },
+                "hpo_phenotype_observed" : {
+                  "type": "keyword"
+                },
+                "hpo_phenotype_observed_text" : {
+                  "type": "keyword"
+                },
+                "hpo_phenotype_not_observed" : {
+                  "type": "keyword"
+                },
+                "hpo_phenotype_not_observed_text" : {
+                  "type": "keyword"
+                },
+                "observed" : {
+                  "type" : "boolean"
+                }
+              }
+            },
+            "race": {
+              "type": "keyword"
+            },
+            "release_id": {
+              "type": "keyword"
+            },
+            "sex": {
+              "type": "keyword"
+            },
+            "study": {
+              "type": "nested",
+              "properties" : {
+                "attribution" : {
+                  "type": "keyword"
+                },
+                "data_access" : {
+                  "type": "keyword"
+                },
+                "experimental_strategy" : {
+                  "type": "keyword"
+                },
+                "external_id" : {
+                  "type": "keyword"
+                },
+                "family_count" : {
+                  "type" : "long"
+                },
+                "family_data" : {
+                  "type" : "boolean"
+                },
+                "fhir_id" : {
+                  "type": "keyword"
+                },
+                "file_count" : {
+                  "type" : "long"
+                },
+                "participant_count" : {
+                  "type" : "long"
+                },
+                "program" : {
+                  "type": "keyword"
+                },
+                "release_id" : {
+                  "type": "keyword"
+                },
+                "status" : {
+                  "type": "keyword"
+                },
+                "study_code" : {
+                  "type": "keyword"
+                },
+                "study_id" : {
+                  "type": "keyword"
+                },
+                "study_name" : {
+                  "type": "keyword"
+                },
+                "version" : {
+                  "type": "keyword"
+                },
+                "website": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "study_external_id": {
+              "type": "keyword"
+            },
+            "study_id": {
+              "type": "keyword"
+            }
+          }
+        },
+        "release_id" : {
+          "type": "keyword"
+        },
+        "repository" : {
+          "type": "keyword"
+        },
+        "sequencing_experiment": {
+          "properties": {
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "sequencing_experiment_id": {
+              "type": "keyword"
+            },
+            "experiment_strategy": {
+              "type": "keyword"
+            },
+            "instrument_model": {
+              "type": "keyword"
+            },
+            "library_name": {
+              "type": "keyword"
+            },
+            "library_strand": {
+              "type": "keyword"
+            },
+            "platform": {
+              "type": "keyword"
+            }
+          }
+        },
+        "size": {
+          "type": "long"
+        },
+        "specimen_fhir_ids" : {
+          "type": "keyword"
+        },
+        "status" : {
+          "type": "keyword"
+        },
+        "study": {
+          "properties" : {
+            "attribution" : {
+              "type": "keyword"
+            },
+            "controlled_access" : {
+              "type": "keyword"
+            },
+            "experimental_strategy" : {
+              "type": "keyword"
+            },
+            "external_id" : {
+              "type": "keyword"
+            },
+            "family_count" : {
+              "type" : "long"
+            },
+            "family_data" : {
+              "type" : "boolean"
+            },
+            "fhir_id" : {
+              "type": "keyword"
+            },
+            "file_count" : {
+              "type" : "long"
+            },
+            "participant_count" : {
+              "type" : "long"
+            },
+            "program" : {
+              "type": "keyword"
+            },
+            "release_id" : {
+              "type": "keyword"
+            },
+            "status" : {
+              "type": "keyword"
+            },
+            "study_code" : {
+              "type": "keyword"
+            },
+            "study_id" : {
+              "type": "keyword"
+            },
+            "study_name" : {
+              "type": "keyword"
+            },
+            "data_category" : {
+              "type": "keyword"
+            },
+            "version" : {
+              "type": "keyword"
+            }
+          }
+        },
+        "study_id": {
+          "type": "keyword"
+        },
+        "urls" : {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
