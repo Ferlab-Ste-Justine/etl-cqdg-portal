@@ -172,13 +172,13 @@
           "type": "nested",
           "properties": {
             "internal_phenotype_id": {
-              "type": "boolean"
+              "type": "keyword"
             },
             "is_tagged": {
               "type": "boolean"
             },
             "phenotype_id": {
-              "type": "boolean"
+              "type": "keyword"
             },
             "is_leaf": {
               "type": "boolean"
@@ -201,13 +201,13 @@
           "type": "nested",
           "properties": {
             "internal_phenotype_id": {
-              "type": "boolean"
+              "type": "keyword"
             },
             "is_tagged": {
               "type": "boolean"
             },
             "phenotype_id": {
-              "type": "boolean"
+              "type": "keyword"
             },
             "is_leaf": {
               "type": "boolean"
