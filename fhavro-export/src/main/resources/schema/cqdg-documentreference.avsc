@@ -642,7 +642,7 @@
                             "type": [
                               "null",
                               {
-                                "type": "bytes",
+                                "type": "float",
                                 "logicalType": "decimal",
                                 "precision": 18,
                                 "scale": 0

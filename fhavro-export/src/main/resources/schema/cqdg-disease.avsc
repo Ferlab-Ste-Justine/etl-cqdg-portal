@@ -458,17 +458,12 @@
             "default": null
           },
           {
-            "name": "value",
+            "name":"value",
             "type": [
               "null",
-              {
-                "type": "bytes",
-                "logicalType": "decimal",
-                "precision": 18,
-                "scale": 0
-              }
+              "int"
             ],
-            "default": null
+            "default":null
           },
           {
             "name": "comparator",

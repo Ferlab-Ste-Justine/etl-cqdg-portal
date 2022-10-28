@@ -418,14 +418,9 @@
                   },
                   {
                     "name":"value",
-                    "type":[
+                    "type": [
                       "null",
-                      {
-                        "type":"bytes",
-                        "logicalType":"decimal",
-                        "precision":18,
-                        "scale":0
-                      }
+                      "int"
                     ],
                     "default":null
                   },
