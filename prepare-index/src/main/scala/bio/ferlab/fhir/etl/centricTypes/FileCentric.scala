@@ -37,10 +37,9 @@ class FileCentric(releaseId: String, studyIds: List[String])(implicit configurat
         .withColumn("file", explode(col("files")))
         .select("*","file.*")
         .drop("file", "files")
-        .addParticipant(data(simple_participant.id))
+        .addParticipantWithBiospecimen(data(simple_participant.id), data(normalized_biospecimen.id), data(normalized_sample_registration.id))
         .addStudy(data(es_index_study_centric.id))
         .addSequencingExperiment(data(normalized_sequencing_experiment.id))
-        .addBiospecimenWithSamples(data(normalized_biospecimen.id), data(normalized_sample_registration.id))
 
     Map(mainDestination.id -> transformedFile)
   }

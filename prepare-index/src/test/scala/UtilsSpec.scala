@@ -421,7 +421,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       SIMPLE_PARTICIPANT(`fhir_id` = "B", participant_facet_ids = PARTICIPANT_FACET_IDS(participant_fhir_id_1 = "B", participant_fhir_id_2 = "B"),`participant_id` = "P_B")
     ).toDF()
 
-    val output = inputBiospecimen.addBiospecimenParticipant(inputParticipant)
+    val output = inputBiospecimen.addParticipant(inputParticipant)
 
     val biospecimenWithParticipant = output.select("fhir_id", "participant").as[(String, SIMPLE_PARTICIPANT)].collect()
     val biospecimen1 = biospecimenWithParticipant.filter(_._1 == "1").head

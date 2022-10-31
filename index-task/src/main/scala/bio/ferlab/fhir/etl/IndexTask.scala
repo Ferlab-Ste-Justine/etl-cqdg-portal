@@ -67,13 +67,8 @@ object IndexTask extends App {
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
 
-    val toto = df.drop("age_at_diagnosis","tagged_icd", "tagged_mondo", "observed_phenotype_tagged", "non_observed_phenotype_tagged", "observed_phenotypes", "age_of_death", "age_at_recruitment")
-    toto.show(false)
-//    toto.printSchema()
-
-
     new Indexer("index", templatePath, indexName)
-      .run(toto)
+      .run(df)
   })
 
 }

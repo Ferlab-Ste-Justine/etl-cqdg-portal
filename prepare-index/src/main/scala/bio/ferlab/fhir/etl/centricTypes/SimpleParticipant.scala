@@ -12,7 +12,6 @@ import java.time.LocalDateTime
 class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit configuration: Configuration) extends ETL {
 
   override val mainDestination: DatasetConf = conf.getDataset("simple_participant")
-  val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
   val normalized_patient: DatasetConf = conf.getDataset("normalized_patient")
   val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
   val normalized_disease: DatasetConf = conf.getDataset("normalized_diagnosis")
@@ -28,7 +27,7 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     (Seq(
-      es_index_study_centric, normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death, normalized_group, normalized_family_relationship)
+      normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death, normalized_group, normalized_family_relationship)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
@@ -47,7 +46,6 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
 
     val transformedParticipant =
       patientDF
-        .addStudy(data(es_index_study_centric.id))
         .addCauseOfDeath(data(normalized_cause_of_death.id))
         .addDiseaseStatus(data(normalized_disease_status.id))
         .addDiagnosisPhenotypes(

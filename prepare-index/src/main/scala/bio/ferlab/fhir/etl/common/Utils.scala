@@ -41,13 +41,40 @@ object Utils {
       df.join(refactorStudyDf, Seq("study_id"), "left_outer")
     }
 
-    def addParticipant(participantDf: DataFrame): DataFrame = {
-      val participantGrouped = participantDf
-        .withColumn("participant", struct(participantDf.columns.filterNot(Seq("fhir_id").contains).map(col): _*))
-        .drop(participantDf.columns.filterNot(Seq("participant", "cqdg_participant_id").contains): _*)
+    def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
+      val biospecimenWithSamples = biospecimenDF.addSamplesToBiospecimen(sampleRegistration)
 
-     df.join(participantGrouped, col("cqdg_participant_id") === col("participant_id"), "left_outer")
+      val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
+
+      val participantsWithBiospecimenGrouped = participantsWithBiospecimen
+        .withColumn("participant", struct(participantsWithBiospecimen.columns.filterNot(Seq("study_id", "release_id").contains).map(col): _*))
+        .drop(participantsWithBiospecimen.columns.filterNot(Seq("participant", "cqdg_participant_id").contains): _*)
+
+      df.join(participantsWithBiospecimenGrouped, col("cqdg_participant_id") === col("participant_id"), "left_outer")
         .drop("cqdg_participant_id")
+    }
+
+    def addSamplesToBiospecimen(samplesDf: DataFrame): DataFrame = {
+      val groupColumns = Seq("subject", "parent", "study_id", "release_id")
+
+      val samplesGrouped = samplesDf
+        .groupBy(groupColumns.head, groupColumns.tail: _*)
+        .agg(collect_list(struct(samplesDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "samples")
+        .withColumnRenamed("parent", "fhir_id")
+
+
+      df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"))
+    }
+
+    def addBiospecimen(biospecimenDf: DataFrame): DataFrame = {
+      val groupColumns = Seq("subject", "study_id", "release_id")
+
+      val biospecimenGrouped = biospecimenDf
+        .groupBy(groupColumns.head, groupColumns.tail: _*)
+        .agg(collect_list(struct(biospecimenDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "biospecimens")
+        .withColumnRenamed("subject", "fhir_id")
+
+      df.join(biospecimenGrouped, Seq("fhir_id", "study_id", "release_id"))
     }
 
     def addOutcomes(vitalStatusDf: DataFrame): DataFrame = {
@@ -105,6 +132,7 @@ object Utils {
         .drop("submitter_participant_ids")
     }
 
+    //TODO - SEQ exp should be added per file using the participant ID or the fileID (alir, svn, ...)???
     def addSequencingExperiment(sequencingExperiment: DataFrame): DataFrame = {
       val sequencingExperimentClean = sequencingExperiment
         .drop("fhir_id", "study_id", "release_id")
@@ -174,42 +202,18 @@ object Utils {
       df.join(groupedFamilyDf, groupedFamilyDf.col("submitter_participant_ids") === df.col("fhir_id"), "left_outer")
     }
 
-    def addSampleRegistration(sampleRegistrationDF: DataFrame): DataFrame = {
-      val cleanSampleRegistration = sampleRegistrationDF
-        .withColumn("sample_type", col("sample_type")("code"))
-        .withColumn("sample", struct(
-          col("subject"),
-          col("fhir_id") as "internal_sampleregistration_id",
-          col("sample_type"),
-          col("submitter_participant_id"),
-        ))
-        .drop(
-          sampleRegistrationDF.columns
-            .filterNot(Seq("parent", "sample").contains(_)): _*
-        )
-
-      df.join(cleanSampleRegistration, col("fhir_id") === col("parent"), "left_outer")
-        .drop("parent")
-    }
-
-    def addParticipantFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
+    def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
 
       val biospecimenWithSample = biospecimensDf
-        .addSampleRegistration(sampleRegistrationDF)
-        .groupBy(biospecimensDf.columns.map(col): _*)
-        .agg(collect_list(col("sample")) as "samples")
-        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
-        .withColumn("biospecimen_tissue_source", col("biospecimen_tissue_source")("code"))
-        .groupBy("fhir_id", "subject", "study_id", "release_id")
-        .agg(collect_list(
+        .addSamplesToBiospecimen(sampleRegistrationDF)
+
+      val biospecimenGrouped = biospecimenWithSample
+        .withColumn("biospecimen",
           struct(
-            col("biospecimen_tissue_source"),
-            col("age_biospecimen_collection"),
-            col("submitter_participant_id"),
-            col("samples"),
-          )
-        ) as "biospecimens")
-        .drop("fhir_id", "study_id", "release_id")
+            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id", "release_id").contains).map(col): _*)
+        )
+        .withColumnRenamed("subject", "participant_id")
+        .select("participant_id", "study_id", "release_id", "biospecimen")
 
       val cleanSeqExperiment = seqExperiment
         .drop("fhir_id", "study_id", "release_id")
@@ -221,17 +225,16 @@ object Utils {
         .drop("files", "for", "files_exp")
 
       val filesWithBiospecimen = filesWithSeqExp
-        .join(biospecimenWithSample, col("participant_id") === col("subject"), "left_outer")
-        .drop("subject")
+        .join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")
 
-      val filesWithBiospecimenGrouped = filesWithBiospecimen
-        .groupBy("participant_id")
+      val filesGroupedPerParticipant = filesWithBiospecimen
+        .groupBy("participant_id",  "study_id", "release_id")
         .agg(collect_list(struct(
-          filesWithBiospecimen.columns.filterNot(Seq("participant_id").contains).map(col): _*
+          filesWithBiospecimen.columns.filterNot(Seq("participant_id",  "study_id", "release_id").contains).map(col): _*
         )) as "files")
         .withColumnRenamed("participant_id", "cqdg_participant_id")
 
-      df.join(filesWithBiospecimenGrouped, Seq("cqdg_participant_id"), "left_outer")
+      df.join(filesGroupedPerParticipant, Seq("cqdg_participant_id", "study_id", "release_id"), "left_outer")
     }
 
     def addFileParticipantsWithBiospecimen(participantDf: DataFrame, biospecimensDf: DataFrame): DataFrame = {
@@ -261,15 +264,21 @@ object Utils {
 
     }
 
-    def addBiospecimenFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
-      val cleanSeqExperiment = seqExperiment
-        .withColumnRenamed("for", "subject")
-        .drop("fhir_id", "study_id", "release_id")
+    def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
 
-      df.join(cleanSeqExperiment, Seq("subject"), "left_outer")
+      val filesWithSeqExp = filesDf.addSequencingExperiment(seqExperiment)
+
+      val filesWithSeqExpGrouped = filesWithSeqExp
+        .groupBy("participant_id", "study_id", "release_id")
+        .agg(collect_list(struct(
+          filesWithSeqExp.columns.filterNot(Seq("participant_id", "study_id", "release_id").contains(_)).map(col): _*
+        )) as "files")
+        .withColumnRenamed("participant_id", "subject")
+
+      df.join(filesWithSeqExpGrouped, Seq("subject", "study_id", "release_id"), "left_outer")
     }
 
-    def addBiospecimenParticipant(participantsDf: DataFrame): DataFrame = {
+    def addParticipant(participantsDf: DataFrame): DataFrame = {
       val reformatParticipant: DataFrame = participantsDf
               .withColumn("participant", struct(participantsDf.columns.map(col): _*))
               .withColumn("subject", col("fhir_id"))

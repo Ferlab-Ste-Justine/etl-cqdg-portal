@@ -18,11 +18,12 @@ class BiospecimenCentric(releaseId: String, studyIds: List[String])(implicit con
   val normalized_sample_registration: DatasetConf = conf.getDataset("normalized_sample_registration")
   val simple_participant: DatasetConf = conf.getDataset("simple_participant")
   val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
+  val es_index_file_centric: DatasetConf = conf.getDataset("es_index_file_centric")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
-    Seq(normalized_biospecimen, normalized_drs_document_reference, simple_participant, es_index_study_centric, normalized_sequencing_experiment, normalized_sample_registration)
+    Seq(normalized_biospecimen, normalized_drs_document_reference, simple_participant, es_index_study_centric, normalized_sequencing_experiment, normalized_sample_registration, es_index_file_centric)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
       ).toMap
@@ -38,9 +39,9 @@ class BiospecimenCentric(releaseId: String, studyIds: List[String])(implicit con
         .withColumn("biospecimen_tissue_source", col("biospecimen_tissue_source")("code"))
         .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
         .addStudy(data(es_index_study_centric.id))
-        .addBiospecimenParticipant(data(simple_participant.id))
-        .addBiospecimenFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
-        .addSampleRegistration(data(normalized_sample_registration.id))
+        .addParticipant(data(simple_participant.id))
+        .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
+        .addSamplesToBiospecimen(data(normalized_sample_registration.id))
 
     Map(mainDestination.id -> transformedBiospecimen)
   }
