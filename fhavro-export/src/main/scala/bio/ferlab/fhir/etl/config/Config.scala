@@ -9,14 +9,14 @@ import pureconfig.generic.auto._
 
 case class AWSConfig(bucketName: String, endpoint: Option[String] = None, pathStyleAccess: Boolean =  false)
 
-case class KeycloakConfig(cookie: String)
+case class KeycloakConfig(token: String)
 
 case class FhirConfig(baseUrl: String, resources: List[FhirRequest])
 
 case class FhirRequest(`type`: String, schema: String, total: Option[String], profile: Option[String], entityType: Option[String], count: Option[Int], additionalQueryParam: Option[Map[String, List[String]]])
 
 case class Config(awsConfig: AWSConfig,
-                  keycloakConfig: Option[KeycloakConfig],
+                  keycloakConfig: KeycloakConfig,
                   fhirConfig: FhirConfig)
 
 object Config {

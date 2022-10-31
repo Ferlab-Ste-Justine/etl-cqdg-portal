@@ -1,7 +1,7 @@
 package bio.ferlab.fhir.etl.fhir
 
 import bio.ferlab.fhir.etl.config.Config
-import bio.ferlab.fhir.etl.auth.CookieInterceptor
+import bio.ferlab.fhir.etl.auth.{AuthTokenInterceptor, CookieInterceptor}
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.client.impl.GenericClient
 import org.apache.http.HttpHost
@@ -15,7 +15,7 @@ object FhirUtils {
 
   def buildFhirClient(config: Config): GenericClient = {
     val fhirClient: GenericClient = fhirContext.getRestfulClientFactory.newGenericClient(s"${config.fhirConfig.baseUrl}").asInstanceOf[GenericClient]
-    config.keycloakConfig.foreach(kc => fhirClient.registerInterceptor(new CookieInterceptor(kc.cookie)))
+    fhirClient.registerInterceptor(new AuthTokenInterceptor(config.keycloakConfig.token))
     fhirClient
   }
 
