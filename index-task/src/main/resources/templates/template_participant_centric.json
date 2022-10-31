@@ -42,111 +42,6 @@
         "age_of_death": {
           "type": "long"
         },
-        "study": {
-          "type": "nested",
-          "properties": {
-            "keyword": {
-              "type": "keyword"
-            },
-            "description": {
-              "type": "keyword"
-            },
-            "contact": {
-              "properties": {
-                "type": {
-                  "type": "keyword"
-                },
-                "value": {
-                  "type": "keyword"
-                }
-              }
-            },
-            "status": {
-              "type": "keyword"
-            },
-            "title": {
-              "type": "keyword"
-            },
-            "domain": {
-              "type": "keyword"
-            },
-            "population" : {
-              "type" : "keyword"
-            },
-            "study_version" : {
-              "type" : "keyword"
-            },
-            "data_types": {
-              "type": "nested",
-              "properties": {
-                "data_type": {
-                  "type": "keyword"
-                },
-                "participant_count": {
-                  "type": "integer"
-                }
-              }
-            },
-            "data_categories": {
-              "type": "nested",
-              "properties": {
-                "data_category": {
-                  "type": "keyword"
-                },
-                "participant_count": {
-                  "type": "integer"
-                }
-              }
-            },
-            "participant_count" : {
-              "type" : "integer"
-            },
-            "file_count" : {
-              "type" : "integer"
-            },
-            "data_category" : {
-              "type" : "keyword"
-            },
-            "family_count" : {
-              "type" : "integer"
-            },
-            "experimental_strategy" : {
-              "type" : "keyword"
-            },
-            "hpo_terms" : {
-              "type" : "keyword"
-            },
-            "mondo_terms" : {
-              "type" : "keyword"
-            },
-            "icd_terms" : {
-              "type" : "keyword"
-            },
-            "family_data" : {
-              "type" : "boolean"
-            },
-            "data_access_codes": {
-              "type": "nested",
-              "properties": {
-                "access_requirements": {
-                  "type": "keyword"
-                },
-                "access_limitations": {
-                  "type": "keyword"
-                }
-              }
-            },
-            "internal_study_id" : {
-              "type" : "keyword"
-            },
-            "study_id" : {
-              "type" : "keyword"
-            },
-            "release_id" : {
-              "type" : "keyword"
-            }
-          }
-        },
         "cause_of_death": {
           "type": "keyword"
         },
@@ -361,6 +256,111 @@
         },
         "is_a_proband": {
           "type": "boolean"
+        },
+        "study": {
+          "type": "nested",
+          "properties": {
+            "keyword": {
+              "type": "keyword"
+            },
+            "description": {
+              "type": "keyword"
+            },
+            "contact": {
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                },
+                "value": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "status": {
+              "type": "keyword"
+            },
+            "title": {
+              "type": "keyword"
+            },
+            "domain": {
+              "type": "keyword"
+            },
+            "population" : {
+              "type" : "keyword"
+            },
+            "study_version" : {
+              "type" : "keyword"
+            },
+            "data_types": {
+              "type": "nested",
+              "properties": {
+                "data_type": {
+                  "type": "keyword"
+                },
+                "participant_count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "data_categories": {
+              "type": "nested",
+              "properties": {
+                "data_category": {
+                  "type": "keyword"
+                },
+                "participant_count": {
+                  "type": "integer"
+                }
+              }
+            },
+            "participant_count" : {
+              "type" : "integer"
+            },
+            "file_count" : {
+              "type" : "integer"
+            },
+            "data_category" : {
+              "type" : "keyword"
+            },
+            "family_count" : {
+              "type" : "integer"
+            },
+            "experimental_strategy" : {
+              "type" : "keyword"
+            },
+            "hpo_terms" : {
+              "type" : "keyword"
+            },
+            "mondo_terms" : {
+              "type" : "keyword"
+            },
+            "icd_terms" : {
+              "type" : "keyword"
+            },
+            "family_data" : {
+              "type" : "boolean"
+            },
+            "data_access_codes": {
+              "type": "nested",
+              "properties": {
+                "access_requirements": {
+                  "type": "keyword"
+                },
+                "access_limitations": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "internal_study_id" : {
+              "type" : "keyword"
+            },
+            "study_id" : {
+              "type" : "keyword"
+            },
+            "release_id" : {
+              "type" : "keyword"
+            }
+          }
         },
         "files": {
           "type": "nested",

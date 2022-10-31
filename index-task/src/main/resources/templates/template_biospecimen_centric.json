@@ -162,111 +162,6 @@
             "age_of_death": {
               "type": "integer"
             },
-            "study": {
-              "type": "nested",
-              "properties": {
-                "keyword": {
-                  "type": "keyword"
-                },
-                "description": {
-                  "type": "keyword"
-                },
-                "contact": {
-                  "properties": {
-                    "type": {
-                      "type": "keyword"
-                    },
-                    "value": {
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "status": {
-                  "type": "keyword"
-                },
-                "title": {
-                  "type": "keyword"
-                },
-                "domain": {
-                  "type": "keyword"
-                },
-                "population": {
-                  "type": "keyword"
-                },
-                "study_version": {
-                  "type": "keyword"
-                },
-                "data_types": {
-                  "type": "nested",
-                  "properties": {
-                    "data_type": {
-                      "type": "keyword"
-                    },
-                    "participant_count": {
-                      "type": "integer"
-                    }
-                  }
-                },
-                "data_categories": {
-                  "type": "nested",
-                  "properties": {
-                    "data_category": {
-                      "type": "keyword"
-                    },
-                    "participant_count": {
-                      "type": "integer"
-                    }
-                  }
-                },
-                "participant_count": {
-                  "type": "integer"
-                },
-                "file_count": {
-                  "type": "integer"
-                },
-                "data_category": {
-                  "type": "keyword"
-                },
-                "family_count": {
-                  "type": "integer"
-                },
-                "experimental_strategy": {
-                  "type": "keyword"
-                },
-                "hpo_terms": {
-                  "type": "keyword"
-                },
-                "mondo_terms": {
-                  "type": "keyword"
-                },
-                "icd_terms": {
-                  "type": "keyword"
-                },
-                "family_data": {
-                  "type": "boolean"
-                },
-                "data_access_codes": {
-                  "type": "nested",
-                  "properties": {
-                    "access_requirements": {
-                      "type": "keyword"
-                    },
-                    "access_limitations": {
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "internal_study_id": {
-                  "type": "keyword"
-                },
-                "study_id": {
-                  "type": "keyword"
-                },
-                "release_id": {
-                  "type": "keyword"
-                }
-              }
-            },
             "cause_of_death": {
               "type": "keyword"
             },
@@ -490,59 +385,93 @@
             }
           }
         },
-        "owner": {
-          "type": "keyword"
-        },
-        "bio_informatic_analysis": {
-          "type": "keyword"
-        },
-        "labAliquotID": {
-          "type": "keyword"
-        },
-        "run_name": {
-          "type": "keyword"
-        },
-        "run_alias": {
-          "type": "keyword"
-        },
-        "run_date": {
-          "type": "keyword"
-        },
-        "capture_kit": {
-          "type": "keyword"
-        },
-        "platform": {
-          "type": "keyword"
-        },
-        "experimental_strategy": {
-          "type": "keyword"
-        },
-        "sequencer_id": {
-          "type": "keyword"
-        },
-        "workflow_name": {
-          "type": "keyword"
-        },
-        "workflow_version": {
-          "type": "keyword"
-        },
-        "genome_build": {
-          "type": "keyword"
-        },
-        "alir": {
-          "type": "keyword"
-        },
-        "snv": {
-          "type": "keyword"
-        },
-        "gcnv": {
-          "type": "keyword"
-        },
-        "gsv": {
-          "type": "keyword"
-        },
-        "ssup": {
-          "type": "keyword"
+        "files": {
+          "type": "nested",
+          "properties": {
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "biospecimen_reference": {
+              "type": "keyword"
+            },
+            "data_type": {
+              "type": "keyword"
+            },
+            "data_category": {
+              "type": "keyword"
+            },
+            "files": {
+              "type": "nested",
+              "properties": {
+                "file_name": {
+                  "type": "keyword"
+                },
+                "file_format": {
+                  "type": "keyword"
+                },
+                "file_size": {
+                  "type": "float"
+                },
+                "ferload_url": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "owner": {
+              "type": "keyword"
+            },
+            "bio_informatic_analysis": {
+              "type": "keyword"
+            },
+            "labAliquotID": {
+              "type": "keyword"
+            },
+            "run_name": {
+              "type": "keyword"
+            },
+            "run_alias": {
+              "type": "keyword"
+            },
+            "run_date": {
+              "type": "keyword"
+            },
+            "capture_kit": {
+              "type": "keyword"
+            },
+            "platform": {
+              "type": "keyword"
+            },
+            "experimental_strategy": {
+              "type": "keyword"
+            },
+            "sequencer_id": {
+              "type": "keyword"
+            },
+            "workflow_name": {
+              "type": "keyword"
+            },
+            "workflow_version": {
+              "type": "keyword"
+            },
+            "genome_build": {
+              "type": "keyword"
+            },
+            "alir": {
+              "type": "keyword"
+            },
+            "snv": {
+              "type": "keyword"
+            },
+            "gcnv": {
+              "type": "keyword"
+            },
+            "gsv": {
+              "type": "keyword"
+            },
+            "ssup": {
+              "type": "keyword"
+            }
+          }
         },
         "samples": {
           "type": "nested",
@@ -551,7 +480,14 @@
               "type": "keyword"
             },
             "sample_type": {
-              "type": "keyword"
+              "properties": {
+                "system": {
+                  "type": "keyword"
+                },
+                "code": {
+                  "type": "keyword"
+                }
+              }
             },
             "submitter_participant_id": {
               "type": "keyword"
