@@ -28,20 +28,16 @@ case class PHENOTYPE_HPO_CODE(
 case class PHENOTYPE_TAGGED (
                               `internal_phenotype_id`: String = "1",
                               `is_tagged`: Boolean = true,
-                              `phenotype_id`: String = "HP:0001626",
                               `is_leaf`: Boolean = false,
-                              `name`: String = "Abnormality of the cardiovascular system",
+                              `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                               `parents`: Seq[String] = Nil,
-                              `age_at_event`: Int = 0,
-                              `display_name`: String = "Abnormality of the cardiovascular system (HP:0001626)"
+                              `age_at_event`: Long = 0,
                             )
 
 case class PHENOTYPE_TAGGED_WITH_ANCESTORS (
-                                             `phenotype_id`: String = "HP:0001626",
-                                             `name`: String = "Abnormality of the cardiovascular system",
+                                             `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                                              `parents`: Seq[String] = Nil,
                                              `is_leaf`: Boolean = false,
                                              `is_tagged`: Boolean = false,
-                                             `display_name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                                              `age_at_event`: Seq[Int] = Seq(0)
                                            )

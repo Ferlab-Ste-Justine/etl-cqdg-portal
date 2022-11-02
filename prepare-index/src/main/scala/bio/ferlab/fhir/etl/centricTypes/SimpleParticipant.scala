@@ -54,7 +54,6 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
         )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
         .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
 
-
     Map(mainDestination.id -> transformedParticipant)
   }
 }

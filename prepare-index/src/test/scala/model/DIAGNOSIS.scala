@@ -12,6 +12,6 @@ case class DIAGNOSIS(
                     )
 
 case class AGE_AT_DIAGNOSIS(
-                             value: Long = 825505328,
+                             value: Long = 12,
                              unit: String = "days",
                            )

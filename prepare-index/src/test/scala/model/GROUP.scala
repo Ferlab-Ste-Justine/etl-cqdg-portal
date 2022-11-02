@@ -1,15 +1,18 @@
 package model
 
 case class GROUP(
-                   fhir_id: String = "42367",
-                   study_id: String = "SD_Z6MWD3H0",
-                   family_id: String = "FM_NV901ZZN",
-                   `type`: String = "person",
-                   family_members: Seq[(String, Boolean)] = Seq(("38734", false)),
-                   family_members_id: Seq[String] = Seq("38734")
+                  study_id: String = "Study_1",
+                  release_id: String = "5",
+                  internal_family_id: String = "1",
+                  family_type: String = "trio",
+                  family_members: Seq[String] = Seq("P1", "P2", "P3"),
+                  submitter_family_id: String = "1"
                  )
 case class FAMILY(
+                   cqdg_participant_id: String = "42367",
                    fhir_id: String = "42367",
+                   study_id: String = "Study_1",
+                   release_id: String = "5",
                    family_id: String = "FM_NV901ZZN",
                    father_id: Option[String] = None,
                    mother_id: Option[String] = None,
