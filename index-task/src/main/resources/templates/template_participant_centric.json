@@ -72,9 +72,6 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "phenotype_id": {
-              "type": "keyword"
-            },
             "is_leaf": {
               "type": "boolean"
             },
@@ -85,10 +82,7 @@
               "type": "keyword"
             },
             "age_at_event": {
-              "type": "long"
-            },
-            "display_name": {
-              "type": "keyword"
+              "type": "integer"
             }
           }
         },
@@ -101,9 +95,6 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "phenotype_id": {
-              "type": "keyword"
-            },
             "is_leaf": {
               "type": "boolean"
             },
@@ -114,19 +105,13 @@
               "type": "keyword"
             },
             "age_at_event": {
-              "type": "long"
-            },
-            "display_name": {
-              "type": "keyword"
+              "type": "integer"
             }
           }
         },
         "mondo": {
           "type": "nested",
           "properties": {
-            "id": {
-              "type": "keyword"
-            },
             "name": {
               "type": "keyword"
             },
@@ -139,11 +124,8 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "display_name": {
-              "type": "keyword"
-            },
             "age_at_event": {
-              "type": "long"
+              "type": "integer"
             }
           }
         },
@@ -153,9 +135,6 @@
             "internal_phenotype_id": {
               "type": "keyword"
             },
-            "phenotype_id": {
-              "type": "keyword"
-            },
             "name": {
               "type": "keyword"
             },
@@ -168,11 +147,8 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "display_name": {
-              "type": "keyword"
-            },
             "age_at_event": {
-              "type": "long"
+              "type": "integer"
             }
           }
         },
@@ -182,9 +158,6 @@
             "internal_phenotype_id": {
               "type": "keyword"
             },
-            "phenotype_id": {
-              "type": "keyword"
-            },
             "name": {
               "type": "keyword"
             },
@@ -197,20 +170,14 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "display_name": {
-              "type": "keyword"
-            },
             "age_at_event": {
-              "type": "long"
+              "type": "integer"
             }
           }
         },
         "observed_phenotypes": {
           "type": "nested",
           "properties": {
-            "id": {
-              "type": "keyword"
-            },
             "name": {
               "type": "keyword"
             },
@@ -223,11 +190,8 @@
             "is_tagged": {
               "type": "boolean"
             },
-            "display_name": {
-              "type": "keyword"
-            },
             "age_at_event": {
-              "type": "long"
+              "type": "integer"
             }
           }
         },
