@@ -199,9 +199,6 @@ object Utils {
         .withColumn("is_a_proband", when(col("relationship_to_proband") === "Is the proband", lit(true)).otherwise(lit(false)))
         .drop("relationship_to_proband")
 
-      familyRelationshipDf.show(false)
-      isProbandDf.show(false)
-
       val familyWithGroup = familyRelationshipDf
         .join(explodedFamilyDF, col("family_members_exp") === col("submitter_participant_id"), "left_outer")
         .groupBy("study_id", "release_id", "internal_family_id", "submitter_family_id")

@@ -9,3 +9,12 @@ case class FAMILY_RELATIONSHIP(
                                 `focus_participant_id`: String = "428396",
                                 `relationship_to_proband`: String = "mother",
                               )
+
+case class FAMILY_RELATIONSHIP_WITH_FAMILY(
+                                            `submitter_participant_id`: String = "P1",
+                                            `focus_participant_id`: String = "P2",
+                                            `relationship_to_proband`: String = "father",
+                                            `internal_familyrelationship_id`: String = "Family1",
+                                            `family_type`: String = "trio",
+                                            `family_id`: String = "fam1",
+                                          )

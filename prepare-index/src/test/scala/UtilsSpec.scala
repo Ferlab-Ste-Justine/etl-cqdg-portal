@@ -2,7 +2,7 @@ import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.Utils._
 import model._
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{col, explode_outer}
+import org.apache.spark.sql.functions.col
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -16,6 +16,13 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val allHpoTerms: DataFrame = read(getClass.getResource("/hpo_terms.json").toString, "Json", Map(), None, None)
   val allMondoTerms: DataFrame = read(getClass.getResource("/mondo_terms.json").toString, "Json", Map(), None, None)
 
+  val inputPatients: DataFrame = Seq(
+    PATIENT(`cqdg_participant_id` = "P1",`fhir_id` = "P1", `submitter_participant_id` = "P1"),
+    PATIENT(`cqdg_participant_id` = "P2",`fhir_id` = "P2", `submitter_participant_id` = "P2"),
+    PATIENT(`cqdg_participant_id` = "P3",`fhir_id` = "P3", `submitter_participant_id` = "P3"),
+    PATIENT(`cqdg_participant_id` = "P4", `fhir_id` = "P4", `submitter_participant_id` = "P4")
+  ).toDF()
+
   "addStudy" should "add studies to participant" in {
     val inputStudies = Seq(RESEARCHSTUDY()).toDF()
     val inputParticipants = Seq(PATIENT()).toDF()
@@ -26,14 +33,6 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   }
 
   "addFamily" should "add families to patients" in {
-    val inputPatients = Seq(
-      PATIENT(`cqdg_participant_id` = "P1",`fhir_id` = "P1", `submitter_participant_id` = "P1"),
-      PATIENT(`cqdg_participant_id` = "P2",`fhir_id` = "P2", `submitter_participant_id` = "P2"),
-      PATIENT(`cqdg_participant_id` = "P3",`fhir_id` = "P3", `submitter_participant_id` = "P3"),
-      PATIENT(`cqdg_participant_id` = "P4", `fhir_id` = "P4", `submitter_participant_id` = "P4")
-
-    ).toDF()
-
     val inputFamilies = Seq(
       GROUP(internal_family_id = "Family1", submitter_family_id = "fam1"),
       GROUP(internal_family_id = "Family2", family_members = Seq("P4"), family_type="solo", submitter_family_id = "fam1"),
@@ -46,38 +45,36 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     ).toDF()
 
     val output = inputPatients.addFamily(inputFamilies, inputFamilyRelationship)
-    inputPatients.show(false)
-    output.show(false)
 
+    // Should return probands
     val probands = output.select("cqdg_participant_id", "is_a_proband").where(col("is_a_proband")).drop("is_a_proband").as[String].collect()
-    probands should contain theSameElementsAs Seq("P2", "P4") //FIXME what happen when a participant does not have family relationship (is he a proband)
-    //    val patientWithFamilies: Array[(String, FAMILY, String, String)] = output.select("fhir_id", "family", "family_type", "families_id").as[(String, FAMILY, String, String)].collect()
-//
-//    patientWithFamilies.length shouldBe 4
-//
-//    val patient3 = patientWithFamilies.filter(_._1 == "SON").head
-//    patient3._2.family_relations.map(_.`relation`) should contain theSameElementsAs Seq("mother", "father")
-//    patient3._2.mother_id shouldBe Some("P1")
-//    patient3._2.father_id shouldBe Some("P2")
-//    patient3._3 shouldBe "trio"
-//    patient3._4 shouldBe "FM_111"
-//
-//    val patient1 = patientWithFamilies.filter(_._1 == "FTH").head
-//    patient1._2.family_relations.map(_.`relation`) shouldBe Seq("son")
-//    patient1._3 shouldBe "trio"
-//    patient1._4 shouldBe "FM_111"
-//
-//    val patient2 = patientWithFamilies.filter(_._1 == "MTH").head
-//    patient2._3 shouldBe "trio"
-//    patient2._4 shouldBe "FM_111"
-//
-//    val patient4 = patientWithFamilies.filter(_._1 == "44").head
-//    patient4._2 shouldBe null
-//    patient4._3 shouldBe "proband-only"
-//    patient4._4 shouldBe "FM_222"
+//    probands should contain theSameElementsAs Seq("P2", "P4") //FIXME what happen when a participant does not have family relationship (is he a proband)
+    probands should contain theSameElementsAs Seq("P2")
+
+    // Should return mapped family relations per participant
+    val patients = output.select("cqdg_participant_id", "familyRelationships").as[(String, Seq[FAMILY_RELATIONSHIP_WITH_FAMILY])].collect()
+    val p1 = patients.filter(_._1 == "P1").head
+    p1._2 should contain theSameElementsAs Seq(
+      FAMILY_RELATIONSHIP_WITH_FAMILY(),
+      FAMILY_RELATIONSHIP_WITH_FAMILY(
+        `submitter_participant_id` = "P2",
+        `relationship_to_proband` = "Is the proband"),
+      FAMILY_RELATIONSHIP_WITH_FAMILY(
+        `submitter_participant_id` = "P3",
+        `relationship_to_proband` = "mother"),
+    )
   }
-//
-//  it should "return duo" in {
+
+  "addCauseOfDeath" should "add cause of death to participant" in {
+    val causeOfDeath = Seq(CAUSE_OF_DEATH(`fhir_id` = "COD1", `submitter_participant_ids` = "P1")).toDF()
+
+    val output = inputPatients.addCauseOfDeath(causeOfDeath)
+    val participantCauseOfDeath = output.select("cqdg_participant_id", "cause_of_death").as[(String, String)].collect()
+
+    participantCauseOfDeath.filter(_._1 == "P1").head._2 shouldBe "Pie eating"
+  }
+
+  //  it should "return duo" in {
 //    val inputPatients = Seq(
 //      PATIENT(`fhir_id` = "FTH", `submitter_participant_id` = "P1"),
 //      PATIENT(`fhir_id` = "SON", `submitter_participant_id` = "P2"),

@@ -11,7 +11,6 @@ case class PATIENT(
                     `ethnicity`: String = "french canadian",
                     `submitter_participant_id`: String = "35849409716",
                     `age_of_death`: String = null,
-                    `cause_of_death`: String = null,
                     `is_affected`: String = null,
                   )
 
