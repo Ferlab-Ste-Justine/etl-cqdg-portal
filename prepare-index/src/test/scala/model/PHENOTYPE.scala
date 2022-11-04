@@ -5,6 +5,7 @@ case class PHENOTYPE(
                       `release_id`: String = "5",
                       `fhir_id`: String = "PHE0000001",
                       `phenotype_source_text`: String = null,
+                      `age_at_phenotype`: Option[Int] = None ,
                       `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
                       `cqdg_participant_id`: String = "PRT0000003",
                       `phenotype_observed`: String = "POS",
@@ -31,7 +32,7 @@ case class PHENOTYPE_TAGGED (
                               `is_leaf`: Boolean = false,
                               `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                               `parents`: Seq[String] = Nil,
-                              `age_at_event`: Long = 0,
+                              `age_at_event`: Option[Int] = None,
                             )
 
 case class PHENOTYPE_TAGGED_WITH_ANCESTORS (

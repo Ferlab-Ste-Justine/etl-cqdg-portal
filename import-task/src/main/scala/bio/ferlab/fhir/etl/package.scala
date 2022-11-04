@@ -35,6 +35,7 @@ package object etl {
   val SYS_DATA_ACCESS_TYPES = "https://includedcc.org/fhir/code-systems/data_access_types"
   val DOCUMENT_DATA_TYPE = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
   val DOCUMENT_DATA_CATEGORY = "https://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
+  val SYS_AGE_AT_PHENOTYPE = "http://fhir.cqdg.ferlab.bio/StructureDefinition/Observation/AgeAtPhenotype"
 
   //Task
   val TASK_BIO_INFO = "https://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"

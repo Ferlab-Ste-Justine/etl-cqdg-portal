@@ -151,8 +151,12 @@ object Transformations {
 
   val observationPhenotypeMappings: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation")
+      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
+      .withColumn("age_at_phenotype", firstNonNull(transform(
+        filter(col("extension"),col => col("url") === SYS_AGE_AT_PHENOTYPE)("valueAge"),
+        col => col("value")
+      )))
       .withColumn("phenotype_source_text", col("code")("text"))
       .withColumn("phenotype_HPO_code",
          firstNonNull(transform(col("valueCodeableConcept")("coding"), col => struct(col("system") as "system", col("code") as "code")))
@@ -160,7 +164,7 @@ object Transformations {
       .withColumn("cqdg_participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("phenotype_observed", col("interpretation")(0)("coding")(0)("code"))
     ),
-    Drop("code", "valueCodeableConcept", "subject", "interpretation")
+    Drop("code", "valueCodeableConcept", "subject", "interpretation", "extension")
   )
 
 

@@ -24,7 +24,6 @@ object OntologyUtils {
   def generatePhenotypeWithAncestors (observedPhenotypes: DataFrame, colName: String): DataFrame = {
     observedPhenotypes
       .withColumn("ancestors_exp", explode(col("ancestors")))
-      .withColumn("age_at_event", lit(0))  ///fixme - replace with real value when available
       .withColumn("term", struct(
         col("parents"),
         col("is_leaf"),
@@ -65,11 +64,11 @@ object OntologyUtils {
 
     val observedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").equalTo("POS"))
-      .withColumn("age_at_event", lit(0))//FIXME - replace with actual value when available
+      .withColumnRenamed("age_at_phenotype", "age_at_event")
 
     val nonObservedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").notEqual("POS") || col("phenotype_observed").isNull)
-      .withColumn("age_at_event", lit(0))//FIXME - replace with actual value when available
+      .withColumnRenamed("age_at_phenotype", "age_at_event")
 
     val observedPhenotypesWithAncestors = generatePhenotypeWithAncestors(observedPhenotypes, "observed_phenotypes")
 
