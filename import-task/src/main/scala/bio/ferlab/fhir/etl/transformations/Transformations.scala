@@ -49,11 +49,11 @@ object Transformations {
       .withColumn("for", regexp_extract(col("for")("reference"), patientExtract, 1))
       .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
       .withColumn("clean_output", transform(col("output"), col => struct(col("type")("coding")(0) as "code", col("valueReference") as "value")))
-      .withColumn("alir", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "ALIR")(0)("value")("reference"), documentExtract, 1))
-      .withColumn("snv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "SNV")(0)("value")("reference"), documentExtract, 1))
-      .withColumn("gcnv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "GCNV")(0)("value")("reference"), documentExtract, 1))
-      .withColumn("gsv", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "GSV")(0)("value")("reference"), documentExtract, 1))
-      .withColumn("ssup", regexp_extract(filter(col("clean_output"), col => col("code")("code") === "SSUP")(0)("value")("reference"), documentExtract, 1))
+      .withColumn("alir", filter(col("clean_output"), col => col("code")("code") === "ALIR")(0)("value")("reference"))
+      .withColumn("snv", filter(col("clean_output"), col => col("code")("code") === "SNV")(0)("value")("reference"))
+      .withColumn("gcnv", filter(col("clean_output"), col => col("code")("code") === "GCNV")(0)("value")("reference"))
+      .withColumn("gsv", filter(col("clean_output"), col => col("code")("code") === "GSV")(0)("value")("reference"))
+      .withColumn("ssup", filter(col("clean_output"), col => col("code")("code") === "SSUP")(0)("value")("reference"))
     ),
     Drop("seq_exp", "extension", "workflow", "code", "output", "clean_output")
   )
@@ -65,7 +65,6 @@ object Transformations {
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
-      //todo fix value or age (in bytes)
       .withColumn("age_biospecimen_collection", extractValueAge("https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
@@ -136,7 +135,6 @@ object Transformations {
         firstNonNull(filter(col("code")("coding"), col => col("system").equalTo("http://purl.obolibrary.org/obo/mondo.owl"))("code")))
       .withColumn("diagnosis_ICD_code", firstNonNull(filter(col("code")("coding"), col => col("system").isNull)("code")))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      //todo fix value or age (in bytes)
       .withColumn("age_at_diagnosis", struct(col("onsetAge")("value") as "value", col("onsetAge")("unit") as "unit"))
     ),
     Drop("identifier", "code", "onsetAge")
@@ -222,7 +220,6 @@ object Transformations {
       .withColumn("family_type", firstNonNull(transform(col("code")("coding"), col => col("code"))))
       .withColumn("family_members", transform(col("member"), col => regexp_extract(col("entity")("reference"), patientExtract, 1)))
       .withColumn("submitter_family_id", col("identifier")(0)("value"))
-      //fixme missing 'cqdg_participant_id' (see xls file) ?? clarify...
     ),
     Drop("code", "member", "identifier")
   )
@@ -236,7 +233,6 @@ object Transformations {
     "group" -> groupMappings,
     "document_reference" -> documentreferenceMappings,
     "diagnosis" -> conditionDiagnosisMappings,
-    //todo "age_at_phenotype" -> conditionAgeAtPhenotype,
     "phenotype" -> observationPhenotypeMappings,
     "family_relationship" -> observationFamilyRelationshipMappings,
     "cause_of_death" -> observationCauseOfDeathMappings,
