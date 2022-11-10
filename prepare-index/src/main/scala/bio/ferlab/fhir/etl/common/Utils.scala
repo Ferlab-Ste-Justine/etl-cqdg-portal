@@ -19,26 +19,35 @@ object Utils {
     }
 
     def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
-      val biospecimenWithSamples = biospecimenDF.addSamplesToBiospecimen(sampleRegistration)
+      val biospecimenWithSamples = biospecimenDF
+        .addSamplesToBiospecimen(sampleRegistration)
+        .withColumn("biospecimen_tissue_source", col("biospecimen_tissue_source")("code"))
+        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
 
       val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
 
-      val participantsWithBiospecimenGrouped = participantsWithBiospecimen
+      val participantsWithBiospecimens = participantsWithBiospecimen
         .withColumn("participant", struct(participantsWithBiospecimen.columns.filterNot(Seq("study_id", "release_id").contains).map(col): _*))
-        .drop(participantsWithBiospecimen.columns.filterNot(Seq("participant", "cqdg_participant_id").contains): _*)
+        .drop(participantsWithBiospecimen.columns.filterNot(Seq("participant", "participant_id").contains): _*)
 
-      df.join(participantsWithBiospecimenGrouped, col("cqdg_participant_id") === col("participant_id"), "left_outer")
-        .drop("cqdg_participant_id")
+
+      val filesWithParticipants = df
+        .join(participantsWithBiospecimens, Seq("participant_id"), "left_outer")
+        .drop("participant_id")
+
+      filesWithParticipants
+        .groupBy(filesWithParticipants.columns.filterNot(Seq("participant").contains) map col: _*)
+        .agg(collect_list("participant") as "participants")
     }
 
     def addSamplesToBiospecimen(samplesDf: DataFrame): DataFrame = {
       val groupColumns = Seq("subject", "parent", "study_id", "release_id")
 
       val samplesGrouped = samplesDf
+        .withColumn("sample_type", col("sample_type")("code"))
         .groupBy(groupColumns.head, groupColumns.tail: _*)
         .agg(collect_list(struct(samplesDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "samples")
         .withColumnRenamed("parent", "fhir_id")
-
 
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"))
     }
@@ -49,9 +58,9 @@ object Utils {
       val biospecimenGrouped = biospecimenDf
         .groupBy(groupColumns.head, groupColumns.tail: _*)
         .agg(collect_list(struct(biospecimenDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "biospecimens")
-        .withColumnRenamed("subject", "fhir_id")
+        .withColumnRenamed("subject", "participant_id")
 
-      df.join(biospecimenGrouped, Seq("fhir_id", "study_id", "release_id"))
+      df.join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"))
     }
 
     def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {
@@ -65,6 +74,8 @@ object Utils {
         .join(observedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(nonObservedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(observedPhenotypesWithAncestors, Seq("cqdg_participant_id"), "left_outer")
+        .withColumnRenamed("fhir_id", "participant_id")
+        .drop("cqdg_participant_id")
     }
 
     def addCauseOfDeath(causeOfDeath: DataFrame): DataFrame = {
@@ -76,13 +87,19 @@ object Utils {
         .drop("submitter_participant_ids")
     }
 
-    //TODO - SEQ exp should be added per file using the participant ID or the fileID (alir, svn, ...)???
     def addSequencingExperiment(sequencingExperiment: DataFrame): DataFrame = {
       val sequencingExperimentClean = sequencingExperiment
         .drop("fhir_id", "study_id", "release_id")
         .withColumnRenamed("for", "participant_id")
 
-      df.join(sequencingExperimentClean, Seq("participant_id"), "left_outer")
+      val seqExperimentByFile = sequencingExperimentClean
+        .withColumn("all_files", filter(array(col("alir"), col("snv"), col("gcnv"), col("gsv"), col("ssup")), a => a.isNotNull))
+        .withColumn("all_files_exp", explode(col("all_files")))
+        .groupBy("all_files_exp")
+        .agg(collect_list(struct(sequencingExperimentClean.columns.filterNot(Seq("participant_id", "all_files", "all_files_exp").contains).map(e => col(e)): _*))(0) as "sequencing_experiment")
+        .withColumnRenamed("all_files_exp", "fhir_id")
+
+      df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
     }
 
     def addBiospecimenWithSamples(biospecimenDf: DataFrame, sampleRegistrationDf: DataFrame): DataFrame = {
@@ -144,14 +161,11 @@ object Utils {
         .withColumnRenamed("subject", "participant_id")
         .select("participant_id", "study_id", "release_id", "biospecimen")
 
-      val cleanSeqExperiment = seqExperiment
-        .drop("fhir_id", "study_id", "release_id")
-
       val filesWithSeqExp = filesDf
         .withColumn("files_exp", explode(col("files")))
-        .join(cleanSeqExperiment, col("for") === col("participant_id"), "left_outer")
+        .addSequencingExperiment(seqExperiment)
         .select("*", "files_exp.*")
-        .drop("files", "for", "files_exp")
+        .drop("files", "files_exp")
 
       val filesWithBiospecimen = filesWithSeqExp
         .join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")
@@ -161,32 +175,33 @@ object Utils {
         .agg(collect_list(struct(
           filesWithBiospecimen.columns.filterNot(Seq("participant_id",  "study_id", "release_id").contains).map(col): _*
         )) as "files")
-        .withColumnRenamed("participant_id", "cqdg_participant_id")
 
-      df.join(filesGroupedPerParticipant, Seq("cqdg_participant_id", "study_id", "release_id"), "left_outer")
+      df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id", "release_id"), "left_outer")
     }
 
     def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
 
-      val filesWithSeqExp = filesDf.addSequencingExperiment(seqExperiment)
+      val filesWithSeqExp = filesDf
+        .addSequencingExperiment(seqExperiment)
+        .withColumn("files_exp", explode(col("files")))
+        .select("files_exp.*", filesDf.columns.filterNot(Seq("files").contains).:+("sequencing_experiment"): _*)
+        .withColumnRenamed("participant_id", "subject")
+        .withColumnRenamed("fhir_id", "file_id")
 
       val filesWithSeqExpGrouped = filesWithSeqExp
-        .groupBy("participant_id", "study_id", "release_id")
-        .agg(collect_list(struct(
-          filesWithSeqExp.columns.filterNot(Seq("participant_id", "study_id", "release_id").contains(_)).map(col): _*
-        )) as "files")
-        .withColumnRenamed("participant_id", "subject")
+        .groupBy("subject", "study_id", "release_id")
+        .agg(collect_list(struct(filesWithSeqExp.columns.filterNot(Seq("subject", "study_id", "release_id").contains) map col: _*)) as "files")
 
       df.join(filesWithSeqExpGrouped, Seq("subject", "study_id", "release_id"), "left_outer")
     }
 
     def addParticipant(participantsDf: DataFrame): DataFrame = {
       val reformatParticipant: DataFrame = participantsDf
-              .withColumn("participant", struct(participantsDf.columns.map(col): _*))
-              .withColumn("subject", col("fhir_id"))
-              .select("subject", "participant")
+        .withColumn("participant", struct(participantsDf.columns.map(col): _*))
+        .withColumnRenamed("participant_id", "subject")
+        .select("subject", "participant")
 
-      df.join(reformatParticipant, Seq("subject"))
+      df.join(reformatParticipant, Seq("subject"), "left_outer")
     }
 
     def addFamily(familyDf: DataFrame, familyRelationshipDf: DataFrame): DataFrame = {
@@ -217,7 +232,7 @@ object Utils {
         .drop("submitter_participant_id", "family_members", "study_id", "release_id", "internal_family_id", "submitter_family_id")
 
       df
-        .join(familyWithGroup, col("cqdg_participant_id") === col("family_members_exp"), "left_outer")
+        .join(familyWithGroup, col("participant_id") === col("family_members_exp"), "left_outer")
         .drop("family_members_exp")
     }
   }

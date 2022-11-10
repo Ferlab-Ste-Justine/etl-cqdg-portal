@@ -84,7 +84,7 @@ object OntologyUtils {
       .withColumn("age_at_event", col("age_at_diagnosis")("value"))
       .withColumnRenamed("subject", "cqdg_participant_id")
 
-    val taggedMondoTerms = generateTaggedPhenotypes(mondoWithTerms, "tagged_mondo")
+    val taggedMondoTerms = generateTaggedPhenotypes(mondoWithTerms, "mondo_tagged")
 
     val mondoWithAncestors = generatePhenotypeWithAncestors(mondoWithTerms, "mondo")
 
@@ -97,7 +97,7 @@ object OntologyUtils {
       .withColumn("age_at_event", col("age_at_diagnosis")("value"))
       .withColumnRenamed("subject", "cqdg_participant_id")
 
-    val taggedIcdTerms = generateTaggedPhenotypes(icdWithTerms, "tagged_icd")
+    val taggedIcdTerms = generateTaggedPhenotypes(icdWithTerms, "icd_tagged")
 
     (diagnosisDf
       .withColumn("age_at_diagnosis", col("age_at_diagnosis")("value"))
