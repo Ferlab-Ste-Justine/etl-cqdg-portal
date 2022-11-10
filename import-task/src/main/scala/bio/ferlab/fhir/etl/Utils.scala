@@ -35,8 +35,6 @@ object Utils {
 
   val extractReferenceId: Column => Column = (column: Column) => functions.split(column, "/")(1)
 
-  val extractStudyId: () => Column = () => regexp_extract(extractFirstForSystem(col("identifier"), Seq(URN_UNIQUE_ID))("value"), patternUrnUniqueIdStudy, 1)
-
   val extractFirstForSystem: (Column, Seq[String]) => Column = (column: Column, system: Seq[String]) => filter(column, c => regexp_extract(c("system"), extractSystemUrl, 1).isin(system: _*))(0)
 
   val extractDocUrl: Column => Column = artifacts => filter(artifacts, c => c("type") === "documentation")(0)

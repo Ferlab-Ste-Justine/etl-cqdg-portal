@@ -14,15 +14,15 @@ object Transformations {
     Custom(_
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
       .withColumn("age_at_recruitment", firstNonNull(transform(
-        filter(col("extension"),col => col("url") === SYS_AGE_AT_RECRUITMENT)("valueAge"),
+        filter(col("extension"),col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueAge"),
         col => col("value")
       )))
       .withColumn("ethnicity",
-        firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === SYS_ETHNICITY_URL)("valueCodeableConcept"))("coding"))("code")
+        firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
       )
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
       .withColumnRenamed("deceasedBoolean", "vital_status")
-      .withColumn("age_of_death", filter(col("extension"), col => col("url") === SYS_AGE_OF_DEATH_URL)(0)("valueAge")("value"))
+      .withColumn("age_of_death", filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)(0)("valueAge")("value"))
     ),
     Drop("identifier", "extension")
   )
@@ -31,8 +31,8 @@ object Transformations {
     Custom(_
       .select("fhir_id", "study_id", "release_id", "output", "code", "for", "owner", "extension")
       .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("code"))
-      .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT)(0))
-      .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW)(0))
+      .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT_S_D)(0))
+      .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
       .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
       .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
@@ -65,7 +65,7 @@ object Transformations {
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
-      .withColumn("age_biospecimen_collection", extractValueAge("https://fhir.cqdg.ferlab.bio/StructureDefinition/Specimen/ageBiospecimenCollection")(col("extension")).cast("struct<value:long,unit:string>"))
+      .withColumn("age_biospecimen_collection", extractValueAge(AGE_BIO_COLLECTION_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
     Drop("type", "extension", "identifier")
@@ -152,7 +152,7 @@ object Transformations {
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("age_at_phenotype", firstNonNull(transform(
-        filter(col("extension"),col => col("url") === SYS_AGE_AT_PHENOTYPE)("valueAge"),
+        filter(col("extension"),col => col("url") === AGE_AT_PHENOTYPE_S_D)("valueAge"),
         col => col("value")
       )))
       .withColumn("phenotype_source_text", col("code")("text"))
@@ -175,9 +175,9 @@ object Transformations {
       )
       .withColumn("domain", col("category")("coding")(0)("code"))
 
-      .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_URL)(0)("valueCodeableConcept")("coding")("code"))
-      .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_URL)(0)("valueCodeableConcept")("coding")("code"))
-      .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_URL)(0)("valueCoding")("code"))
+      .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_S_D)(0)("valueCodeableConcept")("coding")("code"))
+      .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_S_D)(0)("valueCodeableConcept")("coding")("code"))
+      .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_S_D)(0)("valueCoding")("code"))
       .withColumn("study_version", regexp_extract(filter(col("meta")("tag"), col => col("code").contains("study_version"))(0)("code"), versionExtract, 1))
     ),
     Drop("extension", "category", "meta")
@@ -193,7 +193,7 @@ object Transformations {
         .withColumn("data_type", filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)("code"))
         .withColumn("data_category", filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)("code"))
         .withColumn("content_exp", explode(col("content")))
-        .withColumn("file_size", firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE))("valueDecimal"))
+        .withColumn("file_size", firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D))("valueDecimal"))
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
