@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl.config
 
-import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET}
+import bio.ferlab.datalake.commons.config.Format.{AVRO, CSV, DELTA, JSON, PARQUET}
 import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition}
 import bio.ferlab.datalake.commons.config._
 import bio.ferlab.datalake.commons.file.FileSystemType.S3
@@ -16,23 +16,25 @@ object ConfigurationGenerator extends App {
 
   private val partitionByStudyIdAndReleaseId = List("study_id", "release_id")
   val sourceNames: Seq[SourceConfig] = Seq(
-    SourceConfig("observation", Some("family_relationship"), partitionByStudyIdAndReleaseId),
-    SourceConfig("observation", Some("vital_status"), partitionByStudyIdAndReleaseId),
-    SourceConfig("condition", Some("disease"), partitionByStudyIdAndReleaseId),
-    SourceConfig("condition", Some("phenotype"), partitionByStudyIdAndReleaseId),
     SourceConfig("patient", None, partitionByStudyIdAndReleaseId),
-    SourceConfig("group", None, partitionByStudyIdAndReleaseId),
-    SourceConfig("documentreference", Some("document_reference"), partitionByStudyIdAndReleaseId),
+    SourceConfig("condition", Some("diagnosis"), partitionByStudyIdAndReleaseId),
+    SourceConfig("observation", Some("cause_of_death"), partitionByStudyIdAndReleaseId),
+    SourceConfig("observation", Some("disease_status"), partitionByStudyIdAndReleaseId),
+    SourceConfig("observation", Some("phenotype"), partitionByStudyIdAndReleaseId),
+    SourceConfig("specimen", Some("biospecimen"), partitionByStudyIdAndReleaseId),
+    SourceConfig("specimen", Some("sample_registration"), partitionByStudyIdAndReleaseId),
     SourceConfig("researchstudy", Some("research_study"), partitionByStudyIdAndReleaseId),
-    SourceConfig("researchsubject", Some("research_subject"), partitionByStudyIdAndReleaseId),
-    SourceConfig("specimen", None, partitionByStudyIdAndReleaseId),
-    SourceConfig("organization", None, List("release_id"))
+    SourceConfig("documentreference", Some("document_reference"), partitionByStudyIdAndReleaseId),
+    SourceConfig("observation", Some("family_relationship"), partitionByStudyIdAndReleaseId),
+    SourceConfig("observation", Some("tumor_normal_designation"), partitionByStudyIdAndReleaseId),
+    SourceConfig("group", None, partitionByStudyIdAndReleaseId),
+    SourceConfig("task", None, partitionByStudyIdAndReleaseId)
   )
 
   val storage = "storage"
 
   val rawsAndNormalized = sourceNames.flatMap(source => {
-    val rawPath = source.entityType.getOrElse(source.fhirResource)
+    val rawPath = source.fhirResource
     val tableName = source.entityType.map(_.replace("-", "_")).getOrElse(source.fhirResource.replace("-", "_"))
     Seq(
       DatasetConf(
@@ -47,7 +49,7 @@ object ConfigurationGenerator extends App {
       DatasetConf(
         id = s"normalized_$tableName",
         storageid = storage,
-        path = s"/normalized/$rawPath",
+        path = s"/normalized/${source.entityType.getOrElse(source.fhirResource)}",
         format = DELTA,
         loadtype = OverWritePartition,
         table = Some(TableConf("database", tableName)),
@@ -71,6 +73,23 @@ object ConfigurationGenerator extends App {
       storageid = storage,
       path = s"/mondo_terms",
       table = Some(TableConf("database", "mondo_terms")),
+      format = JSON,
+      loadtype = OverWrite,
+    ),
+    DatasetConf(
+      id = "duo_terms", //TODO should be removed
+      storageid = storage,
+      path = s"/duo_terms",
+      table = Some(TableConf("database", "duo_terms")),
+      readoptions = Map("header" -> "true"),
+      format = CSV,
+      loadtype = OverWrite,
+    ),
+    DatasetConf(
+      id = "icd_terms",
+      storageid = storage,
+      path = s"/icd_terms",
+      table = Some(TableConf("database", "icd_terms")),
       format = JSON,
       loadtype = OverWrite,
     )
@@ -119,7 +138,7 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", Configuration(
       storages = List(
-        StorageConf(storage, "s3a://storage", S3)
+        StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3)
       ),
       sources = populateTable(sources, conf(project)("localDbName")),
       args = args.toList,
