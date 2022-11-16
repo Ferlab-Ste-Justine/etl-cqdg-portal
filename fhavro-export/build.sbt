@@ -36,13 +36,11 @@ Test / fork := true
 
 resolvers ++= Seq("Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 
-//assembly / assemblyMergeStrategy:= {
-//  case PathList("META-INF", _*) => MergeStrategy.discard
-//  case _ => MergeStrategy.first
-//}
-//
-////assembly / test := {}
-//test := {}
-//assembly / mainClass := Some("bio.ferlab.fhir.etl.FhavroExport")
-////mainClass := Some("bio.ferlab.fhir.etl.FhavroExport")
-//assembly / assemblyJarName:= "fhavro-export.jar"
+assembly / assemblyMergeStrategy:= {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _ => MergeStrategy.first
+}
+
+assembly / test := {}
+assembly / mainClass := Some("bio.ferlab.fhir.etl.FhavroExport")
+assembly / assemblyJarName:= "fhavro-export.jar"

@@ -1,13 +1,17 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
+val datalakeSpark3Version = "0.2.46"
+val deltaCoreVersion = "1.0.0"
+
 val sparkDepsSetting = Seq(
-  libraryDependencies ++= Seq("bio.ferlab" %% "datalake-spark31" % "0.2.46",
-    "org.apache.spark" %% "spark-sql" % "3.1.2",
-    "org.apache.spark" %% "spark-hive" % "3.1.2",
-    "org.apache.spark" %% "spark-avro" % "2.4.2",
-    "org.apache.hadoop" % "hadoop-client" % "3.2.0",
-    "org.apache.hadoop" % "hadoop-aws" % "3.2.0",
-    "io.delta" %% "delta-core" % "1.0.0",
+  libraryDependencies ++= Seq(
+    "bio.ferlab" %% "datalake-spark31" % datalakeSpark3Version,
+    "org.apache.spark" %% "spark-sql" % "3.1.2" % Provided,
+    "org.apache.spark" %% "spark-hive" % "3.1.2" % Provided,
+    "org.apache.spark" %% "spark-avro" % "2.4.2" % Provided,
+    "org.apache.hadoop" % "hadoop-client" % "3.2.0" % Provided,
+    "org.apache.hadoop" % "hadoop-aws" % "3.2.0" % Provided,
+    "io.delta" %% "delta-core" % deltaCoreVersion,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test
   )
 )
@@ -15,7 +19,6 @@ val sparkDepsSetting = Seq(
 val commonSettings = Seq(
   scalaVersion := "2.12.16",
   version := "0.1.0-SNAPSHOT",
-  Compile / unmanagedResourceDirectories += config.base / "output",
 
   assembly / assemblyShadeRules := Seq(
     ShadeRule.rename("shapeless.**" -> "shadeshapless.@1").inAll
@@ -38,7 +41,7 @@ val commonSettings = Seq(
 
 )
 
-lazy val config = project in file("config")
+lazy val config = (project in file("config")).settings(commonSettings)
 lazy val fhavro_export = project in file("fhavro-export")
 lazy val import_task = (project in file("import-task")).settings(commonSettings ++ sparkDepsSetting)
 lazy val prepare_index = (project in file("prepare-index")).settings(commonSettings ++ sparkDepsSetting)
