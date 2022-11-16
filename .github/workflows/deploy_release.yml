@@ -30,16 +30,6 @@ jobs:
         run: sbt assembly
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
       - name: Upload Asset Config
         id: upload-asset-config
         uses: actions/upload-release-asset@v1.0.2
@@ -57,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: fhavro-export/target/scala-2.12/fhavro-export.jar
+          asset_path: fhavro-export/target/scala-2.13/fhavro-export.jar
           asset_name: fhavro-export.jar
           asset_content_type: application/java-archive
       - name: Upload Asset Import Task
@@ -100,4 +90,14 @@ jobs:
           asset_path: publish-task/target/scala-2.12/publish-task.jar
           asset_name: publish-task.jar
           asset_content_type: application/java-archive
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
