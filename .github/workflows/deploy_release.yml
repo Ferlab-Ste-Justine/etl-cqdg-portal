@@ -50,16 +50,6 @@ jobs:
           asset_path: config/target/scala-2.12/config.jar
           asset_name: config.jar
           asset_content_type: application/java-archive
-      - name: Upload Asset Fhavro Export
-        id: upload-asset-fhavro-export
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: fhavro-export/target/scala-2.13/fhavro-export.jar
-          asset_name: fhavro-export.jar
-          asset_content_type: application/java-archive
       - name: Upload Asset Import Task
         id: upload-asset-import-task
         uses: actions/upload-release-asset@v1.0.2
@@ -100,4 +90,18 @@ jobs:
           asset_path: publish-task/target/scala-2.12/publish-task.jar
           asset_name: publish-task.jar
           asset_content_type: application/java-archive
+
+  push:
+    name: Publish Image using commit sha and timestamp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Push the image on the registry
+        uses: Ferlab-Ste-Justine/action-push-image@v2
+        with:
+          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+          image: ferlabcrsj/fhavro-export
+          tag_format: "{sha}-{timestamp}"
+          location: fhavro-export/Dockerfile
 
