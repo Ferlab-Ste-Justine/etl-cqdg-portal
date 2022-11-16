@@ -90,13 +90,8 @@ jobs:
           asset_path: publish-task/target/scala-2.12/publish-task.jar
           asset_name: publish-task.jar
           asset_content_type: application/java-archive
-
-  push:
-    name: Publish Image using commit sha and timestamp
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Push the image on the registry
+      - name: Publish Image using commit sha and timestamp
+        id: upload-asset-publish-task
         uses: Ferlab-Ste-Justine/action-push-image@v2
         with:
           username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
@@ -104,4 +99,18 @@ jobs:
           image: ferlabcrsj/fhavro-export
           tag_format: "{sha}-{timestamp}"
           location: fhavro-export/Dockerfile
+
+#  push:
+#    name: Publish Image using commit sha and timestamp
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Push the image on the registry
+#        uses: Ferlab-Ste-Justine/action-push-image@v2
+#        with:
+#          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+#          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+#          image: ferlabcrsj/fhavro-export
+#          tag_format: "{sha}-{timestamp}"
+#          location: fhavro-export/Dockerfile
 
