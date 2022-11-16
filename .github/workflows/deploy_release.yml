@@ -40,13 +40,64 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Asset
-        id: upload-asset
+      - name: Upload Asset Config
+        id: upload-asset-config
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/scala-2.12/clin-variant-etl.jar
-          asset_name: clin-variant-etl.jar
+          asset_path: config/target/scala-2.12/config.jar
+          asset_name: config.jar
           asset_content_type: application/java-archive
+      - name: Upload Asset Fhavro Export
+        id: upload-asset-fhavro-export
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: fhavro-export/target/scala-2.12/fhavro-export.jar
+          asset_name: fhavro-export.jar
+          asset_content_type: application/java-archive
+      - name: Upload Asset Import Task
+        id: upload-asset-import-task
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: import-task/target/scala-2.12/import-task.jar
+          asset_name: import-task.jar
+          asset_content_type: application/java-archive
+      - name: Upload Asset Index Task
+        id: upload-asset-index-task
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: index-task/target/scala-2.12/index-task.jar
+          asset_name: index-task.jar
+          asset_content_type: application/java-archive
+      - name: Upload Asset Prepare Index
+        id: upload-asset-prepare-index
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: prepare-index/target/scala-2.12/prepare-index.jar
+          asset_name: prepare-index.jar
+          asset_content_type: application/java-archive
+      - name: Upload Asset Publish Task
+        id: upload-asset-publish-task
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: publish-task/target/scala-2.12/publish-task.jar
+          asset_name: publish-task.jar
+          asset_content_type: application/java-archive
+
