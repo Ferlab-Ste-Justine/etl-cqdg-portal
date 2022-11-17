@@ -98,19 +98,5 @@ jobs:
           password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
           image: ferlabcrsj/fhavro-export
           tag_format: "{sha}-{timestamp}"
-          location: fhavro-export/Dockerfile
-
-#  push:
-#    name: Publish Image using commit sha and timestamp
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Push the image on the registry
-#        uses: Ferlab-Ste-Justine/action-push-image@v2
-#        with:
-#          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
-#          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
-#          image: ferlabcrsj/fhavro-export
-#          tag_format: "{sha}-{timestamp}"
-#          location: fhavro-export/Dockerfile
-
+          location: fhavro-export
+          dockerfile: fhavro-export/Dockerfile
