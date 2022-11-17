@@ -10,3 +10,5 @@ docker run -ti --rm -v $(pwd):/app/fhavro-export-etl \
     sbt clean assembly
 
 docker build -t fhavro-export .
+
+assembly / assemblyJarName := "fhavro-export.jar"

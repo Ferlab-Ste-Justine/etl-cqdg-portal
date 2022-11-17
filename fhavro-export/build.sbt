@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   "org.apache.avro" % "avro" % avroVersion,
   "org.apache.avro" % "avro-ipc-netty" % avroVersion,
   "bio.ferlab" % "fhavro" % fhavroVersion,
+  "org.keycloak" % "keycloak-authz-client" % "12.0.3",
 
   // TEST
   "org.scalatest" %% "scalatest" % "3.0.8" % Test,

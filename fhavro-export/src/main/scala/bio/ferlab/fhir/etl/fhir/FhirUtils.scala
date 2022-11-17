@@ -15,12 +15,12 @@ object FhirUtils {
 
   def buildFhirClient(config: Config): GenericClient = {
     val fhirClient: GenericClient = fhirContext.getRestfulClientFactory.newGenericClient(s"${config.fhirConfig.baseUrl}").asInstanceOf[GenericClient]
-    fhirClient.registerInterceptor(new AuthTokenInterceptor(config.keycloakConfig.token))
+    fhirClient.registerInterceptor(new AuthTokenInterceptor(config.keycloakConfig))
     fhirClient
   }
 
   def replaceBaseUrl(url: String, replaceHost: String) = {
-    val pattern = """(^http[a-z]?:\/\/.*?)\/""".r
+    val pattern = """(^http[s]?:\/\/.[^\/]+)\/?""".r
     val cleanUrl = pattern.findAllIn(replaceHost).group(1)
     URIUtils.rewriteURI(URI.create(url), HttpHost.create(cleanUrl)).toString
   }

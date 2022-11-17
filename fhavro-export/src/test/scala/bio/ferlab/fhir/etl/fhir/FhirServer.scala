@@ -1,18 +1,14 @@
 package bio.ferlab.fhir.etl.fhir
 import bio.ferlab.fhir.etl.auth.CookieInterceptor
-import bio.ferlab.fhir.etl.config.{AWSConfig, Config, FhirConfig, FhirRequest, KeycloakConfig}
-import bio.ferlab.fhir.etl.minio.MinioContainer
-import bio.ferlab.fhir.etl.task.FhavroExporter
+import bio.ferlab.fhir.etl.config.FhirConfig
 import ca.uhn.fhir.context.{FhirContext, PerformanceOptionsEnum}
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.client.api.{IGenericClient, ServerValidationModeEnum}
-import org.hl7.fhir.instance.model.api.IIdType
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender
-import org.hl7.fhir.r4.model.{CodeableConcept, Coding, Condition, Enumerations, IdType, Meta, Patient, Reference}
+import org.hl7.fhir.r4.model._
 
-import scala.collection.JavaConverters._
 import java.time.{LocalDate, ZoneId}
 import java.util.Date
+import scala.jdk.CollectionConverters._
 
 trait FhirServer {
 
@@ -29,8 +25,6 @@ trait FhirServer {
   implicit val fhirClient: IGenericClient = fhirContext.newRestfulGenericClient(fhirBaseUrl)
 
   implicit val fhirConfig: FhirConfig = FhirConfig(fhirBaseUrl, null)
-
-  implicit val keycloakConfig: KeycloakConfig = KeycloakConfig("cookie")
 
   fhirClient.registerInterceptor(new CookieInterceptor("cookie"))
 
