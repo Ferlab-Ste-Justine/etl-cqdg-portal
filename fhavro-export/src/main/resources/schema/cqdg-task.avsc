@@ -3756,6 +3756,14 @@
                       "default":null
                     },
                     {
+                      "name":"valueBoolean",
+                      "type":[
+                        "null",
+                        "boolean"
+                      ],
+                      "default":null
+                    },
+                    {
                       "type":"bio.ferlab.fhir.Coding",
                       "name":"valueCoding",
                       "default":{

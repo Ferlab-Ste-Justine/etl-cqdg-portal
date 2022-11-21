@@ -362,7 +362,14 @@
                   "type": "keyword"
                 },
                 "age_biospecimen_collection": {
-                  "type": "long"
+                  "properties": {
+                    "unit": {
+                      "type": "keyword"
+                    },
+                    "value": {
+                      "type": "long"
+                    }
+                  }
                 },
                 "submitter_participant_id": {
                   "type": "keyword"

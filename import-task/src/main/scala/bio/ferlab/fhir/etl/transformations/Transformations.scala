@@ -35,6 +35,8 @@ object Transformations {
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
       .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
       .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
+      .withColumn("readLength", filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"))
+      .withColumn("isPairedEnd", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
       .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueString"))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
@@ -63,8 +65,7 @@ object Transformations {
       .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type")
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("biospecimen_tissue_source",
-        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
+      .withColumn("biospecimen_tissue_source", col("type")("coding")(0)("code"))
       .withColumn("age_biospecimen_collection", extractValueAge(AGE_BIO_COLLECTION_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },

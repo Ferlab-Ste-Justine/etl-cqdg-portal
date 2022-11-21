@@ -160,6 +160,8 @@ object Utils {
         )
         .withColumnRenamed("subject", "participant_id")
         .select("participant_id", "study_id", "release_id", "biospecimen")
+        .groupBy("participant_id", "study_id", "release_id")
+        .agg(collect_list("biospecimen") as "biospecimens")
 
       val filesWithSeqExp = filesDf
         .withColumn("files_exp", explode(col("files")))
