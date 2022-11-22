@@ -302,7 +302,7 @@
             "status": {
               "type": "keyword"
             },
-            "title": {
+            "name": {
               "type": "keyword"
             },
             "domain": {

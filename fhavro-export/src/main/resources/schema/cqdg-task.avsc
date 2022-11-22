@@ -3764,6 +3764,17 @@
                       "default":null
                     },
                     {
+                      "name":"valueDateTime",
+                      "type":[
+                        "null",
+                        {
+                          "type":"long",
+                          "logicalType":"timestamp-micros"
+                        }
+                      ],
+                      "default":null
+                    },
+                    {
                       "type":"bio.ferlab.fhir.Coding",
                       "name":"valueCoding",
                       "default":{

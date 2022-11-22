@@ -35,10 +35,10 @@ object Transformations {
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
       .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
       .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
-      .withColumn("readLength", filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"))
-      .withColumn("isPairedEnd", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
+      .withColumn("read_length", filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"))
+      .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
-      .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueString"))
+      .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDateTime"))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
       .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
       .withColumn("experimental_strategy", transform(
