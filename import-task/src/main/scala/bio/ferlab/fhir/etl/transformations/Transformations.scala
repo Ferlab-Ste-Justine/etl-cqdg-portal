@@ -196,6 +196,7 @@ object Transformations {
         .withColumn("content_exp", explode(col("content")))
         .withColumn("file_size", firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D))("valueDecimal"))
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
+        .withColumn("file_hash", col("content_exp")("attachment")("hash"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
         .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category"): _*)
@@ -206,6 +207,7 @@ object Transformations {
               col("file_format"),
               col("file_size"),
               col("ferload_url"),
+              col("file_hash"),
             )
           ) as "files",
         )

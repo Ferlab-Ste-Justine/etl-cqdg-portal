@@ -375,6 +375,9 @@
             "ferload_url": {
               "type": "keyword"
             },
+            "file_hash": {
+              "type": "keyword"
+            },
             "sequencing_experiment": {
               "properties": {
                 "owner" : {
@@ -442,14 +445,7 @@
               "type": "keyword"
             },
             "sample_type": {
-              "properties": {
-                "system": {
                   "type": "keyword"
-                },
-                "code": {
-                  "type": "keyword"
-                }
-              }
             },
             "submitter_participant_id": {
               "type": "keyword"

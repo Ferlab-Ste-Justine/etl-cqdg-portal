@@ -36,7 +36,6 @@ class BiospecimenCentric(releaseId: String, studyIds: List[String])(implicit con
 
     val transformedBiospecimen =
       biospecimenDF
-        .withColumn("biospecimen_tissue_source", col("biospecimen_tissue_source")("code"))
         .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
         .addStudy(data(es_index_study_centric.id))
         .addParticipant(data(simple_participant.id))

@@ -21,7 +21,6 @@ object Utils {
     def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
       val biospecimenWithSamples = biospecimenDF
         .addSamplesToBiospecimen(sampleRegistration)
-        .withColumn("biospecimen_tissue_source", col("biospecimen_tissue_source")("code"))
         .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
 
       val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
@@ -29,7 +28,6 @@ object Utils {
       val participantsWithBiospecimens = participantsWithBiospecimen
         .withColumn("participant", struct(participantsWithBiospecimen.columns.filterNot(Seq("study_id", "release_id").contains).map(col): _*))
         .drop(participantsWithBiospecimen.columns.filterNot(Seq("participant", "participant_id").contains): _*)
-
 
       val filesWithParticipants = df
         .join(participantsWithBiospecimens, Seq("participant_id"), "left_outer")
@@ -168,6 +166,7 @@ object Utils {
         .addSequencingExperiment(seqExperiment)
         .select("*", "files_exp.*")
         .drop("files", "files_exp")
+        .withColumnRenamed("fhir_id", "file_id")
 
       val filesWithBiospecimen = filesWithSeqExp
         .join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")

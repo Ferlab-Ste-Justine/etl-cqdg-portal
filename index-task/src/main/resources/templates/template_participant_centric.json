@@ -331,7 +331,7 @@
             "release_id": {
               "type": "keyword"
             },
-            "fhir_id": {
+            "file_id": {
               "type": "keyword"
             },
             "biospecimen_reference": {
@@ -353,6 +353,9 @@
               "type": "keyword"
             },
             "ferload_url": {
+              "type": "keyword"
+            },
+            "file_hash": {
               "type": "keyword"
             },
             "biospecimens": {

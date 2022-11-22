@@ -42,6 +42,9 @@
         "ferload_url" : {
           "type": "keyword"
         },
+        "file_hash" : {
+          "type": "keyword"
+        },
         "participants": {
           "type": "nested",
           "properties": {
