@@ -17,6 +17,7 @@ object OntologyUtils {
         col("is_leaf"),
         col("parents"),
         col("age_at_event"),
+        col("source_text"),
         displayTerm(col("phenotype_id"), col("name")) as "name",
       )) as colName)
   }
@@ -65,10 +66,12 @@ object OntologyUtils {
     val observedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").equalTo("POS"))
       .withColumnRenamed("age_at_phenotype", "age_at_event")
+      .withColumnRenamed("phenotype_source_text", "source_text")
 
     val nonObservedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").notEqual("POS") || col("phenotype_observed").isNull)
       .withColumnRenamed("age_at_phenotype", "age_at_event")
+      .withColumnRenamed("phenotype_source_text", "source_text")
 
     val observedPhenotypesWithAncestors = generatePhenotypeWithAncestors(observedPhenotypes, "observed_phenotypes")
 
@@ -83,6 +86,7 @@ object OntologyUtils {
       .join(mondoTerms, col("phenotype_id") === col("id"), "left_outer")
       .withColumn("age_at_event", col("age_at_diagnosis")("value"))
       .withColumnRenamed("subject", "cqdg_participant_id")
+      .withColumnRenamed("diagnosis_source_text", "source_text")
 
     val taggedMondoTerms = generateTaggedPhenotypes(mondoWithTerms, "mondo_tagged")
 
@@ -96,6 +100,7 @@ object OntologyUtils {
       .join(icdSplitId, col("phenotype_id") === col("id"), "left_outer")
       .withColumn("age_at_event", col("age_at_diagnosis")("value"))
       .withColumnRenamed("subject", "cqdg_participant_id")
+      .withColumnRenamed("diagnosis_source_text", "source_text")
 
     val taggedIcdTerms = generateTaggedPhenotypes(icdWithTerms, "icd_tagged")
 

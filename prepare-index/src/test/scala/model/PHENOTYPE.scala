@@ -31,6 +31,7 @@ case class PHENOTYPE_TAGGED (
                               `is_tagged`: Boolean = true,
                               `is_leaf`: Boolean = false,
                               `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
+                              `source_text`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                               `parents`: Seq[String] = Nil,
                               `age_at_event`: Option[Int] = None,
                             )

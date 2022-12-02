@@ -219,7 +219,6 @@
           "type": "boolean"
         },
         "study": {
-          "type": "nested",
           "properties": {
             "keyword": {
               "type": "keyword"
@@ -253,7 +252,6 @@
               "type" : "keyword"
             },
             "data_types": {
-              "type": "nested",
               "properties": {
                 "data_type": {
                   "type": "keyword"
@@ -264,7 +262,6 @@
               }
             },
             "data_categories": {
-              "type": "nested",
               "properties": {
                 "data_category": {
                   "type": "keyword"
@@ -302,7 +299,6 @@
               "type" : "boolean"
             },
             "data_access_codes": {
-              "type": "nested",
               "properties": {
                 "access_requirements": {
                   "type": "keyword"
@@ -324,6 +320,7 @@
           }
         },
         "files": {
+          "type": "nested",
           "properties": {
             "study_id": {
               "type": "keyword"
@@ -377,13 +374,9 @@
                 "submitter_participant_id": {
                   "type": "keyword"
                 },
-                "samples": {
-                  "type": "nested",
+                "sample": {
                   "properties": {
-                    "subject": {
-                      "type": "keyword"
-                    },
-                    "internal_sampleregistration_id": {
+                    "fhir_id": {
                       "type": "keyword"
                     },
                     "sample_type": {

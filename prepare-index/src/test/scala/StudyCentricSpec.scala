@@ -13,8 +13,8 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-cqdg.conf")
 
   val patient1: PATIENT =  PATIENT()
-  val patient2: PATIENT =  PATIENT( `fhir_id` = "PRT0000002",`gender` = "male", `age_at_recruitment` = "215640979761", `submitter_participant_id` = "35849419216")
-  val patient3: PATIENT =  PATIENT( `fhir_id` = "PRT0000003",`gender` = "male", `age_at_recruitment` = "215557091632", `ethnicity` = "aboriginal" ,`submitter_participant_id` = "35849430470", `age_of_death` = "3223600")
+  val patient2: PATIENT =  PATIENT( `participant_id` = "PRT0000002",`gender` = "male", `age_at_recruitment` = 12, `submitter_participant_id` = "35849419216")
+  val patient3: PATIENT =  PATIENT( `participant_id` = "PRT0000003",`gender` = "male", `age_at_recruitment` = 13, `ethnicity` = "aboriginal" ,`submitter_participant_id` = "35849430470", `age_of_death` = "3223600")
 
   val family1: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW()
   val family2: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000002FR", `submitter_participant_id` = "PRT0000002", `relationship_to_proband` = "Father")
@@ -28,8 +28,8 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "3", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")))
 
   val diagnosis1: DIAGNOSIS =DIAGNOSIS()
-  val diagnosis2: DIAGNOSIS =DIAGNOSIS(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "Tinnitus", `diagnosis_ICD_code` = "H93.19", `age_at_diagnosis` = AGE_AT_DIAGNOSIS(value = 215556831))
-  val diagnosis3: DIAGNOSIS =DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000003", `diagnosis_source_text` = "Eczema",`diagnosis_mondo_code` = "MONDO:0004980", `diagnosis_ICD_code` = "L20.9", `age_at_diagnosis` = AGE_AT_DIAGNOSIS(value = 48))
+  val diagnosis2: DIAGNOSIS =DIAGNOSIS(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "Tinnitus", `diagnosis_ICD_code` = "H93.19", `age_at_diagnosis` = 215556831)
+  val diagnosis3: DIAGNOSIS =DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000003", `diagnosis_source_text` = "Eczema",`diagnosis_mondo_code` = "MONDO:0004980", `diagnosis_ICD_code` = "L20.9", `age_at_diagnosis` = 48)
 
   val phenotype1: PHENOTYPE = PHENOTYPE()
   val phenotype2: PHENOTYPE = PHENOTYPE(`fhir_id` = "PHE0000002", `phenotype_source_text` = "Hypertension", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:0000822"), `cqdg_participant_id` = "PRT0000002", `phenotype_observed` = "POS")

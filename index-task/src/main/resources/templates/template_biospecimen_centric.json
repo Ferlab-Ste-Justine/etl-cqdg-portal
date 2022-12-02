@@ -438,8 +438,7 @@
             }
           }
         },
-        "samples": {
-          "type": "nested",
+        "sample": {
           "properties": {
             "fhir_id": {
               "type": "keyword"

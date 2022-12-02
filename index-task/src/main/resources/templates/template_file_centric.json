@@ -264,7 +264,6 @@
                   "type": "keyword"
                 },
                 "samples": {
-                  "type": "nested",
                   "properties": {
                     "fhir_id": {
                       "type": "keyword"
@@ -315,7 +314,6 @@
               "type" : "keyword"
             },
             "data_types": {
-              "type": "nested",
               "properties": {
                 "data_type": {
                   "type": "keyword"
@@ -326,7 +324,6 @@
               }
             },
             "data_categories": {
-              "type": "nested",
               "properties": {
                 "data_category": {
                   "type": "keyword"
@@ -364,7 +361,6 @@
               "type" : "boolean"
             },
             "data_access_codes": {
-              "type": "nested",
               "properties": {
                 "access_requirements": {
                   "type": "keyword"

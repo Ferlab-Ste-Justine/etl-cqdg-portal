@@ -9,14 +9,12 @@ case class GROUP(
                   submitter_family_id: String = "1"
                  )
 case class FAMILY(
-                   cqdg_participant_id: String = "42367",
-                   fhir_id: String = "42367",
-                   study_id: String = "Study_1",
-                   release_id: String = "5",
-                   family_id: String = "FM_NV901ZZN",
-                   father_id: Option[String] = None,
-                   mother_id: Option[String] = None,
-                   family_relations: Seq[FAMILY_RELATIONS] = Seq(FAMILY_RELATIONS())
+                   submitter_participant_id: String = "42367",
+                   focus_participant_id: String = "42367",
+                   relationship_to_proband: String = "mother",
+                   internal_familyrelationship_id: String = "5",
+                   family_type: String = "trio",
+                   family_id: String = "family_id",
                  )
 
 case class FAMILY_RELATIONS(

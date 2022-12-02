@@ -84,9 +84,9 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
   "getDiagnosis" should "return diagnosis per participant" in {
 
-    val diagnosis1 = DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000001", `diagnosis_source_text` = "text1", `diagnosis_mondo_code` = "HP:G", `diagnosis_ICD_code` = "HP:G", `age_at_diagnosis` = AGE_AT_DIAGNOSIS())
-    val diagnosis2 = DIAGNOSIS(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "text2", `diagnosis_mondo_code` = "HP:E", `diagnosis_ICD_code` = "HP:E", `age_at_diagnosis` = AGE_AT_DIAGNOSIS())
-    val diagnosis3 = DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000003", `diagnosis_source_text` = "text3", `diagnosis_mondo_code` = "HP:B", `diagnosis_ICD_code` = "HP:B", `age_at_diagnosis` = AGE_AT_DIAGNOSIS())
+    val diagnosis1 = DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000001", `diagnosis_source_text` = "text1", `diagnosis_mondo_code` = "HP:G", `diagnosis_ICD_code` = "HP:G")
+    val diagnosis2 = DIAGNOSIS(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "text2", `diagnosis_mondo_code` = "HP:E", `diagnosis_ICD_code` = "HP:E")
+    val diagnosis3 = DIAGNOSIS(`subject` = "PRT0000001", `fhir_id` = "DIA0000003", `diagnosis_source_text` = "text3", `diagnosis_mondo_code` = "HP:B", `diagnosis_ICD_code` = "HP:B")
 
     val terms = read(getClass.getResource("/ontology_terms_test.json").toString, "Json", Map(), None, None)
 

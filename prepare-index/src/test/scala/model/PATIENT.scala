@@ -1,15 +1,15 @@
 package model
 
 case class PATIENT(
-                    `cqdg_participant_id`: String = "PRT0000001",
-                    `fhir_id`: String = "PRT0000001",
                     `study_id`: String = "STU0000001",
+                    `participant_id`: String = "PRT0483534",
                     `release_id`: String = "5",
-                    `gender`: String = "female",
+                    `fhir_id`: String = "PRT0483534",
+                    `gender`: String = "male",
                     `vital_status`: Boolean = false,
-                    `age_at_recruitment`: String = "10",
-                    `ethnicity`: String = "french canadian",
-                    `submitter_participant_id`: String = "35849409716",
+                    `age_at_recruitment`: Int = 19328,
+                    `ethnicity`: String = "European",
+                    `submitter_participant_id`: String = "35849427674",
                     `age_of_death`: String = null,
                     `is_affected`: String = null,
                   )

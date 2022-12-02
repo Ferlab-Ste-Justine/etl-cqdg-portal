@@ -1,14 +1,12 @@
 package model
 
 case class DIAGNOSIS(
-                      `subject`: String = "PRT0000003",
-                      `study_id`: String = "STU0000001",
-                      `release_id`: String = "5",
-                      `fhir_id`: String = "DIA0000001",
-                      `diagnosis_source_text`: String = "Hypercholesterolemia",
-                      `diagnosis_mondo_code`: String = null,
-                      `diagnosis_ICD_code`: String = "E78.3",
-                      `age_at_diagnosis`: AGE_AT_DIAGNOSIS = AGE_AT_DIAGNOSIS(),
+                      `fhir_id`: String = "DIA0021349",
+                      `subject`: String = "PRT0000001",
+                      `diagnosis_source_text`: String = "Rheumatoid arthritis",
+                      `diagnosis_mondo_code`: String = "MONDO:0008383",
+                      `diagnosis_ICD_code`: String = "M06.9",
+                      `age_at_diagnosis`: Int = 12,
                     )
 
 case class AGE_AT_DIAGNOSIS(

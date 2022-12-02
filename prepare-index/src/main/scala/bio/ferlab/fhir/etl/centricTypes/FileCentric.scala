@@ -36,6 +36,7 @@ class FileCentric(releaseId: String, studyIds: List[String])(implicit configurat
       fileDF
         .withColumn("file", explode(col("files")))
         .select("*","file.*")
+        .filter(col("file.file_format") =!= "CRAI")
         .drop("file", "files")
         .addParticipantWithBiospecimen(data(simple_participant.id), data(normalized_biospecimen.id), data(normalized_sample_registration.id))
         .addStudy(data(es_index_study_centric.id))

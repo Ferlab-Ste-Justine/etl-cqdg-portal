@@ -48,7 +48,7 @@ object Transformations {
       .withColumn("workflow_name", filter(col("workflow")("extension"), col => col("url") === "workflowName")(0)("valueString"))
       .withColumn("workflow_version", filter(col("workflow")("extension"), col => col("url") === "workflowVersion")(0)("valueString"))
       .withColumn("genome_build", filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code"))
-      .withColumn("for", regexp_extract(col("for")("reference"), patientExtract, 1))
+      .withColumn("_for", regexp_extract(col("for")("reference"), patientExtract, 1))
       .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
       .withColumn("clean_output", transform(col("output"), col => struct(col("type")("coding")(0) as "code", col("valueReference") as "value")))
       .withColumn("alir", filter(col("clean_output"), col => col("code")("code") === "Aligned Reads")(0)("value")("reference"))
@@ -67,7 +67,7 @@ object Transformations {
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source", col("type")("coding")(0)("code"))
       .withColumn("age_biospecimen_collection", extractValueAge(AGE_BIO_COLLECTION_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
-      .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
+      .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
     Drop("type", "extension", "identifier")
   )
@@ -78,7 +78,7 @@ object Transformations {
       .where(size(col("parent")) > 0)
       .withColumn("sample_type",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
-      .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
+      .withColumn("submitter_sample_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("parent", firstNonNull(transform(col("parent"),  col => regexp_extract(col("reference"), specimenExtract, 1))))
     },
