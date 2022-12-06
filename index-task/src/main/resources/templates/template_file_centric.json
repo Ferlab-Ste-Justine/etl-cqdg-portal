@@ -19,7 +19,8 @@
     "mappings": {
       "properties": {
         "file_id": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "biospecimen_reference" : {
           "type": "keyword"
@@ -105,6 +106,9 @@
                 "name": {
                   "type": "keyword"
                 },
+                "source_text": {
+                  "type": "keyword"
+                },
                 "parents": {
                   "type": "keyword"
                 },
@@ -126,6 +130,9 @@
                   "type": "boolean"
                 },
                 "name": {
+                  "type": "keyword"
+                },
+                "source_text": {
                   "type": "keyword"
                 },
                 "parents": {
@@ -165,6 +172,9 @@
                 "name": {
                   "type": "keyword"
                 },
+                "source_text": {
+                  "type": "keyword"
+                },
                 "parents": {
                   "type": "keyword"
                 },
@@ -196,6 +206,9 @@
                 },
                 "is_tagged": {
                   "type": "boolean"
+                },
+                "source_text": {
+                  "type": "keyword"
                 },
                 "age_at_event": {
                   "type": "integer"
@@ -258,23 +271,26 @@
                   "type": "keyword"
                 },
                 "age_biospecimen_collection": {
-                  "type": "long"
-                },
-                "submitter_participant_id": {
-                  "type": "keyword"
-                },
-                "samples": {
                   "properties": {
-                    "fhir_id": {
+                    "unit": {
                       "type": "keyword"
                     },
-                    "sample_type": {
-                      "type": "keyword"
-                    },
-                    "submitter_participant_id": {
-                      "type": "keyword"
+                    "value": {
+                      "type": "long"
                     }
                   }
+                },
+                "submitter_biospecimen_id": {
+                  "type": "keyword"
+                },
+                "sample_id": {
+                  "type": "keyword"
+                },
+                "sample_type": {
+                  "type": "keyword"
+                },
+                "submitter_sample_id": {
+                  "type": "keyword"
                 }
               }
             }

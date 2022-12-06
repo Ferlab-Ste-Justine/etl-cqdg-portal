@@ -19,7 +19,8 @@
     "mappings": {
       "properties": {
         "participant_id": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "gender": {
           "type": "keyword"
@@ -78,6 +79,9 @@
             "parents": {
               "type": "keyword"
             },
+            "source_text": {
+              "type": "keyword"
+            },
             "age_at_event": {
               "type": "integer"
             }
@@ -96,6 +100,9 @@
               "type": "boolean"
             },
             "name": {
+              "type": "keyword"
+            },
+            "source_text": {
               "type": "keyword"
             },
             "parents": {
@@ -135,6 +142,9 @@
             "name": {
               "type": "keyword"
             },
+            "source_text": {
+              "type": "keyword"
+            },
             "parents": {
               "type": "keyword"
             },
@@ -156,6 +166,9 @@
               "type": "keyword"
             },
             "name": {
+              "type": "keyword"
+            },
+            "source_text": {
               "type": "keyword"
             },
             "parents": {
@@ -358,6 +371,9 @@
             "biospecimens": {
               "type": "nested",
               "properties": {
+                "fhir_id": {
+                  "type": "keyword"
+                },
                 "biospecimen_tissue_source": {
                   "type": "keyword"
                 },
@@ -371,21 +387,17 @@
                     }
                   }
                 },
-                "submitter_participant_id": {
+                "submitter_biospecimen_id": {
                   "type": "keyword"
                 },
-                "sample": {
-                  "properties": {
-                    "fhir_id": {
-                      "type": "keyword"
-                    },
-                    "sample_type": {
-                      "type": "keyword"
-                    },
-                    "submitter_participant_id": {
-                      "type": "keyword"
-                    }
-                  }
+                "sample_id": {
+                  "type": "keyword"
+                },
+                "sample_type": {
+                  "type": "keyword"
+                },
+                "submitter_sample_id": {
+                  "type": "keyword"
                 }
               }
             },

@@ -14,6 +14,18 @@ case class PATIENT(
                     `is_affected`: String = null,
                   )
 
+case class PATIENT_INPUT(
+                    `study_id`: String = "STU0000001",
+                    `release_id`: String = "5",
+                    `fhir_id`: String = "PRT0483534",
+                    `gender`: String = "male",
+                    `vital_status`: Boolean = false,
+                    `age_at_recruitment`: Int = 19328,
+                    `ethnicity`: String = "European",
+                    `submitter_participant_id`: String = "35849427674",
+                    `age_of_death`: Int = 12,
+                  )
+
 
 case class CAUSE_OF_DEATH(
                            `fhir_id`: String = "PRT0000003",

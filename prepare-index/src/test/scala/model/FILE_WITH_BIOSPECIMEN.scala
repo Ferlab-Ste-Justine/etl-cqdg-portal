@@ -1,26 +1,16 @@
 package model
 
 case class FILE_WITH_BIOSPECIMEN(
-                                  `fhir_id`: Option[String] = Some("337786"),
-                                  `file_facet_ids`: FILE_WITH_BIOSPECIMEN_FACET_IDS = FILE_WITH_BIOSPECIMEN_FACET_IDS(),
-                                  `acl`: Option[Seq[String]] = Some(Seq("phs002330.c999", "SD_Z6MWD3H0", "phs002330.c1")),
-                                  `access_urls`: Option[String] = Some("drs://data.kidsfirstdrc.org//a4e15e78-de88-44d8-87f4-7f56cda2475f"),
-                                  `controlled_access`: Option[String] = Some("Controlled"),
-                                  `data_type`: Option[String] = Some("gVCF"),
-                                  `external_id`: Option[String] = Some("s3://kf-study-us-east-1-prd-sd-z6mwd3h0/harmonized-data/raw-gvcf/4db9adf4-94f7-4800-a360-49eda89dfb62.g.vcf.gz"),
-                                  `file_format`: Option[String] = Some("gvcf"),
-                                  `file_name`: Option[String] = Some("4db9adf4-94f7-4800-a360-49eda89dfb62.g.vcf.gz"),
-                                  `file_id`: Option[String] = Some("GF_067MR115"),
-                                  `hashes`: Option[Map[String, String]] = Some(Map("md5" -> "3f06b25fb517e3c4af688e5539f3a67b")),
-                                  `is_harmonized`: Option[Boolean] = Some(true),
-                                  `latest_did`: Option[String] = Some("a4e15e78-de88-44d8-87f4-7f56cda2475f"),
-                                  `repository`: Option[String] = Some("gen3"),
-                                  `size`: Option[BigInt] = Some(BigInt.apply(2610321004L)),
-                                  `urls`: Option[String] = Some("s3://kf-study-us-east-1-prd-sd-z6mwd3h0/harmonized-data/raw-gvcf/4db9adf4-94f7-4800-a360-49eda89dfb62.g.vcf.gz"),
-                                  `study_id`: Option[String] = Some("SD_Z6MWD3H0"),
-                                  `release_id`: Option[String] = Some("re_000001"),
-                                  `biospecimens`: Seq[BIOSPECIMEN] = Seq.empty,
-                                  `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT] = None
+                                  `file_id`: Option[String] = Some("FIL0086557"),
+                                  `biospecimen_reference`: Option[String] = Some("SAM0247817"),
+                                  `data_type`: Option[String] = Some("Germline Structural Variant"),
+                                  `data_category`: Option[String] = Some("Genomics"),
+                                  `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT] = None,
+                                  `file_name`: Option[String] = Some("NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz"),
+                                  `file_format`: Option[String] = Some("VCF"),
+                                  `file_size`: Option[Double] = Some(1118934.0),
+                                  `ferload_url`: Option[String] = Some("https://ferload.qa.cqdg.ferlab.bio/e24d78edeff9e033dac8445d32835c46c480d8a4|NWQ3MDA3NGY2YzAwMmFiOWE1YzdiZDVmNTFlZmU5YTcgIE5TLjE4ODUuSURUX2k3Xzg3LS0tSURUX2k1Xzg3LjExMTM3MjMwLnN2LnZjZi5neg=="),
+                                  `biospecimens`: Seq[BIOSPECIMEN] = Seq.empty
                                 )
 
 case class FILE_WITH_BIOSPECIMEN_FACET_IDS(

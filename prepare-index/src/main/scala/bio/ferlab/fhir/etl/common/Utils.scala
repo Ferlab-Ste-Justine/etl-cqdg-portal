@@ -21,7 +21,6 @@ object Utils {
     def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
       val biospecimenWithSamples = biospecimenDF
         .addSamplesToBiospecimen(sampleRegistration)
-        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
 
       val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
 
@@ -39,12 +38,9 @@ object Utils {
     }
 
     def addSamplesToBiospecimen(samplesDf: DataFrame): DataFrame = {
-      val groupColumns = Seq("subject", "parent", "study_id", "release_id")
-
       val samplesGrouped = samplesDf
         .withColumn("sample_type", col("sample_type")("code"))
-        .withColumn("sample", struct(samplesDf.columns.filterNot(groupColumns.contains).map(col): _*))
-        .select(groupColumns.head , groupColumns.tail :+ "sample": _*)
+        .withColumnRenamed("fhir_id", "sample_id")
         .withColumnRenamed("parent", "fhir_id")
 
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"), "left_outer")

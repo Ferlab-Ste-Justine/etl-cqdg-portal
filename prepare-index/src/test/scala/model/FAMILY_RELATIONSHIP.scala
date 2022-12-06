@@ -1,8 +1,8 @@
 package model
 
 case class FAMILY_RELATIONSHIP(
-                                `study_id`: String = "SD_65064P2Z",
-                                `release_id`: String = "RE_000004",
+                                `study_id`: String = "STU0000001",
+                                `release_id`: String = "5",
                                 `internal_family_relationship_id`: String = "439751",
                                 `category`: String = "FR_XA5WESR3",
                                 `submitter_participant_id`: String = "FR_XA5WESR3",

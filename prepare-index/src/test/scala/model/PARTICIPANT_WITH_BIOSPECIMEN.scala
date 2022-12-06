@@ -6,7 +6,7 @@ case class PARTICIPANT_WITH_BIOSPECIMEN(
                                          `age_at_recruitment`: Int = 19558,
                                          `ethnicity`: String = "European",
                                          `submitter_participant_id`: String = "35849428444",
-                                         `age_of_death`: String = null,
+                                         `age_of_death`: Int = 12,
                                          `cause_of_death`: String = null,
                                          `is_affected`: String = null,
 //                                         `diagnosis`: Seq[DIAGNOSIS] = Seq.empty,

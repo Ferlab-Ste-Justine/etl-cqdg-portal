@@ -43,14 +43,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val file_centric = output("es_index_file_centric").as[FILE_CENTRIC].collect()
 
-    output("es_index_file_centric").show(false)
-
     file_centric.find(_.file_id == "11") shouldBe Some(
         FILE_CENTRIC(
           `file_id` = "11",
           `biospecimen_reference` = "B1",
           `data_type` = "SSUP",
-          `data_category` = "GENO",
+          `data_category` = "Genomics",
           `file_name` = "file5.json",
           `file_format` = "TGZ",
           `file_size` = 56,
@@ -62,10 +60,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
             `biospecimens` = Set(
               BIOSPECIMEN(
                 `fhir_id` = "B1",
+                `age_biospecimen_collection` = AGE_AT(value = 17174)
               ),
               BIOSPECIMEN(
                 `fhir_id` = "B2",
-                `sample` = SAMPLE(fhir_id = "sam2")
+                `age_biospecimen_collection` = AGE_AT(value = 17174),
+                `sample_id` = "sam2",
               )
             )
           )),

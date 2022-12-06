@@ -18,19 +18,24 @@
     },
     "mappings": {
       "properties": {
-        "subject": {
-          "type": "keyword"
-        },
-        "fhir_id": {
-          "type": "keyword"
+        "biospecimen_id": {
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "biospecimen_tissue_source": {
           "type": "keyword"
         },
-        "age_at_biospecimen_collection": {
-          "type": "integer"
+        "age_biospecimen_collection": {
+          "properties": {
+            "unit": {
+              "type": "keyword"
+            },
+            "value": {
+              "type": "long"
+            }
+          }
         },
-        "submitter_participant_id": {
+        "submitter_biospecimen_id": {
           "type": "keyword"
         },
         "study": {
@@ -197,6 +202,9 @@
                 "name": {
                   "type": "keyword"
                 },
+                "source_text": {
+                  "type": "keyword"
+                },
                 "parents": {
                   "type": "keyword"
                 },
@@ -218,6 +226,9 @@
                   "type": "boolean"
                 },
                 "name": {
+                  "type": "keyword"
+                },
+                "source_text": {
                   "type": "keyword"
                 },
                 "parents": {
@@ -257,6 +268,9 @@
                 "name": {
                   "type": "keyword"
                 },
+                "source_text": {
+                  "type": "keyword"
+                },
                 "parents": {
                   "type": "keyword"
                 },
@@ -278,6 +292,9 @@
                   "type": "keyword"
                 },
                 "name": {
+                  "type": "keyword"
+                },
+                "source_text": {
                   "type": "keyword"
                 },
                 "parents": {
@@ -438,23 +455,20 @@
             }
           }
         },
-        "sample": {
-          "properties": {
-            "fhir_id": {
-              "type": "keyword"
-            },
-            "sample_type": {
-                  "type": "keyword"
-            },
-            "submitter_participant_id": {
-              "type": "keyword"
-            }
-          }
-        },
         "study_id": {
           "type": "keyword"
         },
         "release_id": {
+          "type": "keyword"
+        },
+        "sample_id": {
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
+        },
+        "sample_type": {
+          "type": "keyword"
+        },
+        "submitter_sample_id": {
           "type": "keyword"
         }
       }
