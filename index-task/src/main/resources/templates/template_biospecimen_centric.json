@@ -26,14 +26,7 @@
           "type": "keyword"
         },
         "age_biospecimen_collection": {
-          "properties": {
-            "unit": {
-              "type": "keyword"
-            },
-            "value": {
-              "type": "long"
-            }
-          }
+          "type": "long"
         },
         "submitter_biospecimen_id": {
           "type": "keyword"
@@ -142,7 +135,7 @@
             }
           }
         },
-        "participants": {
+        "participant": {
           "type": "nested",
           "properties": {
             "participant_id": {
@@ -172,20 +165,25 @@
             "is_affected": {
               "type": "keyword"
             },
-            "internal_diagnosis_id": {
-              "type": "keyword"
-            },
-            "diagnosis_source_text": {
-              "type": "keyword"
-            },
-            "diagnosis_mondo_code": {
-              "type": "keyword"
-            },
-            "diagnosis_ICD_code": {
-              "type": "keyword"
-            },
-            "age_at_diagnosis": {
-              "type": "integer"
+            "diagnoses": {
+              "type": "nested",
+              "properties": {
+                "fhir_id": {
+                  "type": "keyword"
+                },
+                "diagnosis_source_text": {
+                  "type": "keyword"
+                },
+                "diagnosis_mondo_code": {
+                  "type": "keyword"
+                },
+                "diagnosis_ICD_code": {
+                  "type": "keyword"
+                },
+                "age_at_diagnosis": {
+                  "type": "long"
+                }
+              }
             },
             "icd_tagged": {
               "type": "nested",

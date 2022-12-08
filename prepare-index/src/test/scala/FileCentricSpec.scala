@@ -2,8 +2,8 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader}
 import bio.ferlab.fhir.etl.centricTypes.FileCentric
 import model._
 import org.apache.spark.sql.DataFrame
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
@@ -24,7 +24,6 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "simple_participant" -> Seq(
         SIMPLE_PARTICIPANT(
           `participant_id` = "P1",
-          `gender` = "mala"
         ),
         SIMPLE_PARTICIPANT(
           `participant_id` = "P2",
@@ -55,16 +54,16 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
             `participant_id` = "P1",
-            `gender` = "mala",
+            `gender` = "male",
             `age_at_recruitment` = 24566,
             `biospecimens` = Set(
               BIOSPECIMEN(
                 `fhir_id` = "B1",
-                `age_biospecimen_collection` = AGE_AT(value = 17174)
+                `age_biospecimen_collection` = 17174
               ),
               BIOSPECIMEN(
                 `fhir_id` = "B2",
-                `age_biospecimen_collection` = AGE_AT(value = 17174),
+                `age_biospecimen_collection` = 17174,
                 `sample_id` = "sam2",
               )
             )

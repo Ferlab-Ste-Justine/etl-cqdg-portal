@@ -21,6 +21,7 @@ object Utils {
     def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
       val biospecimenWithSamples = biospecimenDF
         .addSamplesToBiospecimen(sampleRegistration)
+        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
 
       val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
 
@@ -145,6 +146,7 @@ object Utils {
     def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
       val biospecimenWithSample = biospecimensDf
         .addSamplesToBiospecimen(sampleRegistrationDF)
+        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
 
       val biospecimenGrouped = biospecimenWithSample
         .withColumn("biospecimen",

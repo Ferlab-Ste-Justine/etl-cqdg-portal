@@ -22,7 +22,7 @@ case class SAMPLE_INPUT(
                        `release_id`: String = "5",
                        `fhir_id`: String = "SAM0252957",
                        `sample_type`: CODE_SYSTEM = CODE_SYSTEM(),
-                       `submitter_participant_id`: String = "35849414972",
+                       `submitter_sample_id`: String = "35849414972",
                      )
 
 case class CODE_SYSTEM (

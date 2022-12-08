@@ -1,10 +1,5 @@
 package model
 
-case class CONDITION_CODING(
-                             `category`: String = "ICD",
-                             `code`: String = "C91.0"
-                           )
-
 case class AGE_AT_EVENT(
                          `value`: Int = 0,
                          `unit`: String = "day",

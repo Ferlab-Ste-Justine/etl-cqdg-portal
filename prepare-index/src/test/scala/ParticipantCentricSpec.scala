@@ -59,7 +59,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `biospecimen_reference` = Some("SAM0000001"),
             `data_type` = Some("SSUP"),
             `biospecimens` = Seq(
-              BIOSPECIMEN(`fhir_id` = "B1", `age_biospecimen_collection` = AGE_AT(value = 17174), `sample_id` = "S1")),
+              BIOSPECIMEN(`fhir_id` = "B1", `age_biospecimen_collection` =  17174, `sample_id` = "S1")),
           ),
         )
       )
