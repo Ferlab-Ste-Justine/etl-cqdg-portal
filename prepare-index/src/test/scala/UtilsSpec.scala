@@ -94,7 +94,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       FILE_INPUT(`participant_id` = "P3"),
     ).toDF()
     val biospecimenDF = Seq.empty[BIOSPECIMEN_INPUT].toDF()
-    val seqExperimentDF = Seq.empty[SEQUENCING_EXPERIMENT].toDF()
+    val seqExperimentDF = Seq.empty[SEQUENCING_EXPERIMENT_INPUT].toDF()
     val samplesDF = Seq.empty[SAMPLE_INPUT].toDF()
 
     val output = inputPatients.addFilesWithBiospecimen(filesDf, biospecimenDF, seqExperimentDF, samplesDF)
@@ -115,4 +115,20 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     output.select("fhir_id").as[String].collect() should not contain "F3"
   }
 
+  "addSequencingExperiment" should " map the correct type_of_sequencing" in {
+    val filesDf = Seq(
+      FILE_INPUT(`participant_id` = "P1", `fhir_id` = "F1"),
+      FILE_INPUT(`participant_id` = "P2", `fhir_id` = "F2"),
+    ).toDF()
+
+    val seqExperiment = Seq(
+      SEQUENCING_EXPERIMENT_INPUT(`alir` = "F1"),
+      SEQUENCING_EXPERIMENT_INPUT(`snv` = "F2", `is_paired_end` = false),
+    ).toDF()
+
+
+    val output = filesDf.addSequencingExperiment(seqExperiment)
+
+    output.select("sequencing_experiment.type_of_sequencing").as[String].collect() should contain theSameElementsAs Seq("Paired Reads", "Unpaired Reads")
+  }
 }

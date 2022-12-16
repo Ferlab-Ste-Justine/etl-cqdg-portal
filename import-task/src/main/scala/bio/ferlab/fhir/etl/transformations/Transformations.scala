@@ -19,7 +19,10 @@ object Transformations {
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
       )
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
-      .withColumnRenamed("deceasedBoolean", "vital_status")
+      .withColumn("vital_status", when(col("deceasedBoolean"), lit("Deceased"))
+          .when(!col("deceasedBoolean"), lit("Alive"))
+          .otherwise(lit("Unknown"))
+      )
       .withColumn("age_of_death", filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)(0)("valueAge")("value"))
     ),
     Drop("identifier", "extension")
@@ -55,7 +58,7 @@ object Transformations {
       .withColumn("gsv", filter(col("clean_output"), col => col("code")("code") === "Germline Structural Variant")(0)("value")("reference"))
       .withColumn("ssup", filter(col("clean_output"), col => col("code")("code") === "Sequencing Data Supplement")(0)("value")("reference"))
     ),
-    Drop("seq_exp", "extension", "workflow", "code", "output", "clean_output")
+    Drop("seq_exp", "extension", "workflow", "code", "output", "clean_output", "for")
   )
 
   val biospecimenMappings: List[Transformation] = List(

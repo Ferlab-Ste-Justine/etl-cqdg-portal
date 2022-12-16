@@ -84,8 +84,9 @@ object Utils {
 
     def addSequencingExperiment(sequencingExperiment: DataFrame): DataFrame = {
       val sequencingExperimentClean = sequencingExperiment
-        .drop("fhir_id", "study_id", "release_id")
         .withColumnRenamed("_for", "participant_id")
+        .withColumn("type_of_sequencing", when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads")))
+        .drop("fhir_id", "study_id", "release_id", "is_paired_end")
 
       val seqExperimentByFile = sequencingExperimentClean
         .withColumn("all_files", filter(array(col("alir"), col("snv"), col("gcnv"), col("gsv"), col("ssup")), a => a.isNotNull))

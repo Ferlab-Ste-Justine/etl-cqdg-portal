@@ -13,7 +13,7 @@ case class FILE_CENTRIC(
                          ferload_url: String = "https://ferload.qa.cqdg.ferlab.bio/e24d78edeff9e033dac8445d32835c46c480d8a4|NWQ3MDA3NGY2YzAwMmFiOWE1YzdiZDVmNTFlZmU5YTcgIE5TLjE4ODUuSURUX2k3Xzg3LS0tSURUX2k1Xzg3LjExMTM3MjMwLnN2LnZjZi5neg==",
                          participants: Seq[PARTICIPANT_WITH_BIOSPECIMEN] = Seq.empty,
                          study: STUDY_CENTRIC = STUDY_CENTRIC(),
-                         sequencing_experiment: SEQUENCING_EXPERIMENT = SEQUENCING_EXPERIMENT(),
+                         sequencing_experiment: SEQUENCING_EXPERIMENT_INPUT = SEQUENCING_EXPERIMENT_INPUT(),
                        )
 
 case class FILE_FACET_IDS(

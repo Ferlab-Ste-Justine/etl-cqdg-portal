@@ -26,7 +26,7 @@
           "type": "keyword"
         },
         "vital_status": {
-          "type": "boolean"
+          "type": "keyword"
         },
         "age_at_recruitment": {
           "type": "long"
@@ -410,6 +410,9 @@
                 "bio_informatic_analysis" : {
                   "type": "keyword"
                 },
+                "type_of_sequencing" : {
+                  "type": "keyword"
+                },
                 "labAliquotID" : {
                   "type": "keyword"
                 },
@@ -426,6 +429,9 @@
                   "type": "keyword"
                 },
                 "platform" : {
+                  "type": "keyword"
+                },
+                "read_length" : {
                   "type": "keyword"
                 },
                 "experimental_strategy" : {
