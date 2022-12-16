@@ -68,7 +68,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
               )
             )
           )),
-          `sequencing_experiment` = SEQUENCING_EXPERIMENT(
+          `sequencing_experiment` = SEQUENCING_EXPERIMENT_INPUT(
             `experimental_strategy` = List("WXS"), `alir` = "11", `snv` = "2", `gcnv` = "3", `gsv` = "4", `ssup` = "5"
           )
         )

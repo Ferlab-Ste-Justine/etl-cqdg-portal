@@ -5,7 +5,7 @@ case class SIMPLE_PARTICIPANT(
                                `participant_id`: String = "PRT0483458",
                                `gender`: String = "male",
                                `age_at_recruitment`: Int = 24566,
-                               `vital_status`: Boolean = false,
+                               `vital_status`: String = "Unknown",
                                `ethnicity`: String = "European",
                                `submitter_participant_id`: String = "35849428444",
                                `age_of_death`: Int = 12,

@@ -29,6 +29,7 @@ case class STUDY_CENTRIC (
                            `domain`: Seq[String] = Seq("General health"),
                            `population`: String = "Adult",
                            `study_version`: String = "1",
+                           `study_code`: String = "cag",
                            `study_id`: String = "STU0000001",
                            `data_types`: Seq[(String, String)] = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","1"), ("ALIR","1"), ("GSV","1")),
                            `data_categories`: Seq[(String, String)] = Seq(("GENO","1")),

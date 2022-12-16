@@ -21,7 +21,6 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         DOCUMENTREFERENCE(`fhir_id` = "F1", `participant_id` = "P1"),
         DOCUMENTREFERENCE(`fhir_id` = "F2", `participant_id` = "P2"),
       ).toDF(),
-
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2"),
@@ -41,6 +40,8 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
 
     output.keys should contain("es_index_participant_centric")
 
+    output("es_index_participant_centric").show(false)
+    output("es_index_participant_centric").printSchema()
     val participant_centric = output("es_index_participant_centric").as[PARTICIPANT_CENTRIC].collect()
 
     output("es_index_participant_centric").show(false)
@@ -48,7 +49,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     participant_centric.find(_.`participant_id` == "P1") shouldBe Some(
       PARTICIPANT_CENTRIC(
         `participant_id`= "P1",
-        `vital_status` = Some(false),
+        `vital_status` = Some("Unknown"),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(
             `file_id` = Some("F1"),

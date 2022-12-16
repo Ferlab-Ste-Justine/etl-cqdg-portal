@@ -19,10 +19,6 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
         PATIENT_INPUT(fhir_id = "P2"),
         PATIENT_INPUT(fhir_id = "P3")
       ).toDF(),
-      "normalized_vital_status" -> Seq(
-        OBSERVATION_VITAL_STATUS(fhir_id = "O1", participant_fhir_id = "P1"),
-        OBSERVATION_VITAL_STATUS(fhir_id = "O2", participant_fhir_id = "P2")
-      ).toDF(),
       "normalized_family_relationship" -> Seq(
         FAMILY_RELATIONSHIP(),
       ).toDF(),

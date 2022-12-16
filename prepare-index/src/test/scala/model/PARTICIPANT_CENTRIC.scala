@@ -6,7 +6,7 @@ case class PARTICIPANT_CENTRIC(
                                 `study_id`: String = "STU0000001",
                                 `release_id`: String = "5",
                                 `gender`: String = "male",
-                                `vital_status`: Option[Boolean] = None,
+                                `vital_status`: Option[String] = None,
                                 `age_at_recruitment`: Int = 24566,
                                 `ethnicity`: String = "European",
                                 `submitter_participant_id`: String = "35849428444",

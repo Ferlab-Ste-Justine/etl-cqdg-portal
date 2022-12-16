@@ -7,7 +7,7 @@ case class BIOSPECIMEN(
                         `submitter_biospecimen_id`: String = "cag_sp_20832",
                         `sample_id`: String = "sam1",
                         `sample_type`: String = "NCIT:C449",
-                        `submitter_participant_id`: String = "35849414972"
+//                        `submitter_participant_id`: String = "35849414972"
                       )
 
 case class BIOSPECIMEN_FACET_IDS(

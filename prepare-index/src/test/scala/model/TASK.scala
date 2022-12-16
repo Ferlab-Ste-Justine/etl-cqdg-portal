@@ -6,6 +6,7 @@ case class TASK(
                  `release_id`: String = "5",
                  `_for`: String = "PRT0000001",
                  `owner`: String = "CQDG",
+                 `is_paired_end`: Boolean = true,
                  `bio_informatic_analysis`: String = "GGBA",
                  `labAliquotID`: String = "nanuq_sample_id",
                  `run_name`: String = "runNameExample",

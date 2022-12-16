@@ -147,7 +147,7 @@
               "type": "keyword"
             },
             "vital_status": {
-              "type": "boolean"
+              "type": "keyword"
             },
             "age_at_recruitment": {
               "type": "integer"
@@ -404,6 +404,12 @@
                   "type": "keyword"
                 },
                 "labAliquotID" : {
+                  "type": "keyword"
+                },
+                "type_of_sequencing" : {
+                  "type": "keyword"
+                },
+                "read_length" : {
                   "type": "keyword"
                 },
                 "run_name" : {
