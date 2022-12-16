@@ -41,6 +41,7 @@ class ParticipantCentric(releaseId: String, studyIds: List[String])(implicit con
           data(normalized_sequencing_experiment.id),
           data(normalized_sample_registration.id),
         )
+        .withColumn("study_code", col("study.study_code"))
 
     Map(mainDestination.id -> transformedParticipant)
   }

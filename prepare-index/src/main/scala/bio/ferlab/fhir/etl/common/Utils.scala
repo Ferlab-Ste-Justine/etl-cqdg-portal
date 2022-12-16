@@ -26,7 +26,7 @@ object Utils {
       val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamples)
 
       val participantsWithBiospecimens = participantsWithBiospecimen
-        .withColumn("participant", struct(participantsWithBiospecimen.columns.filterNot(Seq("study_id", "release_id").contains).map(col): _*))
+        .withColumn("participant", struct(participantsWithBiospecimen.columns.map(col): _*))
         .drop(participantsWithBiospecimen.columns.filterNot(Seq("participant", "participant_id").contains): _*)
 
       val filesWithParticipants = df
@@ -219,9 +219,9 @@ object Utils {
           col("submitter_participant_id"),
           col("focus_participant_id"),
           col("relationship_to_proband"),
-          col("internal_family_id") as "internal_familyrelationship_id",
+          col("internal_family_id") as "family_id",
           col("family_type"),
-          col("submitter_family_id") as "family_id",
+          col("submitter_family_id"),
         )) as "familyRelationships",
           first(col("family_members")) as "family_members",
         )

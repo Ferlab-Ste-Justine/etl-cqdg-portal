@@ -42,6 +42,7 @@ class FileCentric(releaseId: String, studyIds: List[String])(implicit configurat
         .addStudy(data(es_index_study_centric.id))
         .addSequencingExperiment(data(normalized_sequencing_experiment.id))
         .withColumnRenamed("fhir_id", "file_id")
+        .withColumn("study_code", col("study.study_code"))
 
     Map(mainDestination.id -> transformedFile)
   }

@@ -14,7 +14,7 @@ case class FAMILY_RELATIONSHIP_WITH_FAMILY(
                                             `submitter_participant_id`: String = "P1",
                                             `focus_participant_id`: String = "P2",
                                             `relationship_to_proband`: String = "father",
-                                            `internal_familyrelationship_id`: String = "Family1",
+                                            `family_id`: String = "Family1",
                                             `family_type`: String = "trio",
-                                            `family_id`: String = "fam1",
+                                            `submitter_family_id`: String = "fam1",
                                           )

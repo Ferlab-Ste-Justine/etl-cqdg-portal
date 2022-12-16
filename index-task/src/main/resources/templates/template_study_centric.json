@@ -100,6 +100,9 @@
         "internal_study_id" : {
           "type" : "keyword"
         },
+        "study_code" : {
+          "type" : "keyword"
+        },
         "study_id" : {
           "type" : "keyword"
         },

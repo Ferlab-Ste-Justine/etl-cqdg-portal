@@ -127,6 +127,9 @@
             "internal_study_id": {
               "type": "keyword"
             },
+            "study_code" : {
+              "type" : "keyword"
+            },
             "study_id": {
               "type": "keyword"
             },
@@ -136,7 +139,6 @@
           }
         },
         "participant": {
-          "type": "nested",
           "properties": {
             "participant_id": {
               "type": "keyword"
@@ -341,13 +343,13 @@
                 "relationship_to_proband": {
                   "type": "keyword"
                 },
-                "internal_familyrelationship_id": {
+                "family_id": {
                   "type": "keyword"
                 },
                 "family_type": {
                   "type": "keyword"
                 },
-                "family_id": {
+                "submitter_family_id": {
                   "type": "keyword"
                 }
               }
@@ -454,6 +456,9 @@
           }
         },
         "study_id": {
+          "type": "keyword"
+        },
+        "study_code": {
           "type": "keyword"
         },
         "release_id": {

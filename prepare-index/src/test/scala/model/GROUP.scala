@@ -12,9 +12,9 @@ case class FAMILY(
                    submitter_participant_id: String = "42367",
                    focus_participant_id: String = "42367",
                    relationship_to_proband: String = "mother",
-                   internal_familyrelationship_id: String = "5",
+                   family_id: String = "5",
                    family_type: String = "trio",
-                   family_id: String = "family_id",
+                   submitter_family_id: String = "family_id",
                  )
 
 case class FAMILY_RELATIONS(

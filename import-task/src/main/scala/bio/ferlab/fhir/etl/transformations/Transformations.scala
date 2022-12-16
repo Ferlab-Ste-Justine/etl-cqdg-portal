@@ -8,8 +8,6 @@ import org.apache.spark.sql.functions.{col, _}
 
 object Transformations {
 
-  val officialIdentifier: Column = extractOfficial(col("identifier"))
-
   val patientMappings: List[Transformation] = List(
     Custom(_
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
@@ -141,13 +139,6 @@ object Transformations {
     Drop("identifier", "code", "onsetAge")
   )
 
-  val conditionAgeAtPhenotype: List[Transformation] = List(
-    Custom(_
-      .select("*")
-    ),
-    Drop()
-  )
-
   val observationPhenotypeMappings: List[Transformation] = List(
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
@@ -169,19 +160,19 @@ object Transformations {
 
   val researchstudyMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "keyword", "release_id", "study_id", "description", "contact", "category", "status", "title", "extension", "meta")
+      .select("fhir_id", "keyword", "release_id", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier")
       .withColumn("keyword", extractKeywords(col("keyword")))
       .withColumn(
         "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
       )
       .withColumn("domain", col("category")("coding")(0)("code"))
-
+      .withColumn("study_code", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
       .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_S_D)(0)("valueCodeableConcept")("coding")("code"))
       .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_S_D)(0)("valueCodeableConcept")("coding")("code"))
       .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_S_D)(0)("valueCoding")("code"))
       .withColumn("study_version", regexp_extract(filter(col("meta")("tag"), col => col("code").contains("study_version"))(0)("code"), versionExtract, 1))
     ),
-    Drop("extension", "category", "meta")
+    Drop("extension", "category", "meta", "identifier")
   )
 
   val documentreferenceMappings: List[Transformation] = List(

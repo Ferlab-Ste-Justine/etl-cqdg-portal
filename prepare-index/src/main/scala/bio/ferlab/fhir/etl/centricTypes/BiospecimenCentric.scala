@@ -43,6 +43,7 @@ class BiospecimenCentric(releaseId: String, studyIds: List[String])(implicit con
         .addSamplesToBiospecimen(data(normalized_sample_registration.id))
         .withColumnRenamed("fhir_id", "biospecimen_id")
         .drop("subject")
+        .withColumn("study_code", col("study.study_code"))
 
     Map(mainDestination.id -> transformedBiospecimen)
   }
