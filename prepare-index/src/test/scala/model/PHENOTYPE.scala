@@ -16,7 +16,7 @@ case class PHENOTYPE_ENRICHED(
                             `parents`: Seq[String] = Seq.empty,
                             `is_tagged`: Boolean = false,
                             `is_leaf`: Boolean = false,
-                            `age_at_event_days`: Seq[Int] = Seq.empty
+                            `age_at_event`: Seq[Long] = Seq.empty
                           )
 
 
@@ -33,7 +33,7 @@ case class PHENOTYPE_TAGGED (
                               `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                               `source_text`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                               `parents`: Seq[String] = Nil,
-                              `age_at_event`: Option[Int] = None,
+                              `age_at_event`: Option[Long] = None,
                             )
 
 case class PHENOTYPE_TAGGED_WITH_ANCESTORS (

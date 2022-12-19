@@ -40,16 +40,13 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
 
     output.keys should contain("es_index_participant_centric")
 
-    output("es_index_participant_centric").show(false)
-    output("es_index_participant_centric").printSchema()
     val participant_centric = output("es_index_participant_centric").as[PARTICIPANT_CENTRIC].collect()
-
-    output("es_index_participant_centric").show(false)
 
     participant_centric.find(_.`participant_id` == "P1") shouldBe Some(
       PARTICIPANT_CENTRIC(
         `participant_id`= "P1",
         `vital_status` = Some("Unknown"),
+        `biospecimens` = Seq(BIOSPECIMEN(`fhir_id` = "B1", `age_biospecimen_collection` =  17174, `sample_id` = "S1")),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(
             `file_id` = Some("F1"),

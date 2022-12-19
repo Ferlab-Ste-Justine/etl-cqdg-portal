@@ -52,6 +52,17 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `file_format` = "TGZ",
           `file_size` = 56,
           `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
+          `biospecimens` = Set(
+            BIOSPECIMEN(
+              `fhir_id` = "B1",
+              `age_biospecimen_collection` = 17174
+            ),
+            BIOSPECIMEN(
+              `fhir_id` = "B2",
+              `age_biospecimen_collection` = 17174,
+              `sample_id` = "sam2",
+            )
+          ),
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
             `participant_id` = "P1",
             `gender` = "male",
@@ -68,7 +79,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
               )
             )
           )),
-          `sequencing_experiment` = SEQUENCING_EXPERIMENT_INPUT(
+          `sequencing_experiment` = SEQUENCING_EXPERIMENT(
             `experimental_strategy` = List("WXS"), `alir` = "11", `snv` = "2", `gcnv` = "3", `gsv` = "4", `ssup` = "5"
           )
         )

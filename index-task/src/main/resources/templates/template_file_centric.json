@@ -46,6 +46,32 @@
         "file_hash" : {
           "type": "keyword"
         },
+        "biospecimens": {
+          "type": "nested",
+          "properties": {
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "biospecimen_tissue_source": {
+              "type": "keyword"
+            },
+            "age_biospecimen_collection": {
+              "type": "long"
+            },
+            "submitter_biospecimen_id": {
+              "type": "keyword"
+            },
+            "sample_id": {
+              "type": "keyword"
+            },
+            "sample_type": {
+              "type": "keyword"
+            },
+            "submitter_sample_id": {
+              "type": "keyword"
+            }
+          }
+        },
         "participants": {
           "type": "nested",
           "properties": {

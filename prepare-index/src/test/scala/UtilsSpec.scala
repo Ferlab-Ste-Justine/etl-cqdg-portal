@@ -83,7 +83,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val biospecimenWithSamples = biospecimensDF.addSamplesToBiospecimen(samplesDF)
 
-    biospecimenWithSamples.select("fhir_id", "sample.fhir_id").as[(String, String)].collect() should contain theSameElementsAs
+    biospecimenWithSamples.select("fhir_id", "sample_id").as[(String, String)].collect() should contain theSameElementsAs
       Seq(("BIO0036882","1"), ("BIO0036882","2"))
   }
 
