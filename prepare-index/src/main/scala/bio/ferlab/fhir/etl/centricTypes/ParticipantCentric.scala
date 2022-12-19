@@ -4,7 +4,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, flatten}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
@@ -42,6 +42,7 @@ class ParticipantCentric(releaseId: String, studyIds: List[String])(implicit con
           data(normalized_sample_registration.id),
         )
         .withColumn("study_code", col("study.study_code"))
+        .withColumn("biospecimens", flatten(col("files.biospecimens")))
 
     Map(mainDestination.id -> transformedParticipant)
   }

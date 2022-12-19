@@ -13,6 +13,7 @@ case class PARTICIPANT_CENTRIC(
                                 `age_of_death`: Int = 12,
                                 `cause_of_death`: String = null,
                                 `is_affected`: String = null,
+                                `biospecimens`: Seq[BIOSPECIMEN] = Seq.empty,
                                 `diagnoses`: Seq[DIAGNOSIS] = Seq.empty,
                                 `icd_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                 `mondo_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
@@ -20,8 +21,8 @@ case class PARTICIPANT_CENTRIC(
                                 `observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                 `non_observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                 `observed_phenotypes`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
-                                `familyRelationships`: FAMILY_RELATIONSHIP = FAMILY_RELATIONSHIP(),
-                                `is_a_proband`: Boolean = false,
+                                `familyRelationships`: Seq[FAMILY_RELATIONSHIP_WITH_FAMILY] = Nil,
+                                `is_a_proband`: Option[Boolean] = None,
                                 `study`: STUDY_CENTRIC = STUDY_CENTRIC(),
                                 `files`: Seq[FILE_WITH_BIOSPECIMEN] = Seq.empty,
                               )
