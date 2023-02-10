@@ -72,7 +72,7 @@
         "family_count" : {
           "type" : "integer"
         },
-        "experimental_strategy" : {
+        "experimental_strategies" : {
           "type" : "keyword"
         },
         "hpo_terms" : {

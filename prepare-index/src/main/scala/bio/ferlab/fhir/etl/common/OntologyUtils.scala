@@ -106,13 +106,29 @@ object OntologyUtils {
 
     (diagnosisDf
       .withColumn("age_at_diagnosis", col("age_at_diagnosis")("value"))
+      .join(mondoTerms, col("diagnosis_mondo_code") === col("id"), "left_outer")
+      .withColumn("diagnosis_mondo_display",
+        when(col("id").isNotNull,
+          concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
+          .otherwise(col("diagnosis_mondo_code"))
+      )
+      .drop("ancestors", "id", "is_leaf", "name", "parents")
+      .join(icdSplitId, col("diagnosis_ICD_code") === col("id"), "left_outer")
+      .withColumn("diagnosis_icd_display",
+        when(col("id").isNotNull,
+          concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
+          .otherwise(col("diagnosis_ICD_code"))
+      )
+      .drop("ancestors", "id", "is_leaf", "name", "parents")
       .groupBy("subject", "study_id", "release_id")
       .agg(collect_list(struct(
         col("fhir_id"),
         col("diagnosis_source_text"),
         col("diagnosis_mondo_code"),
         col("diagnosis_ICD_code"),
-        col("age_at_diagnosis")
+        col("age_at_diagnosis"),
+        col("diagnosis_mondo_display"),
+        col("diagnosis_icd_display"),
       )) as "diagnoses")
       .join(taggedIcdTerms, col("subject") === col("cqdg_participant_id"), "left_outer")
       .join(taggedMondoTerms, Seq("cqdg_participant_id"), "left_outer")

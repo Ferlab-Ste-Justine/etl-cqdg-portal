@@ -4,7 +4,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.{col, flatten}
+import org.apache.spark.sql.functions.{array_distinct, col, flatten}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
@@ -30,7 +30,7 @@ class ParticipantCentric(releaseId: String, studyIds: List[String])(implicit con
   override def transform(data: Map[String, DataFrame],
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val patientDF = data(simple_participant.id)
+    val patientDF = data(simple_participant.id).drop("study")
 
     val transformedParticipant =
       patientDF
@@ -41,8 +41,7 @@ class ParticipantCentric(releaseId: String, studyIds: List[String])(implicit con
           data(normalized_sequencing_experiment.id),
           data(normalized_sample_registration.id),
         )
-        .withColumn("study_code", col("study.study_code"))
-        .withColumn("biospecimens", flatten(col("files.biospecimens")))
+        .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
 
     Map(mainDestination.id -> transformedParticipant)
   }

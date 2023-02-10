@@ -4,7 +4,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.{col, concat, explode, flatten, lit, struct}
+import org.apache.spark.sql.functions.{array_distinct, col, concat, explode, flatten, lit, struct}
 import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 
 import java.time.LocalDateTime
@@ -40,10 +40,10 @@ class FileCentric(releaseId: String, studyIds: List[String])(implicit configurat
         .drop("file", "files")
         .addParticipantWithBiospecimen(data(simple_participant.id), data(normalized_biospecimen.id), data(normalized_sample_registration.id))
         .addStudy(data(es_index_study_centric.id))
-        .addSequencingExperiment(data(normalized_sequencing_experiment.id))
+        .addSequencingExperiment(data(normalized_sequencing_experiment.id).withColumn("experimental_strategy", col("experimental_strategy")(0)))
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("study_code", col("study.study_code"))
-        .withColumn("biospecimens", flatten(col("participants.biospecimens")))
+        .withColumn("biospecimens", array_distinct(flatten(col("participants.biospecimens"))))
 
     Map(mainDestination.id -> transformedFile)
   }

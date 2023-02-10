@@ -12,7 +12,7 @@ object Transformations {
     Custom(_
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
       .withColumn("age_at_recruitment", firstNonNull(transform(
-        filter(col("extension"),col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueAge"),
+        filter(col("extension"), col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueAge"),
         col => col("value")
       )))
       .withColumn("ethnicity",
@@ -39,7 +39,7 @@ object Transformations {
       .withColumn("read_length", filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"))
       .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
-      .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDateTime"))
+      .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDateTime").cast("string"))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
       .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
       .withColumn("experimental_strategy", transform(
@@ -66,7 +66,8 @@ object Transformations {
       .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type")
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("biospecimen_tissue_source", col("type")("coding")(0)("code"))
+      .withColumn("biospecimen_tissue_source",
+        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
       .withColumn("age_biospecimen_collection", extractValueAge(AGE_BIO_COLLECTION_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
@@ -170,8 +171,12 @@ object Transformations {
       )
       .withColumn("domain", col("category")("coding")(0)("code"))
       .withColumn("study_code", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
-      .withColumn("access_limitations", filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_S_D)(0)("valueCodeableConcept")("coding")("code"))
-      .withColumn("access_requirements", filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_S_D)(0)("valueCodeableConcept")("coding")("code"))
+      .withColumn("access_limitations", transform(
+        filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_S_D)(0)("valueCodeableConcept")("coding"),
+        col => struct(col("code") as "code", col("display") as "display")))
+      .withColumn("access_requirements", transform(
+        filter(col("extension"), col => col("url") === ACCESS_REQUIREMENTS_S_D)(0)("valueCodeableConcept")("coding"),
+        col => struct(col("code") as "code", col("display") as "display")))
       .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_S_D)(0)("valueCoding")("code"))
       .withColumn("study_version", regexp_extract(filter(col("meta")("tag"), col => col("code").contains("study_version"))(0)("code"), versionExtract, 1))
     ),
