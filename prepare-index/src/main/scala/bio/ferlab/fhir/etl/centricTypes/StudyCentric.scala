@@ -4,8 +4,9 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.OntologyUtils.displayTerm
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import bio.ferlab.fhir.etl.common.Utils._
+import org.apache.spark.sql.functions.{col, transform => sparkTransform, _}
 
 import java.time.LocalDateTime
 
@@ -18,23 +19,24 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
   val normalized_group: DatasetConf = conf.getDataset("normalized_group")
   val normalized_diagnosis: DatasetConf = conf.getDataset("normalized_diagnosis")
   val normalized_task: DatasetConf = conf.getDataset("normalized_task")
+  val normalized_biospecimen: DatasetConf = conf.getDataset("normalized_biospecimen")
   val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
+  val normalized_sequencing_experiment: DatasetConf = conf.getDataset("normalized_task")
   val hpo_terms: DatasetConf = conf.getDataset("hpo_terms")
   val mondo_terms: DatasetConf = conf.getDataset("mondo_terms")
   val icd_terms: DatasetConf = conf.getDataset("icd_terms")
-  val duo_terms: DatasetConf = conf.getDataset("duo_terms")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     (Seq(
-      normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group, normalized_diagnosis, normalized_task, normalized_phenotype)
+      normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
+      normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,
       icd_terms.id -> icd_terms.read,
-      duo_terms.id -> duo_terms.read,
     )).toMap
 
   }
@@ -44,22 +46,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val studyDF = data(normalized_researchstudy.id)
-
-    val duoTerms = data(duo_terms.id).withColumn("duo_term", displayTerm(col("id"), col("name")))
-
-    val accessLimitationsMap =
-      studyDF
-        .withColumn("access_limitations_exp", explode(col("access_limitations")))
-        .join(duoTerms, col("access_limitations_exp") === col("id"), "left_outer")
-        .groupBy("study_id")
-        .agg(collect_list(col("duo_term")) as "access_limitations")
-
-    val accessRequirementsMap =
-      studyDF
-        .withColumn("access_requirements_exp", explode(col("access_requirements")))
-        .join(duoTerms, col("access_requirements_exp") === col("id"), "left_outer")
-        .groupBy("study_id")
-        .agg(collect_list(col("duo_term")) as "access_requirements")
 
     val filesExplodedDF = data(normalized_drs_document_reference.id)
       .withColumn("files_exp", explode(col("files")))
@@ -85,13 +71,18 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
 
     val participantCount =
       data(normalized_patient.id)
+        .withColumnRenamed("fhir_id", "subject")
+        .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
         .groupBy("study_id")
-        .agg(size(collect_set("fhir_id")) as "participant_count")
+        .agg(size(collect_set("subject")) as "participant_count")
 
+    val participantsRenamed = data(normalized_patient.id).withColumnRenamed("fhir_id", "participant_id")
 
     val fileCount =
       data(normalized_drs_document_reference.id)
         .withColumn("files_exploded", explode(col("files")))
+        .filter(col("files_exploded.file_format") =!= "CRAI")
+        .join(participantsRenamed, Seq("participant_id", "study_id", "release_id"), "inner")
         .groupBy("study_id")
         .agg(
           size(collect_set(
@@ -111,7 +102,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
     val experimentalStrategyGrouped = data(normalized_task.id)
       .withColumn("experimental_strategy_exp", explode(col("experimental_strategy")))
       .groupBy("study_id")
-      .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategy")
+      .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategies")
 
     val phenotypeGrouped = data(normalized_phenotype.id)
       .withColumn("phenotype", col("phenotype_HPO_code")("code"))
@@ -142,9 +133,12 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .join(phenotypeGrouped, Seq("study_id"), "left_outer")
       .join(diagnosisGrouped, Seq("study_id"), "left_outer")
       .withColumn("family_data", col("family_count").gt(0))
-      .drop("access_limitations", "access_requirements")
-      .join(accessLimitationsMap, Seq("study_id"), "left_outer")
-      .join(accessRequirementsMap, Seq("study_id"), "left_outer")
+      .withColumn("access_limitations", sparkTransform(filter(col("access_limitations"), col => col("display").isNotNull),
+        col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
+      ))
+      .withColumn("access_requirements", sparkTransform(filter(col("access_requirements"), col => col("display").isNotNull),
+        col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
+      ))
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("title", "name")
       .drop("fhir_id", "access_requirements", "access_limitations")

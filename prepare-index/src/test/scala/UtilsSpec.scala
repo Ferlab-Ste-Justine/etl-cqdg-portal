@@ -52,7 +52,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     probands should contain theSameElementsAs Seq("P2")
 
     // Should return mapped family relations per participant
-    val patients = output.select("participant_id", "familyRelationships").as[(String, Seq[FAMILY_RELATIONSHIP_WITH_FAMILY])].collect()
+    val patients = output.select("participant_id", "family_relationships").as[(String, Seq[FAMILY_RELATIONSHIP_WITH_FAMILY])].collect()
     val p1 = patients.filter(_._1 == "P1").head
     p1._2 should contain theSameElementsAs Seq(
       FAMILY_RELATIONSHIP_WITH_FAMILY(),

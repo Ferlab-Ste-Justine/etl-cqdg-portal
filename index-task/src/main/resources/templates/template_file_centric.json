@@ -49,7 +49,7 @@
         "biospecimens": {
           "type": "nested",
           "properties": {
-            "fhir_id": {
+            "biospecimen_id": {
               "type": "keyword"
             },
             "biospecimen_tissue_source": {
@@ -69,6 +69,261 @@
             },
             "submitter_sample_id": {
               "type": "keyword"
+            },
+            "participant": {
+              "properties": {
+                "participant_id": {
+                  "type": "keyword"
+                },
+                "gender": {
+                  "type": "keyword"
+                },
+                "age_at_recruitment": {
+                  "type": "integer"
+                },
+                "ethnicity": {
+                  "type": "keyword"
+                },
+                "submitter_participant_id": {
+                  "type": "keyword"
+                },
+                "vital_status": {
+                  "type": "keyword"
+                },
+                "age_of_death": {
+                  "type": "integer"
+                },
+                "cause_of_death": {
+                  "type": "keyword"
+                },
+                "is_affected": {
+                  "type": "keyword"
+                },
+                "diagnoses": {
+                  "type": "nested",
+                  "properties": {
+                    "fhir_id": {
+                      "type": "keyword"
+                    },
+                    "diagnosis_source_text": {
+                      "type": "keyword"
+                    },
+                    "diagnosis_mondo_code": {
+                      "type": "keyword"
+                    },
+                    "diagnosis_ICD_code": {
+                      "type": "keyword"
+                    },
+                    "age_at_diagnosis": {
+                      "type": "long"
+                    },
+                    "diagnosis_mondo_display": {
+                      "type": "keyword"
+                    },
+                    "diagnosis_icd_display": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "icd_tagged": {
+                  "type": "nested",
+                  "properties": {
+                    "internal_phenotype_id": {
+                      "type": "keyword"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "source_text": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "mondo_tagged": {
+                  "type": "nested",
+                  "properties": {
+                    "internal_phenotype_id": {
+                      "type": "keyword"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "source_text": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "mondo": {
+                  "type": "nested",
+                  "properties": {
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "observed_phenotype_tagged": {
+                  "type": "nested",
+                  "properties": {
+                    "internal_phenotype_id": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "source_text": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "non_observed_phenotype_tagged": {
+                  "type": "nested",
+                  "properties": {
+                    "internal_phenotype_id": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "source_text": {
+                      "type": "keyword"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "observed_phenotypes": {
+                  "type": "nested",
+                  "properties": {
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "parents": {
+                      "type": "keyword"
+                    },
+                    "is_leaf": {
+                      "type": "boolean"
+                    },
+                    "is_tagged": {
+                      "type": "boolean"
+                    },
+                    "age_at_event": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "family_relationships": {
+                  "type": "nested",
+                  "properties": {
+                    "submitter_participant_id": {
+                      "type": "keyword"
+                    },
+                    "focus_participant_id": {
+                      "type": "keyword"
+                    },
+                    "relationship_to_proband": {
+                      "type": "keyword"
+                    },
+                    "family_id": {
+                      "type": "keyword"
+                    },
+                    "family_type": {
+                      "type": "keyword"
+                    },
+                    "submitter_family_id": {
+                      "type": "keyword"
+                    },
+                    "is_affected": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "is_a_proband": {
+                  "type": "boolean"
+                },
+                "study": {
+                  "properties": {
+                    "study_code": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "study_code": {
+                  "type": "keyword"
+                },
+                "family_id": {
+                  "type": "keyword"
+                },
+                "family_type": {
+                  "type": "keyword"
+                },
+                "submitter_family_id": {
+                  "type": "keyword"
+                },
+                "study_id": {
+                  "type": "keyword"
+                },
+                "release_id": {
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -125,6 +380,12 @@
                 },
                 "age_at_diagnosis": {
                   "type": "long"
+                },
+                "diagnosis_mondo_display": {
+                  "type": "keyword"
+                },
+                "diagnosis_icd_display": {
+                  "type": "keyword"
                 }
               }
             },
@@ -301,7 +562,7 @@
             "biospecimens": {
               "type": "nested",
               "properties": {
-                "fhir_id": {
+                "biospecimen_id": {
                   "type": "keyword"
                 },
                 "biospecimen_tissue_source": {
@@ -323,6 +584,25 @@
                   "type": "keyword"
                 }
               }
+            },
+            "family_id": {
+              "type": "keyword"
+            },
+            "family_type": {
+              "type": "keyword"
+            },
+            "submitter_family_id": {
+              "type": "keyword"
+            },
+            "study": {
+              "properties": {
+                "study_code": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "study_code": {
+              "type": "keyword"
             }
           }
         },
@@ -391,7 +671,7 @@
             "family_count" : {
               "type" : "integer"
             },
-            "experimental_strategy" : {
+            "experimental_strategies" : {
               "type" : "keyword"
             },
             "hpo_terms" : {
@@ -432,6 +712,9 @@
         },
         "sequencing_experiment": {
           "properties": {
+            "analysis_id" : {
+              "type": "keyword"
+            },
             "owner" : {
               "type": "keyword"
             },
@@ -454,7 +737,8 @@
               "type": "keyword"
             },
             "run_date" : {
-              "type": "keyword"
+              "type": "date",
+              "format": "yyyy-MM-dd"
             },
             "capture_kit" : {
               "type": "keyword"

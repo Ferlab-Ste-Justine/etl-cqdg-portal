@@ -6,6 +6,14 @@ import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOper
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import pureconfig._
+import pureconfig.generic.auto._
+
+case class ServiceConf(
+                        esHost: String,
+                        esUsername: Option[String],
+                        esPassword: Option[String]
+                      )
 
 
 object IndexTask extends App {
@@ -13,28 +21,36 @@ object IndexTask extends App {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
   val Array(
-  esNodes,          // http://localhost:9200
-  esPort,           // 9200
   release_id,       // release id
   study_ids,        // study ids separated by ;
   jobType,          // study_centric or participant_centric or file_centric or biospecimen_centric
-  configFile        // config/qa-[project].conf or config/prod.conf or config/dev-[project].conf
+  env,            // qa/dev/prd
+  project        // cqdg
   ) = args
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources(configFile)
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources(s"config/$env-$project.conf")
+  val indexConf: ServiceConf = ConfigSource.file(s"index-task/src/main/resources/$env.conf").loadOrThrow[ServiceConf]
 
   val esConfigs = Map(
     "es.index.auto.create" -> "true",
-    "es.net.ssl" -> "true",
-    "es.net.ssl.cert.allow.self.signed" -> "true",
-    "es.nodes" -> esNodes,
+    "es.nodes"-> indexConf.esHost,
+    "es.port"-> "443",
+    "es.batch.write.retry.wait" -> "100s",
+    "es.nodes.client.only" -> "false",
+    "es.nodes.discovery" -> "false",
     "es.nodes.wan.only" -> "true",
+    "es.read.ignore_exception" -> "true",
     "es.wan.only" -> "true",
-    "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> esPort)
+    "es.write.ignore_exception" -> "true"
+  )
+
+  val esUserPass = (indexConf.esUsername, indexConf.esPassword) match {
+    case (Some(u), Some(p)) => Map("es.net.http.auth.user"-> u, "es.net.http.auth.pass" -> p)
+    case _ => Map.empty[String, String]
+  }
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf ++ esConfigs)
+    (conf.sparkconf ++ esConfigs ++ esUserPass)
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -47,7 +63,7 @@ object IndexTask extends App {
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
-  implicit val esClient: ElasticSearchClient = new ElasticSearchClient(esNodes.split(',').head, None, None)
+  implicit val esClient: ElasticSearchClient = new ElasticSearchClient(indexConf.esHost, indexConf.esUsername, indexConf.esPassword)
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")

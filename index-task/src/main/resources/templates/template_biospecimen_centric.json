@@ -98,7 +98,7 @@
             "family_count": {
               "type": "integer"
             },
-            "experimental_strategy": {
+            "experimental_strategies": {
               "type": "keyword"
             },
             "hpo_terms": {
@@ -184,6 +184,12 @@
                 },
                 "age_at_diagnosis": {
                   "type": "long"
+                },
+                "diagnosis_mondo_display": {
+                  "type": "keyword"
+                },
+                "diagnosis_icd_display": {
+                  "type": "keyword"
                 }
               }
             },
@@ -331,7 +337,7 @@
                 }
               }
             },
-            "familyRelationships": {
+            "family_relationships": {
               "type": "nested",
               "properties": {
                 "submitter_participant_id": {
@@ -351,16 +357,38 @@
                 },
                 "submitter_family_id": {
                   "type": "keyword"
+                },
+                "is_affected": {
+                  "type": "keyword"
                 }
               }
             },
             "is_a_proband": {
               "type": "boolean"
             },
+            "relationship_to_proband": {
+              "type": "keyword"
+            },
+            "family_id": {
+              "type": "keyword"
+            },
+            "family_type": {
+              "type": "keyword"
+            },
             "study_id": {
               "type": "keyword"
             },
             "release_id": {
+              "type": "keyword"
+            },
+            "study": {
+              "properties": {
+                "study_code": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "study_code": {
               "type": "keyword"
             }
           }
@@ -397,6 +425,9 @@
             },
             "sequencing_experiment": {
               "properties": {
+                "analysis_id" : {
+                  "type": "keyword"
+                },
                 "owner" : {
                   "type": "keyword"
                 },
@@ -419,7 +450,8 @@
                   "type": "keyword"
                 },
                 "run_date" : {
-                  "type": "keyword"
+                  "type": "date",
+                  "format": "yyyy-MM-dd"
                 },
                 "capture_kit" : {
                   "type": "keyword"
