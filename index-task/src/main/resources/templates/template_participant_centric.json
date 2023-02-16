@@ -471,7 +471,7 @@
                 },
                 "run_date" : {
                   "type": "date",
-                  "format": "yyyy-MM-dd HH:mm:ss || date_nanos"
+                  "format": "yyyy-MM-dd HH:mm:ss"
                 },
                 "capture_kit" : {
                   "type": "keyword"

@@ -31,12 +31,12 @@ object Transformations {
   val taskMappings: List[Transformation] = List(
     Custom(_
       .select("fhir_id", "study_id", "release_id", "output", "code", "for", "owner", "extension")
-      .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("code"))
+      .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("display"))
       .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT_S_D)(0))
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
       .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
       .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
-      .withColumn("read_length", filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"))
+      .withColumn("read_length", split(filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"), ",")(0))
       .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
       .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDateTime").cast("string"))
@@ -79,7 +79,7 @@ object Transformations {
       .select("identifier", "type", "subject", "parent", "study_id", "release_id", "fhir_id")
       .where(size(col("parent")) > 0)
       .withColumn("sample_type",
-        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
+        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
       .withColumn("submitter_sample_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("parent", firstNonNull(transform(col("parent"),  col => regexp_extract(col("reference"), specimenExtract, 1))))

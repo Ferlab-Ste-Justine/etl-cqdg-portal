@@ -22,7 +22,13 @@ val sparkDepsSetting = Seq(
     "org.apache.spark" %% "spark-avro" % "2.4.2" % Provided,
     "org.apache.hadoop" % "hadoop-client" % "3.2.0" % Provided,
     "org.apache.hadoop" % "hadoop-aws" % "3.2.0" % Provided,
-    "io.delta" %% "delta-core" % deltaCoreVersion % Provided,
+//    "io.delta" %% "delta-core" % deltaCoreVersion % Provided,
+//    "org.apache.spark" %% "spark-sql" % "3.1.2",
+//    "org.apache.spark" %% "spark-hive" % "3.1.2" ,
+//    "org.apache.spark" %% "spark-avro" % "2.4.2" ,
+//    "org.apache.hadoop" % "hadoop-client" % "3.2.0" ,
+//    "org.apache.hadoop" % "hadoop-aws" % "3.2.0" ,
+    "io.delta" %% "delta-core" % deltaCoreVersion,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test
   )
 )

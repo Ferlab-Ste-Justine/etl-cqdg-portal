@@ -41,7 +41,10 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.read.ignore_exception" -> "true",
     "es.wan.only" -> "true",
-    "es.write.ignore_exception" -> "true"
+    "es.write.ignore_exception" -> "true",
+//    "es.net.ssl" -> "true",
+//    "es.net.ssl.keystore.location" -> "file:///home/adrian/.jdks/corretto-11.0.13/lib/security/cacerts",
+//    "es.net.ssl.keystore.pass" -> "changeit"
   )
 
   val esUserPass = (indexConf.esUsername, indexConf.esPassword) match {
