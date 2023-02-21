@@ -1,15 +1,16 @@
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
 import bio.ferlab.fhir.etl.centricTypes.FileCentric
 import model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import pureconfig.generic.auto._
 
 class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-cqdg.conf")
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
   "transform" should "prepare index file_centric" in {
     val data: Map[String, DataFrame] = Map(

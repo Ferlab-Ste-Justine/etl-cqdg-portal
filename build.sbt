@@ -1,7 +1,7 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
-val datalakeSpark3Version = "0.2.46"
-val deltaCoreVersion = "1.0.0"
+val datalakeSpark3Version = "5.3.0"
+val deltaCoreVersion = "2.1.1"
 
 lazy val config = (project in file("config")).settings(
   Seq(assembly / assemblyMergeStrategy := {
@@ -16,18 +16,12 @@ lazy val fhavro_export = project in file("fhavro-export")
 
 val sparkDepsSetting = Seq(
   libraryDependencies ++= Seq(
-    "bio.ferlab" %% "datalake-spark31" % datalakeSpark3Version,
+    "bio.ferlab" %% "datalake-spark3" % datalakeSpark3Version,
     "org.apache.spark" %% "spark-sql" % "3.1.2" % Provided,
     "org.apache.spark" %% "spark-hive" % "3.1.2" % Provided,
     "org.apache.spark" %% "spark-avro" % "2.4.2" % Provided,
-    "org.apache.hadoop" % "hadoop-client" % "3.2.0" % Provided,
-    "org.apache.hadoop" % "hadoop-aws" % "3.2.0" % Provided,
-//    "io.delta" %% "delta-core" % deltaCoreVersion % Provided,
-//    "org.apache.spark" %% "spark-sql" % "3.1.2",
-//    "org.apache.spark" %% "spark-hive" % "3.1.2" ,
-//    "org.apache.spark" %% "spark-avro" % "2.4.2" ,
-//    "org.apache.hadoop" % "hadoop-client" % "3.2.0" ,
-//    "org.apache.hadoop" % "hadoop-aws" % "3.2.0" ,
+    "org.apache.hadoop" % "hadoop-client" % "3.3.1" % Provided,
+    "org.apache.hadoop" % "hadoop-aws" % "3.3.1" % Provided,
     "io.delta" %% "delta-core" % deltaCoreVersion,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test
   )

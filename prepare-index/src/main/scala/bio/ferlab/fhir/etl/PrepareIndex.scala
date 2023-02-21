@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.spark3.public.SparkApp
+import bio.ferlab.datalake.spark3.SparkApp
 import bio.ferlab.fhir.etl.centricTypes.{BiospecimenCentric, FileCentric, ParticipantCentric, SimpleParticipant, StudyCentric}
 
 object PrepareIndex extends SparkApp {
@@ -19,16 +19,16 @@ object PrepareIndex extends SparkApp {
       new SimpleParticipant(releaseId, studyList).run()
       new StudyCentric(releaseId, studyList).run()
     case "participant_centric" =>
-      new StudyCentric(releaseId, studyList).run()
-      new SimpleParticipant(releaseId, studyList).run()
+//      new StudyCentric(releaseId, studyList).run()
+//      new SimpleParticipant(releaseId, studyList).run()
       new ParticipantCentric(releaseId, studyList).run()
     case "file_centric" =>
-      new StudyCentric(releaseId, studyList).run()
-      new SimpleParticipant(releaseId, studyList).run()
+//      new StudyCentric(releaseId, studyList).run()
+//      new SimpleParticipant(releaseId, studyList).run()
       new FileCentric(releaseId, studyList).run()
     case "biospecimen_centric" =>
-      new StudyCentric(releaseId, studyList).run()
-      new SimpleParticipant(releaseId, studyList).run()
+//      new StudyCentric(releaseId, studyList).run()
+//      new SimpleParticipant(releaseId, studyList).run()
       new BiospecimenCentric(releaseId, studyList).run()
     case "all" =>
       new StudyCentric(releaseId, studyList).run()

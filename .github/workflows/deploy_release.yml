@@ -27,7 +27,7 @@ jobs:
           git config user.email "no-mail"
           git config user.name "ig-deploy-bot"
       - name: Build Assembly
-        run: sbt assembly
+        run: sbt clean assembly
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release

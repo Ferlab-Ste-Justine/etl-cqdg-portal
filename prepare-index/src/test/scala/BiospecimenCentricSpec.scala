@@ -1,15 +1,17 @@
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
 import bio.ferlab.fhir.etl.centricTypes.BiospecimenCentric
 import model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
+import pureconfig.generic.auto._
+import pureconfig.module.enum._
 
 class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-cqdg.conf")
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
   "transform" should "prepare index biospecimen_centric" in {
     val data: Map[String, DataFrame] = Map(

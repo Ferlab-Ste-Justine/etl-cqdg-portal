@@ -1,16 +1,17 @@
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.SimpleParticipant
 import model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
+import pureconfig.generic.auto._
 
 class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources("config/dev-cqdg.conf")
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
   "transform" should "prepare simple_participant" in {
     val data: Map[String, DataFrame] = Map(

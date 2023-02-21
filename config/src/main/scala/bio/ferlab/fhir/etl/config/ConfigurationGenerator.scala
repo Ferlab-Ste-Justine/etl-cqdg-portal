@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl.config
 
-import bio.ferlab.datalake.commons.config.Format.{AVRO, CSV, DELTA, JSON, PARQUET}
+import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET}
 import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition}
 import bio.ferlab.datalake.commons.config._
 import bio.ferlab.datalake.commons.file.FileSystemType.S3
@@ -60,48 +60,11 @@ object ConfigurationGenerator extends App {
   })
 
   val sources = (rawsAndNormalized ++ Seq(
-    DatasetConf(
-      id = "hpo_terms",
-      storageid = storage,
-      path = s"/hpo_terms",
-      format = JSON,
-      table = Some(TableConf("database", "hpo_terms")),
-      loadtype = OverWrite,
-    ),
-    DatasetConf(
-      id = "mondo_terms",
-      storageid = storage,
-      path = s"/mondo_terms",
-      table = Some(TableConf("database", "mondo_terms")),
-      format = JSON,
-      loadtype = OverWrite,
-    ),
-    DatasetConf(
-      id = "duo_terms", //TODO should be removed
-      storageid = storage,
-      path = s"/duo_terms",
-      table = Some(TableConf("database", "duo_terms")),
-      readoptions = Map("header" -> "true"),
-      format = CSV,
-      loadtype = OverWrite,
-    ),
-    DatasetConf(
-      id = "icd_terms",
-      storageid = storage,
-      path = s"/icd_terms",
-      table = Some(TableConf("database", "icd_terms")),
-      format = JSON,
-      loadtype = OverWrite,
-    )
+    DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", format = JSON, table = Some(TableConf("database", "hpo_terms")), loadtype = OverWrite),
+    DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = JSON, loadtype = OverWrite),
+    DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", table = Some(TableConf("database", "icd_terms")), format = JSON, loadtype = OverWrite)
   ) ++ Seq(
-    DatasetConf(
-      id = "simple_participant",
-      storageid = storage,
-      path = s"/es_index/fhir/simple_participant",
-      format = PARQUET,
-      loadtype = OverWrite,
-      partitionby = partitionByStudyIdAndReleaseId
-    )
+    DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
   ) ++ Seq(
     Index("study_centric", partitionByStudyIdAndReleaseId),
     Index("participant_centric", partitionByStudyIdAndReleaseId),
@@ -109,72 +72,77 @@ object ConfigurationGenerator extends App {
     Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
   ).flatMap(index => {
     Seq(
-      DatasetConf(
-        id = s"es_index_${index.name}",
-        storageid = storage,
-        path = s"/es_index/fhir/${index.name}",
-        format = PARQUET,
-        loadtype = OverWrite,
-        table = Some(TableConf("database", s"es_index_${index.name}")),
-        partitionby = index.partitionBy
-      )
+      DatasetConf(id = s"es_index_${index.name}", storageid = storage, path = s"/es_index/fhir/${index.name}", format = PARQUET, loadtype = OverWrite, table = Some(TableConf("database", s"es_index_${index.name}")), partitionby = index.partitionBy)
     )
   })).toList
 
-  val cqdgConf = Map("fhir" -> "http://localhost:8080", "qaDbName" -> "cqdg_portal_qa", "prdDbName" -> "cqdg_portal_prd", "localDbName" -> "normalized", "bucketNamePrefix" -> "clinical-data/e2adb961-4f58-4e13-a24f-6725df802e2c")
+  val cqdgConf = Map("fhir" -> "http://localhost:8080", "qaDbName" -> "cqdg_portal_qa", "prdDbName" -> "cqdg_portal_prd", "localDbName" -> "normalized", "bucketNamePrefix" -> "cqdg-qa-app-clinical-data-service")
   val conf = Map("cqdg" -> cqdgConf)
 
-  conf.foreach { case (project, _) =>
-    val spark_conf = Map(
-      "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
-      "spark.delta.merge.repartitionBeforeWrite" -> "true",
-      "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
-      "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
-      "spark.sql.legacy.parquet.datetimeRebaseModeInWrite" -> "CORRECTED",
-      "spark.sql.legacy.timeParserPolicy" -> "CORRECTED",
-      "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
-      "spark.fhir.server.url" -> conf(project)("fhir")
-    )
+  val spark_conf = Map(
+    "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
+    "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
+    "spark.databricks.delta.schema.autoMerge.enabled" -> "true",
+    "spark.delta.merge.repartitionBeforeWrite" -> "true",
+    "spark.hadoop.fs.s3a.access.key" -> "${?AWS_ACCESS_KEY}",
+    "spark.hadoop.fs.s3a.endpoint" -> "${?AWS_ENDPOINT}",
+    "spark.hadoop.fs.s3a.impl" -> "org.apache.hadoop.fs.s3a.S3AFileSystem",
+    "spark.hadoop.fs.s3a.path.style.access" -> "true",
+    "spark.hadoop.fs.s3a.secret.key" -> "${?AWS_SECRET_KEY}",
+    "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
+    "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
+    "spark.sql.legacy.parquet.datetimeRebaseModeInWrite"->"CORRECTED",
+    "spark.sql.legacy.timeParserPolicy" -> "CORRECTED",
+    "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
+  )
 
-    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", Configuration(
+  val es_conf = Map(
+//    "es.net.http.auth.user" -> "${?ES_USERNAME}",
+//    "es.net.http.auth.pass" -> "${?ES_PASSWORD}",
+    "es.index.auto.create" -> "true",
+//    "es.nodes" -> "${?ES_ENDPOINT}",
+//    "es.port" -> "${?ES_PORT}",
+    "es.net.ssl" -> "true",
+    "es.net.ssl.cert.allow.self.signed" -> "true",
+    "es.batch.write.retry.wait" -> "100s",
+    "es.nodes.wan.only" -> "true",
+    "es.wan.only" -> "true",
+    "spark.es.nodes.wan.only" -> "true",
+    "es.port" -> "9200"
+  )
+  val es_conf_local = Map(
+    "es.net.ssl" -> "true",
+    "es.net.ssl.keystore.location" -> "${?CERT_LOCATION}",
+    "es.net.ssl.keystore.pass" -> "changeit"
+  )
+
+  conf.foreach { case (project, _) =>
+//    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local ,DatalakeConf(
+    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
         StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3)
       ),
       sources = populateTable(sources, conf(project)("localDbName")),
       args = args.toList,
-      sparkconf = Map(
-        "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
-        "spark.delta.merge.repartitionBeforeWrite" -> "true",
-        "spark.hadoop.fs.s3a.access.key" -> "${?AWS_ACCESS_KEY}",
-        "spark.hadoop.fs.s3a.endpoint" -> "${?AWS_ENDPOINT}",
-        "spark.hadoop.fs.s3a.impl" -> "org.apache.hadoop.fs.s3a.S3AFileSystem",
-        "spark.hadoop.fs.s3a.path.style.access" -> "true",
-        "spark.hadoop.fs.s3a.secret.key" -> "${?AWS_SECRET_KEY}",
-        "spark.master" -> "local",
-        "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
-        "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
-        "spark.sql.legacy.timeParserPolicy" -> "CORRECTED",
-        "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
-        "spark.fhir.server.url" -> conf(project)("fhir")
-      )
-    ))
+      sparkconf = spark_conf + ("spark.master" -> "local") + ("spark.fhir.server.url" -> conf(project)("fhir"))
+    )))
 
-    ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", Configuration(
+    ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}-qa", S3)
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}", S3)
       ),
-      sources = populateTable(sources, conf(project)("qaDbName")),
+      sources = populateTable(sources, conf(project)("localDbName")),
       args = args.toList,
-      sparkconf = spark_conf
-    ))
+      sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
+    )))
 
-    ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", Configuration(
+    ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}-prd", S3)
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
       args = args.toList,
-      sparkconf = spark_conf
-    ))
+      sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
+    )))
   }
 }

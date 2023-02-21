@@ -1,19 +1,17 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, ConfigurationWrapper, DatalakeConf, DatasetConf, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.elasticsearch.{ElasticSearchClient, Indexer}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import pureconfig._
+import pureconfig.ConfigSource
 import pureconfig.generic.auto._
+//Required import
+import pureconfig.module.enum._
 
-case class ServiceConf(
-                        esHost: String,
-                        esUsername: Option[String],
-                        esPassword: Option[String]
-                      )
+case class ServiceConf(esConfig: Map[String, String])
 
 
 object IndexTask extends App {
@@ -25,35 +23,17 @@ object IndexTask extends App {
   study_ids,        // study ids separated by ;
   jobType,          // study_centric or participant_centric or file_centric or biospecimen_centric
   env,            // qa/dev/prd
-  project        // cqdg
+  project,        // cqdg
+  esUrl,
+  esPort
   ) = args
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources(s"config/$env-$project.conf")
-  val indexConf: ServiceConf = ConfigSource.file(s"index-task/src/main/resources/$env.conf").loadOrThrow[ServiceConf]
-
-  val esConfigs = Map(
-    "es.index.auto.create" -> "true",
-    "es.nodes"-> indexConf.esHost,
-    "es.port"-> "443",
-    "es.batch.write.retry.wait" -> "100s",
-    "es.nodes.client.only" -> "false",
-    "es.nodes.discovery" -> "false",
-    "es.nodes.wan.only" -> "true",
-    "es.read.ignore_exception" -> "true",
-    "es.wan.only" -> "true",
-    "es.write.ignore_exception" -> "true",
-//    "es.net.ssl" -> "true",
-//    "es.net.ssl.keystore.location" -> "file:///home/adrian/.jdks/corretto-11.0.13/lib/security/cacerts",
-//    "es.net.ssl.keystore.pass" -> "changeit"
-  )
-
-  val esUserPass = (indexConf.esUsername, indexConf.esPassword) match {
-    case (Some(u), Some(p)) => Map("es.net.http.auth.user"-> u, "es.net.http.auth.pass" -> p)
-    case _ => Map.empty[String, String]
-  }
+  implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
+  val serviceConf: ServiceConf = ConfigSource.resources(s"config/$env-$project.conf").loadOrThrow[ServiceConf]
+  private val esConf = serviceConf.esConfig
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf ++ esConfigs ++ esUserPass)
+    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort"))
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -66,7 +46,8 @@ object IndexTask extends App {
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
-  implicit val esClient: ElasticSearchClient = new ElasticSearchClient(indexConf.esHost, indexConf.esUsername, indexConf.esPassword)
+  implicit val esClient: ElasticSearchClient =
+    new ElasticSearchClient(s"$esUrl:$esPort", esConf.get("es.net.http.auth.user"), esConf.get("es.net.http.auth.pass"))
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
@@ -85,6 +66,14 @@ object IndexTask extends App {
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
+
+//    df.show(2, false)
+
+    println(s"$esUrl:$esPort")
+    println(esConf.get("es.net.http.auth.user"))
+    println(esConf.get("es.net.http.auth.pass"))
+
+    (esConf + ("es.nodes" -> s"$esUrl:$esPort")).foreach(println)
 
     new Indexer("index", templatePath, indexName)
       .run(df)

@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.spark3.public.SparkApp
+import bio.ferlab.datalake.spark3.SparkApp
 import bio.ferlab.fhir.etl.fhavro.FhavroToNormalizedMappings
 
 object ImportTask extends SparkApp {
