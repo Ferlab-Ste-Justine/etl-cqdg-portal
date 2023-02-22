@@ -70,6 +70,7 @@ object IndexTask extends App {
 //    df.show(2, false)
 
     println(s"$esUrl:$esPort")
+    println(s"env: $env")
     println(esConf.get("es.net.http.auth.user"))
     println(esConf.get("es.net.http.auth.pass"))
 
