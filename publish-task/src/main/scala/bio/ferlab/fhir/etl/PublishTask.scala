@@ -2,6 +2,7 @@ package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.spark3.elasticsearch.ElasticSearchClient
 import org.slf4j.LoggerFactory
+import org.apache.hadoop.shaded.org.apache.http.util.EntityUtils
 
 import scala.util.{Failure, Try}
 
@@ -43,8 +44,8 @@ object PublishTask extends App {
       val newIndexName = s"${job}_${studyId}_$release_id".toLowerCase
       println(s"Add $newIndexName to alias $job")
 
-      //Remove previous aliases
-//      esClient.setAlias(add = List.empty[String], remove = List(s"job*"), job)
+//      Remove previous aliases
+      esClient.setAlias(add = List.empty[String], remove = List(s"job*"), job)
 
       //Add previous aliases
 //      esClient.setAlias(add = List(newIndexName), remove = List.empty[String], job)
