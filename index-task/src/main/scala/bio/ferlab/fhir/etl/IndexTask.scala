@@ -25,7 +25,8 @@ object IndexTask extends App {
   env,            // qa/dev/prd
   project,        // cqdg
   esUrl,
-  esPort
+  esPort,
+  sparkMaster
   ) = args
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
@@ -33,7 +34,7 @@ object IndexTask extends App {
   private val esConf = serviceConf.esConfig
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort"))
+    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort") + ("spark.master" -> sparkMaster))
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
