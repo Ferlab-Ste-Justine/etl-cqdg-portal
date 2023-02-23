@@ -1,6 +1,7 @@
 package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.spark3.elasticsearch.ElasticSearchClient
+import org.apache.hadoop.shaded.org.apache.http.client.methods.HttpGet
 import org.slf4j.LoggerFactory
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
@@ -33,11 +34,10 @@ object PublishTask extends App {
       val newIndexName = s"${job}_${studyId}_$release_id".toLowerCase
       println(s"Add $newIndexName to alias $job")
 
-      // Remove previous indexes (all releases) for study
-      esClient.setAlias(add = List.empty[String], remove = List(s"${job}_$studyId*"), job)
+      val oldIndexName = Publisher.retrievePreviousIndex(job, studyId, esNodes.split(',').head)
+      oldIndexName.foreach(old => println(s"Remove $old from alias $job"))
 
-      // Add current index for the study and release
-      esClient.setAlias(add = List(newIndexName), remove = List.empty[String], job)
+      Publisher.publish(job, newIndexName, oldIndexName)
     })
     )
   }
