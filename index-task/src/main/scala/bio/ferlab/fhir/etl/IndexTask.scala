@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, ConfigurationWrapper, DatalakeConf, DatasetConf, SimpleConfiguration}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.elasticsearch.{ElasticSearchClient, Indexer}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import org.apache.spark.SparkConf
@@ -12,7 +12,6 @@ import pureconfig.generic.auto._
 import pureconfig.module.enum._
 
 case class ServiceConf(esConfig: Map[String, String])
-
 
 object IndexTask extends App {
 

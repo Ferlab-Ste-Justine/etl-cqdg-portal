@@ -97,8 +97,8 @@ object ConfigurationGenerator extends App {
   )
 
   val es_conf = Map(
-//    "es.net.http.auth.user" -> "${?ES_USERNAME}",
-//    "es.net.http.auth.pass" -> "${?ES_PASSWORD}",
+    "es.net.http.auth.user" -> "${?ES_USERNAME}",
+    "es.net.http.auth.pass" -> "${?ES_PASSWORD}",
     "es.index.auto.create" -> "true",
 //    "es.nodes" -> "${?ES_ENDPOINT}",
 //    "es.port" -> "${?ES_PORT}",
@@ -117,8 +117,7 @@ object ConfigurationGenerator extends App {
   )
 
   conf.foreach { case (project, _) =>
-//    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local ,DatalakeConf(
-    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
+    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local ,DatalakeConf(
       storages = List(
         StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3)
       ),
