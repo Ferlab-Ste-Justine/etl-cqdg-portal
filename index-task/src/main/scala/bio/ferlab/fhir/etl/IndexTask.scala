@@ -25,8 +25,7 @@ object IndexTask extends App {
   env,            // qa/dev/prd
   project,        // cqdg
   esUrl,
-  esPort,
-  sparkMaster
+  esPort
   ) = args
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
@@ -34,7 +33,7 @@ object IndexTask extends App {
   private val esConf = serviceConf.esConfig
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort") + ("spark.master" -> sparkMaster))
+    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort"))
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -67,15 +66,6 @@ object IndexTask extends App {
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
-
-//    df.show(2, false)
-
-    println(s"$esUrl:$esPort")
-    println(s"env: $env")
-    println(esConf.get("es.net.http.auth.user"))
-    println(esConf.get("es.net.http.auth.pass"))
-
-    (esConf + ("es.nodes" -> s"$esUrl:$esPort")).foreach(println)
 
     new Indexer("index", templatePath, indexName)
       .run(df)
