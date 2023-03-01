@@ -57,6 +57,8 @@ object IndexTask extends App {
 
   val studyList = study_ids.split(",")
 
+  spark.sparkContext.getConf.getAll.foreach(c => println(c._1))
+
   studyList.foreach(studyId => {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
 
