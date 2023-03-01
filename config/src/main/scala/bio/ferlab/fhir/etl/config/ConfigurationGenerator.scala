@@ -80,15 +80,14 @@ object ConfigurationGenerator extends App {
   val conf = Map("cqdg" -> cqdgConf)
 
   val spark_conf = Map(
-    "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
+    "spark.databricks.delta.merge.repartitionBeforeWrite.enabled" -> "true",
     "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
     "spark.databricks.delta.schema.autoMerge.enabled" -> "true",
     "spark.delta.merge.repartitionBeforeWrite" -> "true",
-//    "spark.hadoop.fs.s3a.access.key" -> "${?AWS_ACCESS_KEY}",
-//    "spark.hadoop.fs.s3a.endpoint" -> "${?AWS_ENDPOINT}",
-    "spark.hadoop.fs.s3a.impl" -> "org.apache.hadoop.fs.s3a.S3AFileSystem",
-    "spark.hadoop.fs.s3a.path.style.access" -> "true",
-//    "spark.hadoop.fs.s3a.secret.key" -> "${?AWS_SECRET_KEY}",
+    "spark.sql.autoBroadcastJoinThreshold" -> "-1",
+    //    "spark.hadoop.fs.s3a.access.key" -> "${?AWS_ACCESS_KEY}",
+    //    "spark.hadoop.fs.s3a.endpoint" -> "${?AWS_ENDPOINT}",
+    //    "spark.hadoop.fs.s3a.secret.key" -> "${?AWS_SECRET_KEY}",
     "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
     "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
     "spark.sql.legacy.parquet.datetimeRebaseModeInWrite"->"CORRECTED",
