@@ -41,7 +41,7 @@ object IndexTask extends App {
     .appName(s"IndexTask")
     .getOrCreate()
 
-  conf.sparkconf.keys.foreach(println)
+  println(conf.sparkconf("spark.hadoop.fs.s3a.access.key").take(3))
 
   val testFile = spark.read.parquet("s3a://cqdg-prod-app-clinical-data-service/es_index/fhir/study_centric/study_id=ST0000017/release_id=7/")
   testFile.show(3, false)
