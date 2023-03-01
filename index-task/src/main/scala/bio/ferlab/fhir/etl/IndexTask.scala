@@ -41,6 +41,11 @@ object IndexTask extends App {
     .appName(s"IndexTask")
     .getOrCreate()
 
+  conf.sparkconf.keys.foreach(println)
+
+  val testFile = spark.read.parquet("s3a://cqdg-prod-app-clinical-data-service/es_index/fhir/study_centric/study_id=ST0000017/release_id=7/")
+  testFile.show(3, false)
+
   spark.sparkContext.setLogLevel("ERROR")
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
