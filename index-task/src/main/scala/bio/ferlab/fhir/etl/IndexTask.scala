@@ -65,6 +65,10 @@ object IndexTask extends App {
 
     println(s"Run Index Task to fill index $indexName")
 
+    println("sleep 5min")
+    Thread.sleep(300000)
+    println("end sleep")
+
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
