@@ -41,8 +41,6 @@ object IndexTask extends App {
     .appName(s"IndexTask")
     .getOrCreate()
 
-//  println(conf.sparkconf("spark.hadoop.fs.s3a.access.key").take(3))
-
   spark.sparkContext.setLogLevel("ERROR")
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
@@ -63,6 +61,10 @@ object IndexTask extends App {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
 
     println(s"Run Index Task to fill index $indexName")
+
+    println("sleeping for 5 minutes")
+    Thread.sleep(300000)
+    println("done sleeping")
 
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
