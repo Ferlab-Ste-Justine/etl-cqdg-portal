@@ -54,13 +54,19 @@ object IndexTask extends App {
 
   val studyList = study_ids.split(",")
 
-  spark.sparkContext.getConf.getAll.foreach(c => println(c._1))
-  println(spark.sparkContext.getConf.getAll.filter(c => c._1 == "spark.hadoop.fs.s3a.access.key").head._2.take(3))
+//  spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
+//    .foreach(e => println(s"${e._1} -> ${e._2}"))
+
+  spark.sparkContext.getConf.getAll.foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
 
   studyList.foreach(studyId => {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
 
     println(s"Run Index Task to fill index $indexName")
+
+    println("sleep 5min")
+    Thread.sleep(300000)
+    println("end sleep")
 
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
