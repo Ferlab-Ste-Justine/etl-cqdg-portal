@@ -3,6 +3,10 @@ package bio.ferlab.fhir.etl
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.elasticsearch.{ElasticSearchClient, Indexer}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -25,6 +29,7 @@ object IndexTask extends App {
   esPort
   ) = args
 
+  println("toto")
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
@@ -60,6 +65,18 @@ object IndexTask extends App {
   spark.sparkContext.getConf.getAll
     .filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
     .foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
+
+  val access = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key").head._2
+  val secret = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.secret.key").head._2
+  val s3Credential = new BasicAWSCredentials(access, secret)
+  val s3client = AmazonS3ClientBuilder.standard()
+    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("https://s3.ops.cqdg.ferlab.bio", Regions.US_EAST_1.name()))
+    .withPathStyleAccessEnabled(true)
+    .withCredentials(new AWSStaticCredentialsProvider(s3Credential))
+    .build()
+
+
+  println(s3client.listBuckets())
 
   studyList.foreach(studyId => {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
