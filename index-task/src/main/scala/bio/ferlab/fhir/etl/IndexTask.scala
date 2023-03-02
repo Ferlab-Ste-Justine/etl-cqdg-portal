@@ -15,8 +15,10 @@ import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCrede
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 
 import java.net.URI
+import scala.io.Source
 //Required import
 import pureconfig.module.enum._
 
@@ -33,8 +35,6 @@ object IndexTask extends App {
   esUrl,
   esPort
   ) = args
-
-  println("toto")
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
@@ -91,8 +91,18 @@ object IndexTask extends App {
     .httpClient(ApacheHttpClient.create())
     .build()
 
+  val objectRequest = GetObjectRequest
+    .builder()
+    .key("es_index/fhir/study_centric/study_id=ST0000017/release_id=7/part-00000-82f49241-b28c-40a2-bca8-20318ae46edd.c000.snappy.parquet")
+    .bucket("cqdg-prod-app-clinical-data-service")
+    .build()
+
+  val obj = s3.getObject(objectRequest)
 
   println(s3.listBuckets())
+
+  val rest = obj.response()
+  println(rest)
 
 //  studyList.foreach(studyId => {
 //    val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
