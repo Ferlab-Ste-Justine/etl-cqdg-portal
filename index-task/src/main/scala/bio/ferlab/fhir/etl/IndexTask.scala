@@ -71,8 +71,8 @@ object IndexTask extends App {
 //    .filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
 //    .foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
 //
-  val access = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key").head._2
-  val secret = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.secret.key").head._2
+  val access = spark.sparkContext.getConf.getAll.filter(c => c._1 == "spark.hadoop.fs.s3a.access.key").head._2
+  val secret = spark.sparkContext.getConf.getAll.filter(c => c._1 == "spark.hadoop.fs.s3a.secret.key").head._2
 
   val confBuilder: S3Configuration = software.amazon.awssdk.services.s3.S3Configuration.builder()
     .pathStyleAccessEnabled(true)
