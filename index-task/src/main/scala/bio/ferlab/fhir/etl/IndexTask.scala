@@ -57,7 +57,9 @@ object IndexTask extends App {
 //  spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
 //    .foreach(e => println(s"${e._1} -> ${e._2}"))
 
-  spark.sparkContext.getConf.getAll.foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
+  spark.sparkContext.getConf.getAll
+    .filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
+    .foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
 
   studyList.foreach(studyId => {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
