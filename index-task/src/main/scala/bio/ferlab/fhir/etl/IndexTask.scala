@@ -11,8 +11,6 @@ import pureconfig.generic.auto._
 //Required import
 import pureconfig.module.enum._
 
-case class ServiceConf(esConfig: Map[String, String])
-
 object IndexTask extends App {
 
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
@@ -27,12 +25,11 @@ object IndexTask extends App {
   esPort
   ) = args
 
+
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
-  val serviceConf: ServiceConf = ConfigSource.resources(s"config/$env-$project.conf").loadOrThrow[ServiceConf]
-  private val esConf = serviceConf.esConfig
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf ++ esConf + ("es.nodes" -> s"$esUrl:$esPort"))
+    (conf.sparkconf + ("es.nodes" -> s"$esUrl:$esPort"))
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -46,7 +43,7 @@ object IndexTask extends App {
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
   implicit val esClient: ElasticSearchClient =
-    new ElasticSearchClient(s"$esUrl:$esPort", esConf.get("es.net.http.auth.user"), esConf.get("es.net.http.auth.pass"))
+    new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
@@ -64,10 +61,6 @@ object IndexTask extends App {
     val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
 
     println(s"Run Index Task to fill index $indexName")
-
-    println("sleep 5min")
-    Thread.sleep(300000)
-    println("end sleep")
 
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
