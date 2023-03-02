@@ -26,7 +26,9 @@ val sparkDepsSetting = Seq(
     "org.elasticsearch" %% "elasticsearch-spark-30" % elasticsearchVersion,
     "io.delta" %% "delta-core" % deltaCoreVersion,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test,
-    "org.apache.spark" %% "spark-hive" %  "3.3.1" % Provided
+    "org.apache.spark" %% "spark-hive" %  "3.3.1" % Provided,
+    "software.amazon.awssdk" % "s3" % "2.16.66",
+    "software.amazon.awssdk" % "apache-client" % "2.16.66"
   )
 )
 val commonSettings = Seq(
