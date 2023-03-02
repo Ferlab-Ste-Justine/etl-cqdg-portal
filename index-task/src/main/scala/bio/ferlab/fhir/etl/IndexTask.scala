@@ -48,29 +48,29 @@ object IndexTask extends App {
     .appName(s"IndexTask")
     .getOrCreate()
 
-  spark.sparkContext.setLogLevel("ERROR")
+//  spark.sparkContext.setLogLevel("ERROR")
+//
+//  val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
+//
+//  implicit val esClient: ElasticSearchClient =
+//    new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
-  val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
-
-  implicit val esClient: ElasticSearchClient =
-    new ElasticSearchClient(s"$esUrl:$esPort", None, None)
-
-  val ds: DatasetConf = jobType.toLowerCase match {
-    case "study_centric" => conf.getDataset("es_index_study_centric")
-    case "participant_centric" => conf.getDataset("es_index_participant_centric")
-    case "file_centric" => conf.getDataset("es_index_file_centric")
-    case "biospecimen_centric" => conf.getDataset("es_index_biospecimen_centric")
-  }
+//  val ds: DatasetConf = jobType.toLowerCase match {
+//    case "study_centric" => conf.getDataset("es_index_study_centric")
+//    case "participant_centric" => conf.getDataset("es_index_participant_centric")
+//    case "file_centric" => conf.getDataset("es_index_file_centric")
+//    case "biospecimen_centric" => conf.getDataset("es_index_biospecimen_centric")
+//  }
 
   val studyList = study_ids.split(",")
 
 //  spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
 //    .foreach(e => println(s"${e._1} -> ${e._2}"))
 
-  spark.sparkContext.getConf.getAll
-    .filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
-    .foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
-
+//  spark.sparkContext.getConf.getAll
+//    .filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key" || c._1 =="spark.hadoop.fs.s3a.secret.key")
+//    .foreach(e => println(s"${e._1} -> ${e._2.take(3)}"))
+//
   val access = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.access.key").head._2
   val secret = spark.sparkContext.getConf.getAll.filterNot(c => c._1 == "spark.hadoop.fs.s3a.secret.key").head._2
 
@@ -94,21 +94,21 @@ object IndexTask extends App {
 
   println(s3.listBuckets())
 
-  studyList.foreach(studyId => {
-    val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
-
-    println(s"Run Index Task to fill index $indexName")
-
-    println("sleep 5min")
-    Thread.sleep(300000)
-    println("end sleep")
-
-    val df: DataFrame = ds.read
-      .where(col("release_id") === release_id)
-      .where(col("study_id") === studyId)
-
-    new Indexer("index", templatePath, indexName)
-      .run(df)
-  })
+//  studyList.foreach(studyId => {
+//    val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
+//
+//    println(s"Run Index Task to fill index $indexName")
+//
+//    println("sleep 5min")
+//    Thread.sleep(300000)
+//    println("end sleep")
+//
+//    val df: DataFrame = ds.read
+//      .where(col("release_id") === release_id)
+//      .where(col("study_id") === studyId)
+//
+//    new Indexer("index", templatePath, indexName)
+//      .run(df)
+//  })
 
 }
