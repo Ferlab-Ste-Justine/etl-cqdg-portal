@@ -61,6 +61,11 @@ object IndexTask extends App {
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
 
+    df.show(2, false)
+    println("Sleep 10min")
+    Thread.sleep(600000)
+    println("end of sleep")
+
     new Indexer("index", templatePath, indexName)
       .run(df)
   })
