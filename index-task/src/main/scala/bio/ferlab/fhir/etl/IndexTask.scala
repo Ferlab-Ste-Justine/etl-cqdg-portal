@@ -33,6 +33,7 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
+    "spark.hadoop.fs.s3a.connection.ssl.enabled" -> "false",
     "es.port" -> "9200")
 
   println(esUrl)
