@@ -27,7 +27,8 @@ object IndexTask extends App {
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
   val sparkConfigs: SparkConf =
-    (conf.sparkconf + ("es.nodes" -> s"$esUrl:$esPort"))
+//    (conf.sparkconf + ("es.nodes" -> s"$esUrl:$esPort"))
+    (conf.sparkconf + ("es.nodes" -> s"$esUrl:9200", "es.port" -> "433"))
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
