@@ -24,11 +24,21 @@ object IndexTask extends App {
   esPort
   ) = args
 
+  val esConfigs = Map(
+    "es.index.auto.create" -> "true",
+    "es.net.ssl" -> "true",
+    "es.net.ssl.cert.allow.self.signed" -> "true",
+    "es.nodes" -> esUrl,
+    "es.nodes.wan.only" -> "true",
+    "es.wan.only" -> "true",
+    "spark.es.nodes.wan.only" -> "true",
+    "es.port" -> "443")
+
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
   val sparkConfigs: SparkConf =
 //    (conf.sparkconf + ("es.nodes" -> s"$esUrl:$esPort"))
-    (conf.sparkconf + ("es.nodes" -> s"$esUrl:9200", "es.port" -> "433"))
+    (conf.sparkconf ++ esConfigs)
       .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
@@ -61,11 +71,6 @@ object IndexTask extends App {
     val df: DataFrame = ds.read
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
-
-    df.show(2, false)
-    println("Sleep 10min")
-    Thread.sleep(600000)
-    println("end of sleep")
 
     new Indexer("index", templatePath, indexName)
       .run(df)
