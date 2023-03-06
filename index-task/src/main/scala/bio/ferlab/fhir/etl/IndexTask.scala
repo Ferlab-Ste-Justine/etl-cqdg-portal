@@ -29,14 +29,13 @@ object IndexTask extends App {
 
   val esConfigs = Map(
     "es.index.auto.create" -> "true",
-    "es.net.ssl" -> "true",
-    "spark.ssl.enabled" -> "true", //FIXME
+    "es.net.ssl" -> "false",
     "es.net.ssl.cert.allow.self.signed" -> "true",
-    "es.nodes" -> s"$esUrl:$esPort", //https://elasticsearch-workers:9200
+    "es.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> "443") //9200
+    "es.port" -> esPort) //9200
 
   println(esUrl)
   println(esPort)
