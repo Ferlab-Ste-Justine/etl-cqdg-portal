@@ -58,6 +58,9 @@ object IndexTask extends App {
   implicit val esClient: ElasticSearchClient =
     new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
+  spark.sparkContext.getConf.getAll.filterNot(e => e._1 == "spark.hadoop.fs.s3a.access.key" || e._1 == "spark.hadoop.fs.s3a.secret.key")
+    .foreach(r => println(s"${r._1} -> ${r._2}"))
+
   println("toto")
   println(EntityUtils.toString(esClient.getIndex("arranger-projects").getEntity))
   println("toto")
