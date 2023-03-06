@@ -58,7 +58,7 @@ object IndexTask extends App {
     new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
   println("toto")
-  println(esClient.getIndex("arranger-projects"))
+  println(esClient.getIndex("arranger-projects").getEntity)
   println("toto")
 
   val ds: DatasetConf = jobType.toLowerCase match {
