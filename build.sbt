@@ -2,7 +2,7 @@ import sbtassembly.AssemblyPlugin.autoImport.assembly
 
 val datalakeSpark3Version = "5.3.0"
 val deltaCoreVersion = "2.1.1"
-val elasticsearchVersion = "7.17.9"
+val elasticsearchVersion = "7.17.0"
 
 lazy val config = (project in file("config")).settings(
   Seq(assembly / assemblyMergeStrategy := {
