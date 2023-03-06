@@ -30,8 +30,9 @@ object IndexTask extends App {
   val esConfigs = Map(
     "es.index.auto.create" -> "true",
     "es.net.ssl" -> "true",
+    "spark.ssl.enabled" -> "true", //FIXME
     "es.net.ssl.cert.allow.self.signed" -> "true",
-    "es.nodes" -> esUrl,
+    "es.nodes" -> s"$esUrl:$esPort",
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
