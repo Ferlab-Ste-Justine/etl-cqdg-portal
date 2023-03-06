@@ -29,10 +29,10 @@ object IndexTask extends App {
     "es.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
     "es.nodes" -> esUrl,
-    "es.nodes.wan.only" -> "false",
+    "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> esPort)
+    "es.port" -> "443")
 
   println(esUrl)
   println(esPort)
@@ -56,6 +56,10 @@ object IndexTask extends App {
 
   implicit val esClient: ElasticSearchClient =
     new ElasticSearchClient(s"$esUrl:$esPort", None, None)
+
+  println("toto")
+  println(esClient.getIndex("arranger-projects"))
+  println("toto")
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
