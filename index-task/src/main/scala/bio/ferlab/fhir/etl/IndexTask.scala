@@ -32,7 +32,10 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> "443")
+    "es.port" -> esPort)
+
+  println(esUrl)
+  println(esPort)
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
