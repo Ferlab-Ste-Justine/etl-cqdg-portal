@@ -33,8 +33,7 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "spark.hadoop.fs.s3a.connection.ssl.enabled" -> "false",
-    "es.port" -> "9200")
+    "es.port" -> esPort)
 
   println(esUrl)
   println(esPort)
@@ -64,7 +63,10 @@ object IndexTask extends App {
 
   println("toto")
   println(EntityUtils.toString(esClient.getIndex("arranger-projects").getEntity))
+  Thread.sleep(300000)
   println("toto")
+
+
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
