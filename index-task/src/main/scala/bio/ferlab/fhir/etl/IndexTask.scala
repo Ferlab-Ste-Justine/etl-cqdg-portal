@@ -22,7 +22,8 @@ object IndexTask extends App {
   env,            // qa/dev/prd
   project,        // cqdg
   esUrl,
-  esPort
+  esPort,
+  test
   ) = args
 
   val esConfigs = Map(
@@ -61,12 +62,12 @@ object IndexTask extends App {
   spark.sparkContext.getConf.getAll.filterNot(e => e._1 == "spark.hadoop.fs.s3a.access.key" || e._1 == "spark.hadoop.fs.s3a.secret.key")
     .foreach(r => println(s"${r._1} -> ${r._2}"))
 
-  println("toto")
-  println(EntityUtils.toString(esClient.getIndex("arranger-projects").getEntity))
-  Thread.sleep(300000)
-  println("toto")
-
-
+  if(test.toLowerCase() == "true"){
+    println("toto")
+    println(EntityUtils.toString(esClient.getIndex("arranger-projects").getEntity))
+    Thread.sleep(300000)
+    println("toto")
+  }
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
