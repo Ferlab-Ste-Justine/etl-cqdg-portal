@@ -34,7 +34,7 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> esPort)
+    "es.port" -> "443")
 
   println(esUrl)
   println(esPort)
