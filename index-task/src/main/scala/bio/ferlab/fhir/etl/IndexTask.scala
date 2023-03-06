@@ -29,7 +29,7 @@ object IndexTask extends App {
     "es.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
     "es.nodes" -> esUrl,
-    "es.nodes.wan.only" -> "true",
+    "es.nodes.wan.only" -> "false",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
     "es.port" -> esPort)
