@@ -29,7 +29,7 @@ object IndexTask extends App {
 
   val esConfigs = Map(
     "es.index.auto.create" -> "true",
-    "es.net.ssl" -> "false",
+    "es.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
     "es.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
     "es.nodes.wan.only" -> "true",
