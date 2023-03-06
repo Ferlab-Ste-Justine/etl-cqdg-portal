@@ -3,6 +3,7 @@ package bio.ferlab.fhir.etl
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.elasticsearch.{ElasticSearchClient, Indexer}
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
+import org.apache.hadoop.shaded.org.apache.http.util.EntityUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -32,7 +33,7 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> "443")
+    "es.port" -> "9200")
 
   println(esUrl)
   println(esPort)
@@ -58,7 +59,7 @@ object IndexTask extends App {
     new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
   println("toto")
-  println(esClient.getIndex("arranger-projects").getEntity)
+  println(EntityUtils.toString(esClient.getIndex("arranger-projects").getEntity))
   println("toto")
 
   val ds: DatasetConf = jobType.toLowerCase match {
