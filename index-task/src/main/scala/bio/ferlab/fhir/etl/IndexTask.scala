@@ -8,6 +8,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import pureconfig.generic.auto._
+import org.elasticsearch.spark.sql._
 //Required import
 import pureconfig.module.enum._
 
@@ -34,7 +35,7 @@ object IndexTask extends App {
     "es.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> "443")
+    "es.port" -> esPort)
 
   println(esUrl)
   println(esPort)
@@ -87,8 +88,10 @@ object IndexTask extends App {
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
 
-    new Indexer("index", templatePath, indexName)
-      .run(df)
+    df.saveToEs("test/_doc", Map("es.write.operation"-> "index"))
+
+//    new Indexer("index", templatePath, indexName)
+//      .run(df)
   })
 
 }
