@@ -13,9 +13,6 @@ class Auth(conf: KeycloakConf) {
   config.setRealm(conf.realm)
   config.setAuthServerUrl(conf.url)
   config.setResource(conf.clientKey)
-  println("TOTOTO")
-  println(conf.clientSecret.take(3))
-  println("TOTOTO")
   config.setCredentials(Map("secret" -> conf.clientSecret).toMap[String, Object].asJava)
   private val authzClient = AuthzClient.create(config)
 

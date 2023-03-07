@@ -22,6 +22,10 @@ object S3Utils {
       .httpClient(ApacheHttpClient.create())
       .serviceConfiguration(confBuilder)
 
+    println("OTTOO")
+    println(config.awsConfig.endpoint)
+    println("OTTOO")
+
     if(config.awsConfig.endpoint.isDefined) {
       val endpointUri = new URI(config.awsConfig.endpoint.get)
       s3Builder.endpointOverride(endpointUri)
