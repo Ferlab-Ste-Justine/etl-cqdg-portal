@@ -1,6 +1,7 @@
 package bio.ferlab.fhir.etl.s3
 
 import bio.ferlab.fhir.etl.config.{Config, FhirRequest}
+import com.typesafe.config.ConfigFactory
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.http.apache.ApacheHttpClient
@@ -13,6 +14,14 @@ import java.net.URI
 object S3Utils {
 
   def buildS3Client(config: Config): S3Client = {
+    val applicationConf = ConfigFactory.load("application-qa.conf")
+    val accessKey = applicationConf.getString("aws-config.access-key")
+    println("TOTO")
+    println(accessKey.take(1))
+    println(accessKey.takeRight(1))
+    println("TOTO")
+
+
     val confBuilder: S3Configuration = S3Configuration.builder()
       .pathStyleAccessEnabled(config.awsConfig.pathStyleAccess)
       .build()
@@ -21,10 +30,6 @@ object S3Utils {
       .credentialsProvider(DefaultCredentialsProvider.create())
       .httpClient(ApacheHttpClient.create())
       .serviceConfiguration(confBuilder)
-
-    println("OTTOO")
-    println(config.awsConfig.endpoint)
-    println("OTTOO")
 
     if(config.awsConfig.endpoint.isDefined) {
       val endpointUri = new URI(config.awsConfig.endpoint.get)
