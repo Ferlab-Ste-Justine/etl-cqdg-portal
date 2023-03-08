@@ -43,7 +43,8 @@ object ConfigurationGenerator extends App {
         path = s"/fhir/$rawPath",
         format = AVRO,
         loadtype = OverWrite,
-        table = Some(TableConf("database", s"raw_$tableName")),
+        //TODO
+//        table = Some(TableConf("database", s"raw_$tableName")),
         partitionby = source.partitionBy
       ),
       DatasetConf(
@@ -52,7 +53,8 @@ object ConfigurationGenerator extends App {
         path = s"/normalized/${source.entityType.getOrElse(source.fhirResource)}",
         format = DELTA,
         loadtype = OverWritePartition,
-        table = Some(TableConf("database", tableName)),
+        //TODO
+//        table = Some(TableConf("database", tableName)),
         partitionby = source.partitionBy,
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
       )
