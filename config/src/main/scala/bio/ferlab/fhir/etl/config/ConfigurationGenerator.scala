@@ -62,9 +62,9 @@ object ConfigurationGenerator extends App {
   })
 
   val sources = (rawsAndNormalized ++ Seq(
-    DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", format = JSON, table = Some(TableConf("database", "hpo_terms")), loadtype = OverWrite),
-    DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = JSON, loadtype = OverWrite),
-    DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", table = Some(TableConf("database", "icd_terms")), format = JSON, loadtype = OverWrite)
+    DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", format = JSON, loadtype = OverWrite),
+    DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", format = JSON, loadtype = OverWrite),
+    DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", format = JSON, loadtype = OverWrite)
   ) ++ Seq(
     DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
   ) ++ Seq(
@@ -74,7 +74,7 @@ object ConfigurationGenerator extends App {
     Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
   ).flatMap(index => {
     Seq(
-      DatasetConf(id = s"es_index_${index.name}", storageid = storage, path = s"/es_index/fhir/${index.name}", format = PARQUET, loadtype = OverWrite, table = Some(TableConf("database", s"es_index_${index.name}")), partitionby = index.partitionBy)
+      DatasetConf(id = s"es_index_${index.name}", storageid = storage, path = s"/es_index/fhir/${index.name}", format = PARQUET, loadtype = OverWrite, partitionby = index.partitionBy)
     )
   })).toList
 
