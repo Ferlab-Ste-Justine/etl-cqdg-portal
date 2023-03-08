@@ -20,7 +20,7 @@ val sparkDepsSetting = Seq(
     "bio.ferlab" %% "datalake-spark3" % datalakeSpark3Version,
     "org.apache.spark" %% "spark-sql" % "3.1.2" % Provided,
     "org.apache.spark" %% "spark-hive" % "3.1.2" % Provided,
-    "org.apache.spark" %% "spark-avro" % "2.4.2" % Provided,
+    "org.apache.spark" %% "spark-avro" % "2.4.2",
     "org.apache.hadoop" % "hadoop-client" % "3.3.1" % Provided,
     "org.apache.hadoop" % "hadoop-aws" % "3.3.1" % Provided,
     "org.elasticsearch" %% "elasticsearch-spark-30" % elasticsearchVersion,
