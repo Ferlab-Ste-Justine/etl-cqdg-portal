@@ -28,6 +28,7 @@ object IndexTask extends App {
   ) = args
 
   val esConfigs = Map(
+    "spark.master" -> "local[*]",
     "es.index.auto.create" -> "true",
     "es.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
@@ -88,10 +89,8 @@ object IndexTask extends App {
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
 
-    df.saveToEs("test/_doc", Map("es.write.operation"-> "index"))
-
-//    new Indexer("index", templatePath, indexName)
-//      .run(df)
+    new Indexer("index", templatePath, indexName)
+      .run(df)
   })
 
 }
