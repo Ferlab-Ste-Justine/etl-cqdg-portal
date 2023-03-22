@@ -1,8 +1,7 @@
 package bio.ferlab.fhir.etl.common
 
 import bio.ferlab.fhir.etl.common.OntologyUtils._
-import org.apache.spark.sql.{Column, DataFrame}
-import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{when, _}
 
 object Utils {
@@ -47,7 +46,7 @@ object Utils {
       val samplesGrouped = samplesDf
         .withColumn("sample_type",
           when(col("sample_type")("display").isNotNull,
-            concat_ws(" ", col("sample_type")("code"), concat(lit("("), col("sample_type")("display"), lit(")"))))
+            concat_ws(" ", col("sample_type")("display"), concat(lit("("), col("sample_type")("code"), lit(")"))))
             .otherwise(col("sample_type")("code"))
         )
         .withColumnRenamed("fhir_id", "sample_id")
@@ -56,7 +55,7 @@ object Utils {
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"), "left_outer")
         .withColumn("biospecimen_tissue_source",
           when(col("biospecimen_tissue_source")("display").isNotNull,
-            concat_ws(" ", col("biospecimen_tissue_source")("code"), concat(lit("("), col("biospecimen_tissue_source")("display"), lit(")"))))
+            concat_ws(" ", col("biospecimen_tissue_source")("display"), concat(lit("("), col("biospecimen_tissue_source")("code"), lit(")"))))
             .otherwise(col("biospecimen_tissue_source")("code"))
         )
     }
@@ -132,36 +131,6 @@ object Utils {
         .withColumnRenamed("all_files_exp", "fhir_id")
 
       df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
-    }
-
-    def addBiospecimenWithSamples(biospecimenDf: DataFrame, sampleRegistrationDf: DataFrame): DataFrame = {
-      val sampleRegistrationClean = sampleRegistrationDf
-        .withColumn("sample_type", col("sample_type")("code"))
-        .groupBy("subject")
-        .agg(collect_list(struct(
-          col("fhir_id"),
-          col("sample_type"),
-          col("submitter_participant_id"),
-        )) as "samples")
-
-      val biospecimenWithSamplesDf = biospecimenDf
-        .join(sampleRegistrationClean, Seq("subject"), "left_outer")
-        .withColumn("biospecimen_tissue_source",
-          when(col("biospecimen_tissue_source")("display").isNotNull,
-            concat_ws(" ", col("biospecimen_tissue_source")("code"), concat(lit("("), col("biospecimen_tissue_source")("display"), lit(")"))))
-            .otherwise(col("biospecimen_tissue_source")("code"))
-        )
-        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
-
-      val biospecimenWithSamplesGroupedDf = biospecimenWithSamplesDf
-        .groupBy("subject")
-        .agg(collect_list(struct(
-          biospecimenWithSamplesDf.columns.filterNot("subject" == _).map(col): _*
-        )) as "biospecimens")
-
-      df
-        .join(biospecimenWithSamplesGroupedDf, col("subject") === col("participant_id"), "left_outer")
-        .drop("subject")
     }
 
     def addDiseaseStatus(diseaseStatus: DataFrame): DataFrame = {
