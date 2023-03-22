@@ -5,6 +5,7 @@ import model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
+import pureconfig.module.enum._
 import pureconfig.generic.auto._
 
 class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSession {
@@ -15,6 +16,7 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
 
   "transform" should "prepare simple_participant" in {
     val data: Map[String, DataFrame] = Map(
+      "normalized_research_study" -> Seq(RESEARCHSTUDY()).toDF(),
       "normalized_patient" -> Seq(
         PATIENT_INPUT(fhir_id = "P1"),
         PATIENT_INPUT(fhir_id = "P2"),

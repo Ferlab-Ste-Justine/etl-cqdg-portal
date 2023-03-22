@@ -6,6 +6,7 @@ import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import pureconfig.generic.auto._
+import pureconfig.module.enum._
 
 class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 

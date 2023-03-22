@@ -5,7 +5,7 @@ case class FILE_WITH_BIOSPECIMEN(
                                   `biospecimen_reference`: Option[String] = Some("SAM0247817"),
                                   `data_type`: Option[String] = Some("Germline Structural Variant"),
                                   `data_category`: Option[String] = Some("Genomics"),
-                                  `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT] = None,
+                                  `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT_SINGLE] = None,
                                   `file_name`: Option[String] = Some("NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz"),
                                   `file_format`: Option[String] = Some("VCF"),
                                   `file_size`: Option[Double] = Some(1118934.0),

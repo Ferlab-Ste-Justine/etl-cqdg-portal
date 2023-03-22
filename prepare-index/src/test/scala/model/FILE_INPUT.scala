@@ -27,6 +27,6 @@ case class FILE_WITH_SEQ_EXPERIMENT(
                                      `file_id`: String = "FIL0081238",
                                      `biospecimen_reference`: String = "SAM0234037",
                                      `data_category`: String = "Genomics",
-                                     `sequencing_experiment`: SEQUENCING_EXPERIMENT = SEQUENCING_EXPERIMENT(),
+                                     `sequencing_experiment`: SEQUENCING_EXPERIMENT_SINGLE = SEQUENCING_EXPERIMENT_SINGLE(),
                           )
 

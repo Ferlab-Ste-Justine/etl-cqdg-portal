@@ -11,8 +11,8 @@ case class RESEARCHSTUDY(
                           `status`: String = "completed",
                           `title`: String = "CARTaGENE",
                           `domain`: Seq[String] = Seq("General health"),
-                          `access_limitations`: Seq[String] = Seq("DUO:0000005"),
-                          `access_requirements`: Seq[String] = Seq("DUO:0000019", "DUO:0000021", "DUO:0000025", "DUO:0000026", "DUO:0000027", "DUO:0000029"),
+                          `access_limitations`: Seq[CODE_SYSTEM] = Seq(CODE_SYSTEM(`code` = "DUO:0000005", `display` = "General research use")),
+                          `access_requirements`: Seq[CODE_SYSTEM] = Seq(CODE_SYSTEM(`code` = "DUO:0000021", `display` = "Ethics approval required"), CODE_SYSTEM(`code` = "DUO:0000027", `display` = "Project specific restriction")),
                           `population`: String = "Adult",
                           `study_version`: String = "1",
                         )
