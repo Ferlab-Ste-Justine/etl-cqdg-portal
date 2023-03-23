@@ -5,7 +5,7 @@ case class BIOSPECIMEN_INPUT(
                         `subject`: String = "PRT0504459",
                         `study_id`: String = "STU0000001",
                         `release_id`: String = "5",
-                        `biospecimen_tissue_source`: String = "NCIT:C12434",
+                        `biospecimen_tissue_source`: CODE_SYSTEM = CODE_SYSTEM(`code` = "NCIT:C12434", `display` = "Blood"),
                         `age_biospecimen_collection`: AGE_AT_COLLECTION = AGE_AT_COLLECTION(),
                         `submitter_biospecimen_id`: String = "cag_sp_20832",
                       )
@@ -28,4 +28,5 @@ case class SAMPLE_INPUT(
 case class CODE_SYSTEM (
                          `system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
                          `code`: String = "NCIT:C449",
+                         `display`: String = "DNA",
                        )

@@ -20,6 +20,6 @@ case class SIMPLE_PARTICIPANT(
                                `observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                `non_observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                `observed_phenotypes`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
-                               `familyRelationships`: Seq[FAMILY_RELATIONSHIP_WITH_FAMILY] = Nil,
+                               `family_relationships`: Seq[FAMILY_RELATIONSHIP_WITH_FAMILY] = Nil,
                                `is_a_proband`: Option[Boolean] = None,
                              )

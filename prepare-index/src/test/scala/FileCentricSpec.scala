@@ -5,6 +5,7 @@ import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import pureconfig.generic.auto._
+import pureconfig.module.enum._
 
 class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
@@ -55,11 +56,11 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
           `biospecimens` = Set(
             BIOSPECIMEN(
-              `fhir_id` = "B1",
+              `biospecimen_id` = "B1",
               `age_biospecimen_collection` = 17174
             ),
             BIOSPECIMEN(
-              `fhir_id` = "B2",
+              `biospecimen_id` = "B2",
               `age_biospecimen_collection` = 17174,
               `sample_id` = "sam2",
             )
@@ -70,18 +71,18 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
             `age_at_recruitment` = 24566,
             `biospecimens` = Set(
               BIOSPECIMEN(
-                `fhir_id` = "B1",
+                `biospecimen_id` = "B1",
                 `age_biospecimen_collection` = 17174
               ),
               BIOSPECIMEN(
-                `fhir_id` = "B2",
+                `biospecimen_id` = "B2",
                 `age_biospecimen_collection` = 17174,
                 `sample_id` = "sam2",
               )
             )
           )),
-          `sequencing_experiment` = SEQUENCING_EXPERIMENT(
-            `experimental_strategy` = List("WXS"), `alir` = "11", `snv` = "2", `gcnv` = "3", `gsv` = "4", `ssup` = "5"
+          `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
+            `experimental_strategy` = "WXS", `alir` = "11", `snv` = "2", `gcnv` = "3", `gsv` = "4", `ssup` = "5"
           )
         )
       )

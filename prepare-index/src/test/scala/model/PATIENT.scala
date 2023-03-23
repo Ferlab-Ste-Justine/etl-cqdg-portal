@@ -6,7 +6,7 @@ case class PATIENT(
                     `release_id`: String = "5",
                     `fhir_id`: String = "PRT0483534",
                     `gender`: String = "male",
-                    `vital_status`: String = "Unknown",
+                    `deceasedBoolean`: Boolean = false,
                     `age_at_recruitment`: Int = 19328,
                     `ethnicity`: String = "European",
                     `submitter_participant_id`: String = "35849427674",

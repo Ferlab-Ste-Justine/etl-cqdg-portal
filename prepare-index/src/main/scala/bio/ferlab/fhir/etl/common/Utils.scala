@@ -75,16 +75,9 @@ object Utils {
       val biospecimenRenamedDf = df
         .withColumnRenamed("subject", "participant_id")
 
-      val participantCleanDf = participantDf
-        .withColumn("vital_status", when(col("deceasedBoolean"), lit("Deceased"))
-          .when(!col("deceasedBoolean"), lit("Alive"))
-          .otherwise(lit("Unknown"))
-        )
-        .drop("deceasedBoolean")
-
-      val participantGroupedDF = participantCleanDf
-        .withColumn("participant", struct(participantCleanDf.columns.map(col): _*))
-        .drop(participantCleanDf.columns.filterNot(s => s.equals("participant_id")): _*)
+      val participantGroupedDF = participantDf
+        .withColumn("participant", struct(participantDf.columns.map(col): _*))
+        .drop(participantDf.columns.filterNot(s => s.equals("participant_id")): _*)
 
       biospecimenRenamedDf
         .join(participantGroupedDF, Seq("participant_id"), "left_outer")
