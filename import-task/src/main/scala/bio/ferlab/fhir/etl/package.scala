@@ -2,7 +2,7 @@ package bio.ferlab.fhir
 
 package object etl {
   //SYSTEM URL
-  val SYSTEM_URL_CQDG = "http://fhir.cqdg.ferlab.bio"
+  val SYSTEM_URL_CQDG = "https://fhir.cqdg.ca"
 
 //  *********** CODE SYSTEMS **************
   val DOCUMENT_DATA_TYPE = s"$SYSTEM_URL_CQDG/CodeSystem/data-type"
@@ -11,17 +11,17 @@ package object etl {
 
   //  *********** STRUCTURE DEFINITION **************
   val AGE_AT_PHENOTYPE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Observation/AgeAtPhenotype"
-  val SEQUENCING_EXPERIMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/sequencing-experiment"
-  val WORKFLOW_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/workflow"
-  val DOCUMENT_SIZE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/full-size"
-  val AGE_AT_RECRUITMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchSubject/ageAtRecruitment"
+  val SEQUENCING_EXPERIMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SequencingExperimentExtension"
+  val WORKFLOW_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/WorkflowExtension"
+  val DOCUMENT_SIZE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/FullSizeExtension"
+  val AGE_AT_RECRUITMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtRecruitment"
   // Patient
   val ETHNICITY_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/QCEthnicity"
-  val AGE_OF_DEATH_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Patient/age-of-death"
+  val AGE_OF_DEATH_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeOfDeath"
   // ResearchStudy
   val ACCESS_LIMITATIONS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessLimitations"
   val ACCESS_REQUIREMENTS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessRequirements"
   val POPULATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchStudy/population"
   // Specimen
-  val AGE_BIO_COLLECTION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Specimen/ageBiospecimenCollection"
+  val AGE_BIO_COLLECTION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtBioSpecimenCollection"
 }
