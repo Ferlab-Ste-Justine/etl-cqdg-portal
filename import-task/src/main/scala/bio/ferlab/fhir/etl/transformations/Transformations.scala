@@ -68,7 +68,7 @@ object Transformations {
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
-      .withColumn("age_biospecimen_collection", extractValueAge(AGE_BIO_COLLECTION_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
+      .withColumn("age_biospecimen_collection", extractValueAge(AGE_AT_EVENT_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
     },
     Drop("type", "extension", "identifier")
@@ -148,7 +148,7 @@ object Transformations {
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("age_at_phenotype", firstNonNull(transform(
-        filter(col("extension"),col => col("url") === AGE_AT_PHENOTYPE_S_D)("valueAge"),
+        filter(col("extension"),col => col("url") === AGE_AT_EVENT_S_D)("valueAge"),
         col => col("value")
       )))
       .withColumn("phenotype_source_text", col("code")("text"))

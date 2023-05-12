@@ -10,7 +10,7 @@ package object etl {
   val TASK_BIO_INFO = s"$SYSTEM_URL_CQDG/CodeSystem/bioinfo-analysis-code"
 
   //  *********** STRUCTURE DEFINITION **************
-  val AGE_AT_PHENOTYPE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Observation/AgeAtPhenotype"
+  val AGE_AT_EVENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtEvent"
   val SEQUENCING_EXPERIMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SequencingExperimentExtension"
   val WORKFLOW_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/WorkflowExtension"
   val DOCUMENT_SIZE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/FullSizeExtension"
@@ -22,6 +22,4 @@ package object etl {
   val ACCESS_LIMITATIONS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessLimitations"
   val ACCESS_REQUIREMENTS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessRequirements"
   val POPULATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchStudy/population"
-  // Specimen
-  val AGE_BIO_COLLECTION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtBioSpecimenCollection"
 }
