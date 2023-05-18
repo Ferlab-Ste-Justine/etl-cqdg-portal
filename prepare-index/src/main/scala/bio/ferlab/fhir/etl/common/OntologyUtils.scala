@@ -58,10 +58,21 @@ object OntologyUtils {
   }
 
   def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame) = {
-    val phenotypesWithTerms = phenotypesDF
+    val hpoExplodedAlt = hpoTerms
+      .withColumn("alt_id", explode(col("alt_ids")))
+
+    val phenotypesWithTermsAlternate = phenotypesDF
       .withColumn("phenotype_id", col("phenotype_HPO_code")("code"))
-      .join(hpoTerms, col("phenotype_id") === col("id"), "left_outer")
+      .join(hpoExplodedAlt, col("phenotype_id") === col("alt_id"), "inner")
+      .drop("phenotype_id", "alt_id")
+      .withColumnRenamed("id", "phenotype_id")
+
+    val phenotypesWithTermsValid = phenotypesDF
+      .withColumn("phenotype_id", col("phenotype_HPO_code")("code"))
+      .join(hpoTerms, col("phenotype_id") === col("id"), "inner")
       .drop(col("id"))
+
+    val phenotypesWithTerms = phenotypesWithTermsValid.unionByName(phenotypesWithTermsAlternate).drop("alt_ids")
 
     val observedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").equalTo("POS"))

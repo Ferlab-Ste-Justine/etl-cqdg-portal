@@ -52,6 +52,37 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
       )
   }
 
+  it should "return replace phenotypes that are obsolete" in {
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1), `phenotype_source_text` = "text")
+    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:D"), `cqdg_participant_id` = "1", `phenotype_source_text` = "text")
+
+    val phenotypes = Seq(phenotype1, phenotype2).toDF()
+
+    val (t1, _, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+
+    //observed phenotypes tagged
+    val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+
+    taggedPhenotypes shouldBe
+      ("1", Seq(
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some(1), `source_text` = "text"),
+        // HP:D (obsolete) should be changed to HP:G (alternate)
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = None, `source_text` = "text"),
+      ))
+
+    //observed phenotypes with ancestors
+    val taggedPhenotypesWithAncestors = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
+
+    taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
+      Seq(
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1), `name` = "C Name (HP:C)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq(1), `name` = "E Name (HP:E)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Nil, `name` = "G Name (HP:G)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1), `name` = "B Name (HP:B)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq(1), `name` = "A Name (HP:A)"),
+      )
+  }
+
   it should "return phenotypes when no age at phenotype present" in {
     val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1), `phenotype_source_text` = "text")
     val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `phenotype_source_text` = "text")
