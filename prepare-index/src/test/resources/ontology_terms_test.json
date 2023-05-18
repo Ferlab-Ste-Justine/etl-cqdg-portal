@@ -1,6 +1,6 @@
-{"id":"HP:G","name":"G Name","parents":["B Name (HP:B)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true}
-{"id":"HP:E","name":"E Name","parents":["B Name (HP:B)", "C Name (HP:C)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]},{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]}],"is_leaf":true}
-{"id":"HP:F","name":"F Name","parents":["C Name (HP:C)"],"ancestors":[{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true}
-{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false}
-{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false}
-{"id":"HP:A","name":"A Name","parents":[],"ancestors":[],"is_leaf":false}
+{"id":"HP:G","name":"G Name","parents":["B Name (HP:B)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true, "alt_ids": ["HP:D"]}
+{"id":"HP:E","name":"E Name","parents":["B Name (HP:B)", "C Name (HP:C)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]},{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]}],"is_leaf":true, "alt_ids": []}
+{"id":"HP:F","name":"F Name","parents":["C Name (HP:C)"],"ancestors":[{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true, "alt_ids": []}
+{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false, "alt_ids": []}
+{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false, "alt_ids": []}
+{"id":"HP:A","name":"A Name","parents":[],"ancestors":[],"is_leaf":false, "alt_ids": []}
