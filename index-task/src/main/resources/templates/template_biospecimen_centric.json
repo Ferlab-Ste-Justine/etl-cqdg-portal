@@ -45,6 +45,69 @@
               "type": "keyword"
             }
           }
+        },
+        {
+          "object_as_nested_biospecimens": {
+            "match_mapping_type": "object",
+            "path_match": "*biospecimens*",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_diagnoses": {
+            "match_mapping_type": "object",
+            "path_match": "participant.diagnoses",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_mondo": {
+            "match_mapping_type": "object",
+            "path_match": "*mondo*",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_icd_tagged": {
+            "match_mapping_type": "object",
+            "path_match": "*icd_tagged*",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_observed_phenotype": {
+            "match_mapping_type": "object",
+            "path_match": "*observed_phenotype*",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_family_relationships": {
+            "match_mapping_type": "object",
+            "path_match": "*family_relationships",
+            "mapping": {
+              "type": "nested"
+            }
+          }
+        },
+        {
+          "object_as_nested_participants": {
+            "match_mapping_type": "object",
+            "path_match": "files",
+            "mapping": {
+              "type": "nested"
+            }
+          }
         }
       ]
     }
