@@ -42,6 +42,7 @@ class ParticipantCentric(releaseId: String, studyIds: List[String])(implicit con
           data(normalized_sample_registration.id),
         )
         .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
+        .withColumn("participant_2_id", col("participant_id")) //copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedParticipant)
   }

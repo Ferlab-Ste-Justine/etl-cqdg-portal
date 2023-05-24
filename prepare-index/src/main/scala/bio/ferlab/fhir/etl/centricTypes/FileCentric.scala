@@ -44,6 +44,7 @@ class FileCentric(releaseId: String, studyIds: List[String])(implicit configurat
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("study_code", col("study.study_code"))
         .withColumn("biospecimens", array_distinct(flatten(col("participants.biospecimens"))))
+        .withColumn("file_2_id", col("file_id")) //copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedFile)
   }
