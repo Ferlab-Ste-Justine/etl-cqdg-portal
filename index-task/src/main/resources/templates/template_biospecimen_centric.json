@@ -19,26 +19,6 @@
     "mappings": {
       "dynamic_templates": [
         {
-          "named_analyzers_sample": {
-            "match_mapping_type": "string",
-            "path_match": "sample*_id",
-            "mapping": {
-              "type": "keyword",
-              "normalizer": "custom_normalizer"
-            }
-          }
-        },
-        {
-          "named_analyzers_biospecimen": {
-            "match_mapping_type": "string",
-            "path_match": "biospecimen*_id",
-            "mapping": {
-              "type": "keyword",
-              "normalizer": "custom_normalizer"
-            }
-          }
-        },
-        {
           "strings_as_keywords": {
             "match_mapping_type": "string",
             "mapping": {
@@ -109,7 +89,21 @@
             }
           }
         }
-      ]
+      ],
+      "properties": {
+        "biospecimen_id": {
+          "type": "keyword",
+          "normalizer": "custom_normalizer"
+        },
+        "sample_id": {
+          "type": "keyword",
+          "normalizer": "custom_normalizer"
+        },
+        "sample_2_id": {
+          "type": "keyword",
+          "normalizer": "custom_normalizer"
+        }
+      }
     }
   }
 }
