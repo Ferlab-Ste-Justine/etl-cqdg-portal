@@ -36,6 +36,18 @@ case class PHENOTYPE_TAGGED (
                               `age_at_event`: Option[Long] = None,
                             )
 
+case class PHENOTYPE_TAGGED_WITH_OBSERVED (
+                              `internal_phenotype_id`: String = "1",
+                              `is_tagged`: Boolean = true,
+                              `is_leaf`: Boolean = false,
+                              `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
+                              `source_text`: String = "Abnormality of the cardiovascular system (HP:0001626)",
+                              `parents`: Seq[String] = Nil,
+                              `age_at_event`: Option[Long] = None,
+                              `is_observed`: Option[Boolean] = None,
+                            )
+
+
 case class PHENOTYPE_TAGGED_WITH_ANCESTORS (
                                              `name`: String = "Abnormality of the cardiovascular system (HP:0001626)",
                                              `parents`: Seq[String] = Nil,
