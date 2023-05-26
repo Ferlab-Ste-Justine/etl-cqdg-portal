@@ -85,7 +85,7 @@ object Utils {
     }
 
     def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {
-      val (observedPhenotypes, nonObservedPhenotypes, observedPhenotypesWithAncestors) = getTaggedPhenotypes(phenotypeDF, hpoTerms)
+      val (observedPhenotypes, nonObservedPhenotypes, observedPhenotypesWithAncestors, phenotypes) = getTaggedPhenotypes(phenotypeDF, hpoTerms)
 
       val (diagnosis, mondoWithAncestors) = getDiagnosis(diagnosesDF, mondoTerms, icdTerms)
 
@@ -94,6 +94,7 @@ object Utils {
         .join(mondoWithAncestors, Seq("cqdg_participant_id"), "left_outer")
         .join(observedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(nonObservedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
+        .join(phenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(observedPhenotypesWithAncestors, Seq("cqdg_participant_id"), "left_outer")
         .withColumnRenamed("fhir_id", "participant_id")
         .drop("cqdg_participant_id")

@@ -1,6 +1,6 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.OntologyUtils.{getDiagnosis, getTaggedPhenotypes}
-import model.{AGE_AT, DIAGNOSIS, DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS}
+import model.{AGE_AT, DIAGNOSIS, DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS, PHENOTYPE_TAGGED_WITH_OBSERVED}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -20,7 +20,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 
-    val (t1, t2, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (t1, t2, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
     //observed phenotypes tagged
     val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
@@ -58,7 +58,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
 
-    val (t1, _, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (t1, _, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
     //observed phenotypes tagged
     val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
@@ -89,7 +89,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
 
-    val (t1, _, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (t1, _, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
     //observed phenotypes tagged
     val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
@@ -140,6 +140,22 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
     //should map tagged MONDO
     resultP1._3.map(_.`name`) should contain theSameElementsAs Seq("G Name (HP:G)", "B Name (HP:B)")
     resultP2._3.map(_.`name`) should contain theSameElementsAs Seq("E Name (HP:E)")
+  }
+
+  it should "return phenotypes tagged observed and non observed" in {
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1))
+    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(2))
+    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG", `age_at_phenotype` = Some(3))
+
+    val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
+
+    val (_, _, _, t4) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val taggedPhenotypes = t4.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect()
+
+    taggedPhenotypes.flatMap(e => e._2.map(p => (p.`internal_phenotype_id`, p.`is_observed`)))
+
+    taggedPhenotypes.flatMap(e => e._2.map(p => p.`internal_phenotype_id`-> p.`is_observed`)) shouldBe
+      Seq("1" -> Some(true), "2" -> Some(true), "3" -> Some(false))
   }
 
 }

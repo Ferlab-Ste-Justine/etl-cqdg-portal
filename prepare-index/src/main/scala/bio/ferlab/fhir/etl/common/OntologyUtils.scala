@@ -57,7 +57,7 @@ object OntologyUtils {
       .agg(collect_list(col("phenotype_with_age_grouped")) as colName)
   }
 
-  def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame) = {
+  def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame, DataFrame) = {
     val hpoExplodedAlt = hpoTerms
       .withColumn("alt_id", explode(col("alt_ids")))
 
@@ -79,16 +79,27 @@ object OntologyUtils {
       .withColumnRenamed("age_at_phenotype", "age_at_event")
       .withColumnRenamed("phenotype_source_text", "source_text")
 
+
     val nonObservedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").notEqual("POS") || col("phenotype_observed").isNull)
       .withColumnRenamed("age_at_phenotype", "age_at_event")
       .withColumnRenamed("phenotype_source_text", "source_text")
 
+
+
     val observedPhenotypesWithAncestors = generatePhenotypeWithAncestors(observedPhenotypes, "observed_phenotypes")
 
-    (generateTaggedPhenotypes(observedPhenotypes, "observed_phenotype_tagged"),
-      generateTaggedPhenotypes(nonObservedPhenotypes, "non_observed_phenotype_tagged"),
-      observedPhenotypesWithAncestors.drop("study_id"))
+    val taggedObservedPhenotypes = generateTaggedPhenotypes(observedPhenotypes, "observed_phenotype_tagged")
+    val taggedNonObservedPhenotypes = generateTaggedPhenotypes(nonObservedPhenotypes, "non_observed_phenotype_tagged")
+
+    val phenotypes_tagged = taggedObservedPhenotypes.withColumn("is_observed", lit(true))
+      .unionAll(taggedNonObservedPhenotypes.withColumn("is_observed", lit(false)))
+      .withColumn("exp_phenotypes", explode(col("observed_phenotype_tagged")))
+      .withColumn("exp_phenotypes", col("exp_phenotypes").withField("is_observed", col("is_observed")))
+      .groupBy("cqdg_participant_id")
+      .agg(collect_list("exp_phenotypes") as "phenotypes_tagged")
+
+    (taggedObservedPhenotypes, taggedNonObservedPhenotypes, observedPhenotypesWithAncestors.drop("study_id"), phenotypes_tagged)
   }
 
   def getDiagnosis(diagnosisDf: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): (DataFrame, DataFrame) = {
