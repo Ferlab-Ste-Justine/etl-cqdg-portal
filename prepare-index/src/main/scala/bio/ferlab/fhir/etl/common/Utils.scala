@@ -148,20 +148,7 @@ object Utils {
     }
 
     def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
-      val biospecimenWithSample = biospecimensDf
-        .addSamplesToBiospecimen(sampleRegistrationDF)
-        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
-        .withColumnRenamed("fhir_id", "biospecimen_id")
-
-      val biospecimenGrouped = biospecimenWithSample
-        .withColumn("biospecimen",
-          struct(
-            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id", "release_id").contains).map(col): _*)
-        )
-        .withColumnRenamed("subject", "participant_id")
-        .select("participant_id", "study_id", "release_id", "biospecimen")
-        .groupBy("participant_id", "study_id", "release_id")
-        .agg(collect_list("biospecimen") as "biospecimens")
+      val biospecimenGrouped = biospecimensDf.addSamplesGroupedToBiospecimen(sampleRegistrationDF)
 
       val filesWithSeqExp = filesDf
         .withColumn("files_exp", explode(col("files")))
@@ -181,6 +168,24 @@ object Utils {
         )) as "files")
 
       df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id", "release_id"), "inner")
+    }
+
+
+    def addSamplesGroupedToBiospecimen(sampleRegistrationDF: DataFrame) = {
+      val biospecimenWithSample = df
+        .addSamplesToBiospecimen(sampleRegistrationDF)
+        .withColumn("age_biospecimen_collection", col("age_biospecimen_collection")("value"))
+        .withColumnRenamed("fhir_id", "biospecimen_id")
+
+      biospecimenWithSample
+        .withColumn("biospecimen",
+          struct(
+            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id", "release_id").contains).map(col): _*)
+        )
+        .withColumnRenamed("subject", "participant_id")
+        .select("participant_id", "study_id", "release_id", "biospecimen")
+        .groupBy("participant_id", "study_id", "release_id")
+        .agg(collect_list("biospecimen") as "biospecimens")
     }
 
     def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
