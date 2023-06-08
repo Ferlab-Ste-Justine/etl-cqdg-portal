@@ -142,6 +142,23 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
     resultP2._3.map(_.`name`) should contain theSameElementsAs Seq("E Name (HP:E)")
   }
 
+  "getDiagnosis" should "map ICD terms with '.' or '-' inside" in {
+
+    val diagnosis1 = DIAGNOSIS_INPUT(`fhir_id` = "DIA0000001", `diagnosis_ICD_code` = "A28.9")
+    val diagnosis2 = DIAGNOSIS_INPUT(`fhir_id` = "DIA0000002", `diagnosis_ICD_code` = "A20.A28") //as A20-A28 in input file
+
+    val terms = read(getClass.getResource("/ontology_terms_test.json").toString, "Json", Map(), None, None)
+
+    val diagnoses = Seq(diagnosis1, diagnosis2).toDF()
+
+    val (d1, _) = getDiagnosis(diagnoses, terms, terms)
+
+    val result = d1.select("cqdg_participant_id", "icd_tagged").as[(String, Seq[PHENOTYPE_TAGGED])].collect()
+    val resultP1 = result.filter(_._1 == "PRT0000001").head
+
+    resultP1._2.map(_.`name`) should contain theSameElementsAs Seq("ICD 1 (A28.9)", "ICD 2 (A20.A28)")
+  }
+
   it should "return phenotypes tagged observed and non observed" in {
     val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1))
     val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(2))
