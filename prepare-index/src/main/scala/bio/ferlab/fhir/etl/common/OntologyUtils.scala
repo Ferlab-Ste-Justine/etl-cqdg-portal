@@ -117,6 +117,7 @@ object OntologyUtils {
 
     val icdSplitId = icdTerms
       .withColumn("id", split(col("id"), "\\|")(0))
+      .dropDuplicates("id")
 
     val icdWithTerms = diagnosisDf
       .withColumnRenamed("diagnosis_ICD_code", "phenotype_id")
