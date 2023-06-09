@@ -135,8 +135,9 @@ object Transformations {
       .select("identifier", "code", "subject", "onsetAge", "study_id", "release_id", "fhir_id")
       .withColumn("diagnosis_source_text", col("code")("text"))
       .withColumn("diagnosis_mondo_code",
-        firstNonNull(filter(col("code")("coding"), col => col("system").equalTo("http://purl.obolibrary.org/obo/mondo.owl"))("code")))
-      .withColumn("diagnosis_ICD_code", firstNonNull(filter(col("code")("coding"), col => col("system").isNull)("code")))
+        firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_MONDO))("code")))
+      .withColumn("diagnosis_ICD_code",
+        firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_ICD))("code")))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("age_at_diagnosis", struct(col("onsetAge")("value") as "value", col("onsetAge")("unit") as "unit"))
     ),
