@@ -3,6 +3,8 @@ package bio.ferlab.fhir
 package object etl {
   //SYSTEM URL
   val SYSTEM_URL_CQDG = "https://fhir.cqdg.ca"
+  val SYSTEM_MONDO = "http://purl.obolibrary.org/obo/mondo.owl"
+  val SYSTEM_ICD = "http://terminology.hl7.org/CodeSystem/icd10-CA"
 
 //  *********** CODE SYSTEMS **************
   val DOCUMENT_DATA_TYPE = s"$SYSTEM_URL_CQDG/CodeSystem/data-type"

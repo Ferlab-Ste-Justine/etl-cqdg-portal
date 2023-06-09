@@ -3,7 +3,16 @@
   "priority" : 1,
   "template": {
     "settings" : {
-      "number_of_shards" : 5
+      "number_of_shards" : 5,
+      "analysis": {
+        "normalizer": {
+          "custom_normalizer": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": "lowercase"
+          }
+        }
+      }
     },
     "mappings": {
       "properties": {
@@ -27,7 +36,8 @@
           "type": "keyword"
         },
         "name": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "domain": {
           "type": "keyword"
@@ -101,7 +111,8 @@
           "type" : "keyword"
         },
         "study_code" : {
-          "type" : "keyword"
+          "type" : "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "study_id" : {
           "type" : "keyword"

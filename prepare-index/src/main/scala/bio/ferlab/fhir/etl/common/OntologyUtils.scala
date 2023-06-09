@@ -111,6 +111,7 @@ object OntologyUtils {
       .withColumnRenamed("diagnosis_source_text", "source_text")
 
     val taggedMondoTerms = generateTaggedPhenotypes(mondoWithTerms, "mondo_tagged")
+      .withColumnRenamed("cqdg_participant_id", "subject")
 
     val mondoWithAncestors = generatePhenotypeWithAncestors(mondoWithTerms, "mondo")
 
@@ -125,6 +126,7 @@ object OntologyUtils {
       .withColumnRenamed("diagnosis_source_text", "source_text")
 
     val taggedIcdTerms = generateTaggedPhenotypes(icdWithTerms, "icd_tagged")
+      .withColumnRenamed("cqdg_participant_id", "subject")
 
     (diagnosisDf
       .withColumn("age_at_diagnosis", col("age_at_diagnosis")("value"))
@@ -152,10 +154,11 @@ object OntologyUtils {
         col("diagnosis_mondo_display"),
         col("diagnosis_icd_display"),
       )) as "diagnoses")
-      .join(taggedIcdTerms, col("subject") === col("cqdg_participant_id"), "left_outer")
-      .join(taggedMondoTerms, Seq("cqdg_participant_id"), "left_outer")
+      .join(taggedIcdTerms, Seq("subject"), "left_outer")
+      .join(taggedMondoTerms, Seq("subject"), "left_outer")
       .withColumnRenamed("fhir_id", "internal_diagnosis_id")
-      .drop("subject", "study_id", "release_id"),
+      .withColumnRenamed("subject", "cqdg_participant_id")
+      .drop("study_id", "release_id"),
       mondoWithAncestors.drop("study_id"))
   }
 }
