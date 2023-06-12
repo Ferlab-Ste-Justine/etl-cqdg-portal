@@ -100,7 +100,7 @@ object ConfigurationGenerator extends App {
     DatasetConf(
       id = "raw_vcf",
       storageid = storage_vcf,
-      path = "/{{PREFIX}}/{{STUDY_NAME}}/*.vep.vcf.gz",
+      path = "/vcf/{{STUDY_ID}}/*.vep.vcf.gz",
       format = VCF,
       loadtype = OverWrite,
       partitionby = List("chromosome"),

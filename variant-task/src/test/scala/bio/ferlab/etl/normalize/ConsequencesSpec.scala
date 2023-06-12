@@ -22,7 +22,7 @@ class ConsequencesSpec extends AnyFlatSpec with Matchers with WithSparkSession w
 
 
   it should "generate normalized consequences from input VCF" in {
-    val results = new Consequences("prefix","STUDY_NAME").transform(data)
+    val results = new Consequences("STU0000001").transform(data)
 
     val result = results("normalized_consequences").as[NormalizedConsequences].collect()
 

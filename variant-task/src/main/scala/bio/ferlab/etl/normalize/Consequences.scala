@@ -9,14 +9,14 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-class Consequences(prefix: String, studyName: String)(implicit configuration: Configuration) extends BaseConsequences(annotationsColumn = csq, groupByLocus = true) {
+class Consequences(studyId: String)(implicit configuration: Configuration) extends BaseConsequences(annotationsColumn = csq, groupByLocus = true) {
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_consequences")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Map(
-      raw_vcf -> vcf(raw_variant_calling.location.replace("{{PREFIX}}", prefix).replace("{{STUDY_NAME}}", studyName), referenceGenomePath = None)
+      raw_vcf -> vcf(raw_variant_calling.location.replace("{{STUDY_ID}}", s"${studyId}_test"), referenceGenomePath = None) //TODO remove "test" when server is available
         .where(col("contigName").isin(validContigNames: _*))
     )
   }
