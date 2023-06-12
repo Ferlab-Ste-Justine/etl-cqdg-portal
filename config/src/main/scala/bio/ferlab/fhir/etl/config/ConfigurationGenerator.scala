@@ -1,9 +1,10 @@
 package bio.ferlab.fhir.etl.config
 
-import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET}
-import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition}
+import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET, VCF}
+import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition, Scd1}
 import bio.ferlab.datalake.commons.config._
 import bio.ferlab.datalake.commons.file.FileSystemType.S3
+import pureconfig.generic.auto._
 
 case class SourceConfig(fhirResource: String, entityType: Option[String], partitionBy: List[String])
 
@@ -32,6 +33,7 @@ object ConfigurationGenerator extends App {
   )
 
   val storage = "storage"
+  val storage_vcf = "storage_vcf"
 
   val rawsAndNormalized = sourceNames.flatMap(source => {
     val rawPath = source.fhirResource
@@ -43,8 +45,6 @@ object ConfigurationGenerator extends App {
         path = s"/fhir/$rawPath",
         format = AVRO,
         loadtype = OverWrite,
-        //TODO
-//        table = Some(TableConf("database", s"raw_$tableName")),
         partitionby = source.partitionBy
       ),
       DatasetConf(
@@ -53,8 +53,6 @@ object ConfigurationGenerator extends App {
         path = s"/normalized/${source.entityType.getOrElse(source.fhirResource)}",
         format = DELTA,
         loadtype = OverWritePartition,
-        //TODO
-//        table = Some(TableConf("database", tableName)),
         partitionby = source.partitionBy,
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
       )
@@ -76,7 +74,52 @@ object ConfigurationGenerator extends App {
     Seq(
       DatasetConf(id = s"es_index_${index.name}", storageid = storage, path = s"/es_index/fhir/${index.name}", format = PARQUET, loadtype = OverWrite, partitionby = index.partitionBy)
     )
-  })).toList
+  }) ++ Seq(
+    DatasetConf(
+      id = "normalized_snv",
+      storageid = storage,
+      path = s"/normalized/snv",
+      format = DELTA,
+      loadtype = OverWritePartition,
+      table = Some(TableConf("database", "normalized_snv")),
+      partitionby = List("study_id", "chromosome"),
+      writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
+      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
+    ),
+    DatasetConf(
+      id = "normalized_consequences",
+      storageid = storage,
+      path = "/normalized/consequences",
+      format = DELTA,
+      loadtype = Scd1,
+      partitionby = List("chromosome"),
+      table = Some(TableConf("database", "normalized_consequences")),
+      keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
+      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
+    ),
+    DatasetConf(
+      id = "raw_vcf",
+      storageid = storage_vcf,
+      path = "/vcf/{{STUDY_ID}}/*.vep.vcf.gz",
+      format = VCF,
+      loadtype = OverWrite,
+      partitionby = List("chromosome"),
+      table = Some(TableConf("database", "normalized_consequences")),
+      keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
+      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
+    ),
+  ) ++ Seq(
+    DatasetConf(
+      id = "enriched_specimen",
+      storageid = storage,
+      path = s"/enriched/specimen",
+      format = DELTA,
+      loadtype = OverWritePartition,
+      table = Some(TableConf("database", "enriched_specimen")),
+      partitionby = List("study_id"),
+      writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
+    )
+  )).toList
 
   val cqdgConf = Map("fhir" -> "http://localhost:8080", "qaDbName" -> "cqdg_portal_qa", "prdDbName" -> "cqdg_portal_prd", "localDbName" -> "normalized", "bucketNamePrefix" -> "cqdg-qa-app-clinical-data-service", "bucketNamePrefixPrd" -> "cqdg-prod-app-clinical-data-service")
   val conf = Map("cqdg" -> cqdgConf)
@@ -87,9 +130,6 @@ object ConfigurationGenerator extends App {
     "spark.databricks.delta.schema.autoMerge.enabled" -> "true",
     "spark.delta.merge.repartitionBeforeWrite" -> "true",
     "spark.sql.autoBroadcastJoinThreshold" -> "-1",
-//    "spark.hadoop.fs.s3a.access.key" -> "${?AWS_ACCESS_KEY}",
-//    "spark.hadoop.fs.s3a.endpoint" -> "${?AWS_ENDPOINT}",
-//    "spark.hadoop.fs.s3a.secret.key" -> "${?AWS_SECRET_KEY}",
     "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
     "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
     "spark.sql.legacy.parquet.datetimeRebaseModeInWrite"->"CORRECTED",
@@ -101,8 +141,6 @@ object ConfigurationGenerator extends App {
     "es.net.http.auth.user" -> "${?ES_USERNAME}",
     "es.net.http.auth.pass" -> "${?ES_PASSWORD}",
     "es.index.auto.create" -> "true",
-//    "es.nodes" -> "${?ES_ENDPOINT}",
-//    "es.port" -> "${?ES_PORT}",
     "es.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
     "es.batch.write.retry.wait" -> "100s",
@@ -120,7 +158,8 @@ object ConfigurationGenerator extends App {
   conf.foreach { case (project, _) =>
     ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local ,DatalakeConf(
       storages = List(
-        StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3)
+        StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3),
+        StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("localDbName")),
       args = args.toList,
@@ -129,7 +168,8 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}", S3)
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}", S3),
+        StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("localDbName")),
       args = args.toList,
@@ -138,7 +178,8 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefixPrd")}", S3)
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefixPrd")}", S3),
+        StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
       args = args.toList,

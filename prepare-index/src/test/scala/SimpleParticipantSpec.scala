@@ -5,7 +5,6 @@ import model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
-import pureconfig.module.enum._
 import pureconfig.generic.auto._
 
 class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSession {
