@@ -80,6 +80,16 @@ jobs:
           asset_path: publish-task/target/scala-2.12/publish-task.jar
           asset_name: publish-task.jar
           asset_content_type: application/java-archive
+      - name: Upload Variant Task
+        id: upload-variant-task
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: variant-task/target/scala-2.12/variant-task.jar
+          asset_name: variant-task.jar
+          asset_content_type: application/java-archive
       - name: Publish Image using commit sha and timestamp
         id: publish-fharo-image
         uses: Ferlab-Ste-Justine/action-push-image@v2
