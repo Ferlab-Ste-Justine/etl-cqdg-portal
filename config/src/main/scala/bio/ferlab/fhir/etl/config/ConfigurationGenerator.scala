@@ -81,7 +81,7 @@ object ConfigurationGenerator extends App {
       path = s"/normalized/snv",
       format = DELTA,
       loadtype = OverWritePartition,
-      table = Some(TableConf("database", "normalized_snv")),
+//      table = Some(TableConf("database", "normalized_snv")),
       partitionby = List("study_id", "chromosome"),
       writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
       repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
@@ -93,7 +93,7 @@ object ConfigurationGenerator extends App {
       format = DELTA,
       loadtype = Scd1,
       partitionby = List("chromosome"),
-      table = Some(TableConf("database", "normalized_consequences")),
+//      table = Some(TableConf("database", "normalized_consequences")),
       keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
       repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
     ),
@@ -104,7 +104,7 @@ object ConfigurationGenerator extends App {
       format = VCF,
       loadtype = OverWrite,
       partitionby = List("chromosome"),
-      table = Some(TableConf("database", "normalized_consequences")),
+//      table = Some(TableConf("database", "normalized_consequences")),
       keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
       repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
     ),
@@ -115,7 +115,7 @@ object ConfigurationGenerator extends App {
       path = s"/enriched/specimen",
       format = DELTA,
       loadtype = OverWritePartition,
-      table = Some(TableConf("database", "enriched_specimen")),
+//      table = Some(TableConf("database", "enriched_specimen")),
       partitionby = List("study_id"),
       writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
     )
