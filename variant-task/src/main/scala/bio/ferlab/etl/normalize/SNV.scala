@@ -69,12 +69,10 @@ object SNV{
         struct(
           col("genotype.sampleId"),
           col("genotype.conditionalQuality"),
-          col("genotype.F1R2"),
           col("genotype.SQ"),
           col("genotype.PRI"),
           col("genotype.posteriorProbabilities"),
           col("genotype.SB"),
-          col("genotype.F2R1"),
           col("genotype.alleleDepths"),
           col("genotype.ICNT"),
           col("genotype.AF"),
