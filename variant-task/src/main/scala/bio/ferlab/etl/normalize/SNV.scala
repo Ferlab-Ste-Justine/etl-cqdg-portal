@@ -69,22 +69,23 @@ object SNV{
         struct(
           col("genotype.sampleId"),
           col("genotype.conditionalQuality"),
-          col("genotype.SQ"),
-          col("genotype.PRI"),
-          col("genotype.posteriorProbabilities"),
+//          col("genotype.SQ"),
+//          col("genotype.PRI"),
+//          col("genotype.posteriorProbabilities"),
           col("genotype.SB"),
           col("genotype.alleleDepths"),
-          col("genotype.ICNT"),
-          col("genotype.AF"),
+//          col("genotype.ICNT"),
+//          col("genotype.AF"),
           col("genotype.phased"),
           col("genotype.calls"),
           col("genotype.MIN_DP"),
           col("genotype.phredLikelihoods"),
           col("genotype.depth"),
           col("genotype.RGQ"),
-          col("genotype.SPL"),
-          col("genotype.PS"),
-          col("genotype.MB"),
+          col("genotype.PGT"),
+//          col("genotype.SPL"),
+//          col("genotype.PS"),
+//          col("genotype.MB"), //TODO confirm is ok
         )
       )
   }

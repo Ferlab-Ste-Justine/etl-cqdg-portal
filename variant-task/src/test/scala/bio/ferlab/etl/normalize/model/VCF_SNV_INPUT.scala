@@ -65,24 +65,26 @@ case class INFO_csq(`Allele`: String = "-",
 
 case class GENOTYPES(`sampleId`: String = "S03329",
                      `conditionalQuality`: Int = 18,
-                     `F1R2`: Seq[Int] = Seq(0, 8),
-                     `SQ`: Option[Seq[Double]] = None,
-                     `PRI`: Seq[Double] = Seq(0.0, 29.0, 32.0, 34.77, 63.77, 37.77),
-                     `posteriorProbabilities`: Option[Seq[Double]] = None,
+//                     `F1R2`: Seq[Int] = Seq(0, 8),
+//                     `SQ`: Option[Seq[Double]] = None,
+//                     `PRI`: Seq[Double] = Seq(0.0, 29.0, 32.0, 34.77, 63.77, 37.77),
+//                     `posteriorProbabilities`: Option[Seq[Double]] = None,
                      `SB`: Option[Seq[Int]] = None,
-                     `F2R1`: Seq[Int] = Seq(4, 4),
+//                     `F2R1`: Seq[Int] = Seq(4, 4),
                      `alleleDepths`: Seq[Int] = Seq(4, 12),
-                     `ICNT`: Seq[Int] = Seq(16, 14),
-                     `AF`: Seq[Double] = Seq(0.75),
+//                     `ICNT`: Seq[Int] = Seq(16, 14),
+//                     `AF`: Seq[Double] = Seq(0.75),
                      `phased`: Boolean = false,
                      `calls`: Seq[Int] = Seq(1, 1),
                      `MIN_DP`: Option[Int] = None,
                      `phredLikelihoods`: Seq[Int] = Seq(80, 18, 0),
                      `depth`: Int = 16,
-                     `RGQ`: Option[Int] = None,
-                     `SPL`: Seq[Int] = Seq(255, 0, 255),
-                     `PS`: Option[Int] = None,
-                     `MB`: Seq[Int] = Seq(0, 4, 10, 2))
+                     `PGT`: Int = 16,
+                     `RGQ`: Option[Int] = None
+//                     `SPL`: Seq[Int] = Seq(255, 0, 255),
+//                     `PS`: Option[Int] = None,
+//                     `MB`: Seq[Int] = Seq(0, 4, 10, 2)
+                     )
 
 case class AMINO_ACIDS(`reference`: Option[String] = None,
                        `variant`: Option[String] = None)
