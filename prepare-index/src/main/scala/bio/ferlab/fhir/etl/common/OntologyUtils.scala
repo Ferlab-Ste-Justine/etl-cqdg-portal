@@ -121,7 +121,7 @@ object OntologyUtils {
 
     val icdWithTerms = diagnosisDf
       .withColumnRenamed("diagnosis_ICD_code", "phenotype_id")
-      .join(icdSplitId, col("phenotype_id") === regexp_replace(col("id"), "-", "."), "left_outer")
+      .join(icdSplitId, col("phenotype_id") === col("id"), "left_outer")
       .withColumn("age_at_event", col("age_at_diagnosis")("value"))
       .withColumnRenamed("subject", "cqdg_participant_id")
       .withColumnRenamed("diagnosis_source_text", "source_text")
