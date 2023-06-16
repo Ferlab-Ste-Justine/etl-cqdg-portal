@@ -145,7 +145,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
   "getDiagnosis" should "map ICD terms with '.' or '-' inside" in {
 
     val diagnosis1 = DIAGNOSIS_INPUT(`fhir_id` = "DIA0000001", `diagnosis_ICD_code` = "A28.9")
-    val diagnosis2 = DIAGNOSIS_INPUT(`fhir_id` = "DIA0000002", `diagnosis_ICD_code` = "A20.A28") //as A20-A28 in input file
+    val diagnosis2 = DIAGNOSIS_INPUT(`fhir_id` = "DIA0000002", `diagnosis_ICD_code` = "A20-A28") //as A20-A28 in input file
 
     val terms = read(getClass.getResource("/ontology_terms_test.json").toString, "Json", Map(), None, None)
 
@@ -156,7 +156,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
     val result = d1.select("cqdg_participant_id", "icd_tagged").as[(String, Seq[PHENOTYPE_TAGGED])].collect()
     val resultP1 = result.filter(_._1 == "PRT0000001").head
 
-    resultP1._2.map(_.`name`) should contain theSameElementsAs Seq("ICD 1 (A28.9)", "ICD 2 (A20.A28)")
+    resultP1._2.map(_.`name`) should contain theSameElementsAs Seq("ICD 1 (A28.9)", "ICD 2 (A20-A28)")
   }
 
   it should "return phenotypes tagged observed and non observed" in {
