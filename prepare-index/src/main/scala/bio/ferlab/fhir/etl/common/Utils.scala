@@ -222,10 +222,10 @@ object Utils {
       val wholeFamilyDf = familyRelationshipDf
         .join(explodedFamilyDF, col("family_members_exp") === col("submitter_participant_id"), "left_outer")
         .withColumnRenamed("internal_family_id", "family_id")
+        .withColumnRenamed("submitter_participant_id", "participant_id")
 
 
-      val participantIsAffectedDf = df.select("participant_id", "is_affected")
-        .withColumnRenamed("participant_id","submitter_participant_id")
+      val participantIsAffectedDf = df.select("participant_id", "submitter_participant_id", "is_affected")
 
       val isProbandDf = familyRelationshipDf
         .select("submitter_participant_id", "relationship_to_proband")
@@ -233,9 +233,10 @@ object Utils {
         .drop("relationship_to_proband")
 
       val familyWithGroup = wholeFamilyDf
-        .join(participantIsAffectedDf, Seq("submitter_participant_id"), "left_outer")
+        .join(participantIsAffectedDf, Seq("participant_id"), "left_outer")
         .groupBy("study_id", "release_id", "family_id", "submitter_family_id")
         .agg(collect_list(struct(
+          col("participant_id"),
           col("submitter_participant_id"),
           col("focus_participant_id"),
           col("relationship_to_proband"),
@@ -252,8 +253,7 @@ object Utils {
 
       val participantFamilyRelDf =
         wholeFamilyDf
-          .select("submitter_participant_id", "relationship_to_proband", "family_id", "family_type")
-          .withColumnRenamed("submitter_participant_id", "participant_id")
+          .select("participant_id", "relationship_to_proband", "family_id", "family_type")
 
       df
         .join(familyWithGroup, col("participant_id") === col("family_members_exp"), "left_outer")
