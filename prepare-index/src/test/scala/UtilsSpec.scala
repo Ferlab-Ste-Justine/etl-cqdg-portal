@@ -17,10 +17,10 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val allMondoTerms: DataFrame = read(getClass.getResource("/mondo_terms.json").toString, "Json", Map(), None, None)
 
   val inputPatients: DataFrame = Seq(
-    PATIENT(`participant_id` = "P1", `fhir_id` = "P1", `submitter_participant_id` = "P1"),
-    PATIENT(`participant_id` = "P2", `fhir_id` = "P2", `submitter_participant_id` = "P2"),
-    PATIENT(`participant_id` = "P3", `fhir_id` = "P3", `submitter_participant_id` = "P3"),
-    PATIENT(`participant_id` = "P4", `fhir_id` = "P4", `submitter_participant_id` = "P4")
+    PATIENT(`participant_id` = "P1", `fhir_id` = "P1", `submitter_participant_id` = "S_P1"),
+    PATIENT(`participant_id` = "P2", `fhir_id` = "P2", `submitter_participant_id` = "S_P2"),
+    PATIENT(`participant_id` = "P3", `fhir_id` = "P3", `submitter_participant_id` = "S_P3"),
+    PATIENT(`participant_id` = "P4", `fhir_id` = "P4", `submitter_participant_id` = "S_P4")
   ).toDF()
 
   "addStudy" should "add studies to participant" in {
@@ -57,10 +57,12 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     p1._2 should contain theSameElementsAs Seq(
       FAMILY_RELATIONSHIP_WITH_FAMILY(),
       FAMILY_RELATIONSHIP_WITH_FAMILY(
-        `submitter_participant_id` = "P2",
+        `participant_id` = "P2",
+        `submitter_participant_id` = "S_P2",
         `relationship_to_proband` = "Is the proband"),
       FAMILY_RELATIONSHIP_WITH_FAMILY(
-        `submitter_participant_id` = "P3",
+        `participant_id` = "P3",
+        `submitter_participant_id` = "S_P3",
         `relationship_to_proband` = "mother"),
     )
   }

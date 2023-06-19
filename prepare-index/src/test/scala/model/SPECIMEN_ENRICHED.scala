@@ -33,8 +33,9 @@ case class PARTICIPANT_ENRICHED(`participant_id`: String = "P2",
                        `family_id`: String = "FAMO1",
                        `family_type`: String = "trio")
 
-case class FAMILY_RELATIONSHIPS_ENRICHED(`submitter_participant_id`: String = "P1",
+case class FAMILY_RELATIONSHIPS_ENRICHED(`participant_id`: String = "P1",
                                 `focus_participant_id`: String = "P1",
+                                `submitter_participant_id`: String = "S_P1",
                                 `relationship_to_proband`: String = "is_proband",
                                 `family_id`: String = "FAMO1",
                                 `family_type`: String = "trio",

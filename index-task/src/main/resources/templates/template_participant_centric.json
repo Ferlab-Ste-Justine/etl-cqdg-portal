@@ -278,6 +278,9 @@
         "family_relationships": {
           "type": "nested",
           "properties": {
+            "participant_id": {
+              "type": "keyword"
+            },
             "submitter_participant_id": {
               "type": "keyword"
             },

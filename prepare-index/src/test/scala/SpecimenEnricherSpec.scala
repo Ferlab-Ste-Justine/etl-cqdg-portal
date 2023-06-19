@@ -51,9 +51,9 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
 
     val specimensEnriched = resultDF.as[SPECIMEN_ENRICHED].collect()
     val outputFamily = Seq(
-      FAMILY_RELATIONSHIPS_ENRICHED(`is_affected` = Some(true)),
-      FAMILY_RELATIONSHIPS_ENRICHED(`submitter_participant_id` = "P2", `relationship_to_proband` = "father", `is_affected` = Some(false)),
-      FAMILY_RELATIONSHIPS_ENRICHED(`submitter_participant_id` = "P3", `relationship_to_proband` = "mother", `is_affected` = Some(false)),
+      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P1" ,`submitter_participant_id` = "P1_internal", `is_affected` = Some(true)),
+      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P2", `submitter_participant_id` = "P2_internal", `relationship_to_proband` = "father", `is_affected` = Some(false)),
+      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P3", `submitter_participant_id` = "P3_internal", `relationship_to_proband` = "mother", `is_affected` = Some(false)),
     )
 
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_1") shouldBe Some(
