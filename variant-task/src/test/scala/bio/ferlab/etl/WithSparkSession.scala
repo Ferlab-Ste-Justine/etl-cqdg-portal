@@ -1,4 +1,4 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl
 
 import org.apache.hadoop.security.UserGroupInformation
 import org.apache.spark.sql.SparkSession

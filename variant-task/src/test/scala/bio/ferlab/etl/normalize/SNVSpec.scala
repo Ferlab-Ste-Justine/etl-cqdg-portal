@@ -1,6 +1,7 @@
 package bio.ferlab.etl.normalize
 
 import bio.ferlab.datalake.commons.config.DatasetConf
+import bio.ferlab.etl.{WithSparkSession, WithTestConfig}
 import bio.ferlab.etl.normalize.model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec

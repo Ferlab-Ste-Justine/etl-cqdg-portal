@@ -17,8 +17,6 @@ class ImportRawToNormalizedETL(override val source: DatasetConf,
                                val studyIds: List[String])
                               (override implicit val conf: Configuration) extends RawToNormalizedETL(source, mainDestination, transformations) {
 
-  val nbPartitions = 10
-
   override def extract(lastRunDateTime: LocalDateTime,
                        currentRunDateTime: LocalDateTime)(implicit spark: SparkSession): Map[String, DataFrame] = {
     log.info(s"extracting: ${source.location}")
@@ -28,23 +26,5 @@ class ImportRawToNormalizedETL(override val source: DatasetConf,
     )
   }
 
-  override def load(data: Map[String, DataFrame],
-                    lastRunDateTime: LocalDateTime = minDateTime,
-                    currentRunDateTime: LocalDateTime = LocalDateTime.now(),
-                    defaultRepartition: DataFrame => DataFrame)(implicit spark: SparkSession): Map[String, DataFrame] = {
-    data.map { case (dsid, df) =>
-      val ds = conf.getDataset(dsid)
-      LoadResolver
-        .write(spark, conf)(ds.format -> ds.loadtype)
-        .apply(ds, df.coalesce(nbPartitions))
-      dsid -> ds.read
-    }
-
-  }
-
-  override def defaultRepartition: DataFrame => DataFrame = {df =>
-    val persisted = df.persist()
-    persisted.repartition(nbPartitions)
-  }
-
+  override def replaceWhere: Option[String] = Some(s"study_id in (${studyIds.map(s => s"'$s'").mkString(", ")})")
 }

@@ -46,6 +46,17 @@ class SNV(studyId: String)(implicit configuration: Configuration) extends ETLSin
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
       .withGenotypeTransmission("transmission", `gender_name` = "participant.gender")
+      .printSchema()
+
+    occurrences.join(enrichedSpecimenDF, Seq("sample_id", "study_id"))
+      .withColumn("affected_status", col("participant.is_affected"))
+      .withAlleleDepths()
+      .withRelativesGenotype(columnNames,
+        participantIdColumn = col("participant.participant_id"),
+        familyIdColumn = col("participant.family_id")
+      )
+      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
+      .withGenotypeTransmission("transmission", `gender_name` = "participant.gender")
 //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
@@ -59,6 +70,7 @@ object SNV{
       .withColumn("annotation", firstCsq)
       .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
+      .withColumn("genes_symbol", array_distinct(csq("symbol")))
       .drop("annotation", "INFO_CSQ")
       .withColumn("INFO_DS", lit(null).cast("boolean"))
       .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
@@ -99,6 +111,7 @@ object SNV{
         reference,
         alternate,
         name,
+        col("genes_symbol"),
         col("hgvsg"),
         col("variant_class"),
         col("genotype.sampleId") as "sample_id",

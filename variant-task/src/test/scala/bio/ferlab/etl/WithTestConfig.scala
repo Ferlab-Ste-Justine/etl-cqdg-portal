@@ -1,4 +1,4 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
 import pureconfig.generic.auto._

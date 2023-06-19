@@ -1,7 +1,7 @@
 package bio.ferlab.etl.normalize
 
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
-import bio.ferlab.datalake.spark3.genomics.normalize.BaseConsequences
+import bio.ferlab.datalake.spark3.genomics.normalized.BaseConsequences
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
 import org.apache.spark.sql.functions.col
