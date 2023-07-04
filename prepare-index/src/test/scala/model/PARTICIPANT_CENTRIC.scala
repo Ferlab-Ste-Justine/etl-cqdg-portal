@@ -23,7 +23,7 @@ case class PARTICIPANT_CENTRIC(
                                 `observed_phenotypes`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
                                 `family_relationships`: Seq[FAMILY_RELATIONSHIP_WITH_FAMILY] = Nil,
                                 `is_a_proband`: Option[Boolean] = None,
-                                `study`: STUDY_CENTRIC = STUDY_CENTRIC(),
+                                `study`: STUDY_LIGHT = STUDY_LIGHT(),
                                 `files`: Seq[FILE_WITH_BIOSPECIMEN] = Seq.empty,
                               )
 
