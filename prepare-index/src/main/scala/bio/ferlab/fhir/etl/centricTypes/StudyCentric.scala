@@ -22,6 +22,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
   val normalized_biospecimen: DatasetConf = conf.getDataset("normalized_biospecimen")
   val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
   val normalized_sequencing_experiment: DatasetConf = conf.getDataset("normalized_task")
+  val normalized_sample_registration: DatasetConf = conf.getDataset("normalized_sample_registration")
   val hpo_terms: DatasetConf = conf.getDataset("hpo_terms")
   val mondo_terms: DatasetConf = conf.getDataset("mondo_terms")
   val icd_terms: DatasetConf = conf.getDataset("icd_terms")
@@ -30,7 +31,8 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     (Seq(
       normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
-      normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen)
+      normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen,
+      normalized_sample_registration)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
@@ -46,6 +48,21 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val studyDF = data(normalized_researchstudy.id)
+
+    val samplesCount =
+      data(normalized_patient.id)
+        .select("fhir_id", "study_id", "release_id")
+        .withColumnRenamed("fhir_id", "participant_id")
+        .addFilesWithBiospecimen(
+          data(normalized_drs_document_reference.id),
+          data(normalized_biospecimen.id),
+          data(normalized_sequencing_experiment.id),
+          data(normalized_sample_registration.id),
+        )
+        .withColumn("file_exp", explode(col("files")))
+        .withColumn("bio_exp", explode(col("file_exp.biospecimens")))
+        .select("study_id", "release_id", "bio_exp.sample_id")
+        .distinct().filter(col("sample_id").isNotNull).count().toInt
 
     val filesExplodedDF = data(normalized_drs_document_reference.id)
       .withColumn("files_exp", explode(col("files")))
@@ -124,6 +141,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .agg(collect_set(col("mondo_term")) as "mondo_terms", collect_set(col("icd_term")) as "icd_terms")
 
     val transformedStudyDf = studyDF
+      .withColumn("sample_count", lit(samplesCount))
       .join(dataTypesCount, Seq("study_id"), "left_outer")
       .join(dataCategoryCount, Seq("study_id"), "left_outer")
       .join(participantCount, Seq("study_id"), "left_outer")

@@ -37,6 +37,7 @@ case class STUDY_CENTRIC (
                            `file_count`: Int = 5,
                            `status`: String = "completed",
                            `family_count`: Int = 1,
+                           `sample_count`: Int = 1,
                            `experimental_strategies`: Seq[String] = Seq("WXS"),
                            `hpo_terms`: Seq[String] = Seq("Hypercholesterolemia (HP:0003124)", "Hypertension (HP:0000822)"),
                            `mondo_terms`: Seq[String] = Seq("atopic eczema (MONDO:0004980)"),

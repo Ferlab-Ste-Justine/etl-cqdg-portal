@@ -22,11 +22,12 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val family3: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000003FR", `submitter_participant_id` = "PRT0000003", `relationship_to_proband` = "Is the proband")
 
 
-  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM"), FILE(`file_name` = "file1.crai", `file_format` = "CRAI")))
+  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = "BIO1" , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM"), FILE(`file_name` = "file1.crai", `file_format` = "CRAI")))
   val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()))
-  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")))
+  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `biospecimen_reference` = "BIO1", `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")))
   val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "4", `data_type` = "GSV", `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")))
   val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "3", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")))
+  val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "6", `participant_id` = "PRT0000002", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")))
 
   val diagnosis1: DIAGNOSIS_INPUT =DIAGNOSIS_INPUT()
   val diagnosis2: DIAGNOSIS_INPUT =DIAGNOSIS_INPUT(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "Tinnitus", `diagnosis_ICD_code` = "H93.19", `age_at_diagnosis` = AGE_AT(value = 215556831))
@@ -37,16 +38,27 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val phenotype3: PHENOTYPE = PHENOTYPE(`fhir_id` = "PHE0000003", `phenotype_source_text` = "Hypertension", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:0000822"), `cqdg_participant_id` = "PRT0000001", `phenotype_observed` = "NEG")
 
 
+  val biospecimen1: BIOSPECIMEN_INPUT = BIOSPECIMEN_INPUT(`fhir_id` = "BIO1", `subject` = "PRT0000001")
+  val biospecimen2: BIOSPECIMEN_INPUT = BIOSPECIMEN_INPUT(`fhir_id` = "BIO2", `subject` = "PRT0000002") //no specimen
+
+  val sample1: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE1", `parent` = "BIO1", `subject` = "PRT0000001")
+  val sample2: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE2", `parent` = "BIO1", `subject` = "PRT0000001")
+  val sample3: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE3", `parent` = "BIO1", `subject` = "PRT0000001")
+  val sample4: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE4", `parent` = "BIO1", `subject` = "PRT0000001")
+
+
   "transform" should "prepare index study_centric" in {
     val data: Map[String, DataFrame] = Map(
       "normalized_research_study" -> Seq(RESEARCHSTUDY()).toDF(),
       "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
-      "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5).toDF(),
+      "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6).toDF(),
       "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
       "normalized_group" -> Seq(GROUP_NEW()).toDF(),
       "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
       "normalized_task" -> Seq(TASK()).toDF(),
       "normalized_phenotype" -> Seq(phenotype1, phenotype2, phenotype3).toDF(),
+      "normalized_biospecimen" -> Seq(biospecimen1, biospecimen2).toDF(),
+      "normalized_sample_registration" -> Seq(sample1, sample2, sample3, sample4).toDF(),
       "hpo_terms" -> read(getClass.getResource("/hpo_terms.json").toString, "Json", Map(), None, None),
       "mondo_terms" -> read(getClass.getResource("/mondo_terms.json").toString, "Json", Map(), None, None),
       "icd_terms" -> read(getClass.getResource("/icd_terms.json").toString, "Json", Map(), None, None),
@@ -67,6 +79,10 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         "Atopic dermatitis, unspecified (L20.9)",
         "Tinnitus, unspecified ear (H93.19)",
       ),
+      `participant_count` = 2, // PRT0000001, PRT0000002
+      `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
+      `sample_count` = 4,
+      `data_categories` = Seq(("Genomics","2")),
     )
 
     study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs
