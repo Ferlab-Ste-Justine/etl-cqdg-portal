@@ -45,6 +45,16 @@ case class STUDY_CENTRIC (
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                          )
+
+case class STUDY_LIGHT (
+                         `study_code`: String = "cag",
+                         `name`: String = "CARTaGENE",
+                         `population`: String = "Adult",
+                         `domain`: Seq[String] = Seq("General health"),
+                         `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
+                         `contact`: CONTACT = CONTACT(),
+                         )
+
 case class DATA_ACCESS_CODES(
                               `access_limitations`: Seq[String] = Seq("DUO:0000005"),
                               `access_requirements`: Seq[String] = Seq("DUO:0000019", "DUO:0000021")
