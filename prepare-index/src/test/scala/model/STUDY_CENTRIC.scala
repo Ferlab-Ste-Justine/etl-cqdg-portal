@@ -39,9 +39,6 @@ case class STUDY_CENTRIC (
                            `family_count`: Int = 1,
                            `sample_count`: Int = 1,
                            `experimental_strategies`: Seq[String] = Seq("WXS"),
-                           `hpo_terms`: Seq[String] = Seq("Hypercholesterolemia (HP:0003124)", "Hypertension (HP:0000822)"),
-                           `mondo_terms`: Seq[String] = Seq("atopic eczema (MONDO:0004980)"),
-                           `icd_terms`: Seq[String] = Seq("Tinnitus, unspecified ear (H93.19)", "Atopic dermatitis, unspecified (L20.9)", "Hyperchylomicronemia (E78.3)"),
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                          )

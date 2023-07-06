@@ -59,9 +59,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "normalized_phenotype" -> Seq(phenotype1, phenotype2, phenotype3).toDF(),
       "normalized_biospecimen" -> Seq(biospecimen1, biospecimen2).toDF(),
       "normalized_sample_registration" -> Seq(sample1, sample2, sample3, sample4).toDF(),
-      "hpo_terms" -> read(getClass.getResource("/hpo_terms.json").toString, "Json", Map(), None, None),
-      "mondo_terms" -> read(getClass.getResource("/mondo_terms.json").toString, "Json", Map(), None, None),
-      "icd_terms" -> read(getClass.getResource("/icd_terms.json").toString, "Json", Map(), None, None),
       "duo_terms" -> read(getClass.getResource("/duo_terms.csv").toString, "csv", Map("header" -> "true"), None, None),
     )
 
@@ -73,12 +70,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val study_centric = output("es_index_study_centric")
 
     val studyCentricOutput = STUDY_CENTRIC(
-      `mondo_terms` = Seq("rheumatoid arthritis (MONDO:0008383)", "atopic eczema (MONDO:0004980)"),
-      `icd_terms` = Seq(
-        "Rheumatoid arthritis, unspecified (M06.9)",
-        "Atopic dermatitis, unspecified (L20.9)",
-        "Tinnitus, unspecified ear (H93.19)",
-      ),
       `participant_count` = 2, // PRT0000001, PRT0000002
       `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
       `sample_count` = 4,
