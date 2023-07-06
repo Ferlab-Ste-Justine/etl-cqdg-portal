@@ -121,7 +121,14 @@ object ConfigurationGenerator extends App {
     )
   )).toList
 
-  val cqdgConf = Map("fhir" -> "http://localhost:8080", "qaDbName" -> "cqdg_portal_qa", "prdDbName" -> "cqdg_portal_prd", "localDbName" -> "normalized", "bucketNamePrefix" -> "cqdg-qa-app-clinical-data-service", "bucketNamePrefixPrd" -> "cqdg-prod-app-clinical-data-service")
+  val cqdgConf = Map(
+    "fhir" -> "http://localhost:8080",
+    "qaDbName" -> "cqdg_portal_qa",
+    "prdDbName" -> "cqdg_portal_prd",
+    "localDbName" -> "normalized",
+    "bucketNamePrefix" -> "cqdg-qa-app-datalake",
+    "bucketNamePrefixPrd" -> "cqdg-prod-app-datalake"
+  )
   val conf = Map("cqdg" -> cqdgConf)
 
   val spark_conf = Map(

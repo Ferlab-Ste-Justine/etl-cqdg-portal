@@ -3,7 +3,6 @@ package bio.ferlab.fhir.etl.centricTypes
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
-import bio.ferlab.fhir.etl.common.OntologyUtils.displayTerm
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import bio.ferlab.fhir.etl.common.Utils._
 import org.apache.spark.sql.functions.{col, transform => sparkTransform, _}
@@ -23,23 +22,16 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
   val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
   val normalized_sequencing_experiment: DatasetConf = conf.getDataset("normalized_task")
   val normalized_sample_registration: DatasetConf = conf.getDataset("normalized_sample_registration")
-  val hpo_terms: DatasetConf = conf.getDataset("hpo_terms")
-  val mondo_terms: DatasetConf = conf.getDataset("mondo_terms")
-  val icd_terms: DatasetConf = conf.getDataset("icd_terms")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    (Seq(
+    Seq(
       normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
       normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen,
       normalized_sample_registration)
       .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
         .where(col("study_id").isin(studyIds: _*))
-      ) ++ Seq(
-      hpo_terms.id -> hpo_terms.read,
-      mondo_terms.id -> mondo_terms.read,
-      icd_terms.id -> icd_terms.read,
-    )).toMap
+      ).toMap
 
   }
 
@@ -121,25 +113,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .groupBy("study_id")
       .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategies")
 
-    val phenotypeGrouped = data(normalized_phenotype.id)
-      .withColumn("phenotype", col("phenotype_HPO_code")("code"))
-      .join(data(hpo_terms.id), col("phenotype") === col("id"), "left_outer")
-      .withColumn("hpo_term", displayTerm(col("id"), col("name")))
-      .groupBy("study_id")
-      .agg(collect_set(col("hpo_term")) as "hpo_terms")
-
-    // the id is of the from id|chapter. See why it was done like this, and if still required
-    val icdSplitId = data(icd_terms.id)
-      .withColumn("splitId", split(col("id"), "\\|")(0))
-    val diagnosisGrouped = data(normalized_diagnosis.id)
-      .join(data(mondo_terms.id), col("diagnosis_mondo_code") === col("id"), "left_outer")
-      .withColumn("mondo_term", displayTerm(col("id"), col("name")))
-      .drop("id", "name")
-      .join(icdSplitId, col("diagnosis_ICD_code") === col("splitId"), "left_outer")
-      .withColumn("icd_term", displayTerm(col("splitId"), col("name")))
-      .groupBy("study_id")
-      .agg(collect_set(col("mondo_term")) as "mondo_terms", collect_set(col("icd_term")) as "icd_terms")
-
     val transformedStudyDf = studyDF
       .withColumn("sample_count", lit(samplesCount))
       .join(dataTypesCount, Seq("study_id"), "left_outer")
@@ -148,8 +121,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .join(fileCount, Seq("study_id"), "left_outer")
       .join(familyCount, Seq("study_id"), "left_outer")
       .join(experimentalStrategyGrouped, Seq("study_id"), "left_outer")
-      .join(phenotypeGrouped, Seq("study_id"), "left_outer")
-      .join(diagnosisGrouped, Seq("study_id"), "left_outer")
       .withColumn("family_data", col("family_count").gt(0))
       .withColumn("access_limitations", sparkTransform(filter(col("access_limitations"), col => col("display").isNotNull),
         col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
