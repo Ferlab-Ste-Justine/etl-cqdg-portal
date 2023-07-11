@@ -4,6 +4,8 @@ import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET, VC
 import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition, Scd1}
 import bio.ferlab.datalake.commons.config._
 import bio.ferlab.datalake.commons.file.FileSystemType.S3
+import bio.ferlab.datalake.spark3.genomics.GenomicDatasets
+import bio.ferlab.datalake.spark3.publictables.PublicDatasets
 import pureconfig.generic.auto._
 
 case class SourceConfig(fhirResource: String, entityType: Option[String], partitionBy: List[String])
@@ -53,81 +55,69 @@ object ConfigurationGenerator extends App {
         path = s"/normalized/${source.entityType.getOrElse(source.fhirResource)}",
         format = DELTA,
         loadtype = OverWritePartition,
+        table = Some(TableConf("database", tableName)),
         partitionby = source.partitionBy,
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
       )
     )
   })
 
-  val sources = (rawsAndNormalized ++ Seq(
-    DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", format = JSON, loadtype = OverWrite),
-    DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", format = JSON, loadtype = OverWrite),
-    DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", format = JSON, loadtype = OverWrite)
-  ) ++ Seq(
-    DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
-  ) ++ Seq(
-    Index("study_centric", partitionByStudyIdAndReleaseId),
-    Index("participant_centric", partitionByStudyIdAndReleaseId),
-    Index("file_centric", partitionByStudyIdAndReleaseId),
-    Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
-  ).flatMap(index => {
-    Seq(
-      DatasetConf(id = s"es_index_${index.name}", storageid = storage, path = s"/es_index/fhir/${index.name}", format = PARQUET, loadtype = OverWrite, partitionby = index.partitionBy)
-    )
-  }) ++ Seq(
-    DatasetConf(
-      id = "normalized_snv",
-      storageid = storage,
-      path = s"/normalized/snv",
-      format = DELTA,
-      loadtype = OverWritePartition,
-//      table = Some(TableConf("database", "normalized_snv")),
-      partitionby = List("study_id", "chromosome"),
-      writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
-      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
-    ),
-    DatasetConf(
-      id = "normalized_consequences",
-      storageid = storage,
-      path = "/normalized/consequences",
-      format = DELTA,
-      loadtype = Scd1,
-      partitionby = List("chromosome"),
-//      table = Some(TableConf("database", "normalized_consequences")),
-      keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
-      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
-    ),
-    DatasetConf(
-      id = "raw_vcf",
-      storageid = storage_vcf,
-      path = "/vcf/{{STUDY_ID}}/*.vep.vcf.gz",
-      format = VCF,
-      loadtype = OverWrite,
-      partitionby = List("chromosome"),
-//      table = Some(TableConf("database", "normalized_consequences")),
-      keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
-      repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
-    ),
-  ) ++ Seq(
-    DatasetConf(
-      id = "enriched_specimen",
-      storageid = storage,
-      path = s"/enriched/specimen",
-      format = DELTA,
-      loadtype = OverWritePartition,
-//      table = Some(TableConf("database", "enriched_specimen")),
-      partitionby = List("study_id"),
-      writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
-    )
-  )).toList
+  val sources = (
+    PublicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
+      GenomicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
+      rawsAndNormalized ++ Seq(
+      DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", table = Some(TableConf("database", "hpo_terms")), format = JSON, loadtype = OverWrite),
+      DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = JSON, loadtype = OverWrite),
+      DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", table = Some(TableConf("database", "icd_terms")), format = JSON, loadtype = OverWrite)
+    ) ++ Seq(
+      DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
+    ) ++ Seq(
+      Index("study_centric", partitionByStudyIdAndReleaseId),
+      Index("participant_centric", partitionByStudyIdAndReleaseId),
+      Index("file_centric", partitionByStudyIdAndReleaseId),
+      Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
+    ).flatMap(index => {
+      Seq(
+        DatasetConf(
+          id = s"es_index_${index.name}",
+          storageid = storage,
+          path = s"/es_index/fhir/${index.name}",
+          format = PARQUET,
+          loadtype = OverWrite,
+          table = Some(TableConf("database", s"es_index_${index.name}")),
+          partitionby = index.partitionBy
+        )
+      )
+    }) ++ Seq(
+      DatasetConf(
+        id = "normalized_snv",
+        storageid = storage,
+        path = s"/normalized/snv",
+        format = DELTA,
+        loadtype = OverWritePartition,
+        table = Some(TableConf("database", "normalized_snv")),
+        partitionby = List("study_id", "chromosome"),
+        writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
+        repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
+      ),
+      DatasetConf(
+        id = "enriched_specimen",
+        storageid = storage,
+        path = s"/enriched/specimen",
+        format = DELTA,
+        loadtype = OverWritePartition,
+        table = Some(TableConf("database", "enriched_specimen")),
+        partitionby = List("study_id"),
+        writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true")
+      )
+    ))
 
   val cqdgConf = Map(
     "fhir" -> "http://localhost:8080",
     "qaDbName" -> "cqdg_portal_qa",
     "prdDbName" -> "cqdg_portal_prd",
     "localDbName" -> "normalized",
-    "bucketNamePrefix" -> "cqdg-qa-app-datalake",
-    "bucketNamePrefixPrd" -> "cqdg-prod-app-datalake"
+    "bucketNamePrefix" -> "cqdg-{ENV}-app-datalake"
   )
   val conf = Map("cqdg" -> cqdgConf)
 
@@ -175,17 +165,17 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix")}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix".replace("{ENV}","qa"))}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-qa-app-clinical-data-service", S3) //TODO change to Actual VCF bucket -test only
       ),
-      sources = populateTable(sources, conf(project)("localDbName")),
+      sources = populateTable(sources, conf(project)("qaDbName")),
       args = args.toList,
       sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
     )))
 
     ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefixPrd")}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix".replace("{ENV}","prod"))}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
