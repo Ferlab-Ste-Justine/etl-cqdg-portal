@@ -22,12 +22,12 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val family3: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000003FR", `submitter_participant_id` = "PRT0000003", `relationship_to_proband` = "Is the proband")
 
 
-  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = "BIO1" , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM"), FILE(`file_name` = "file1.crai", `file_format` = "CRAI")))
-  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()))
-  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `biospecimen_reference` = "BIO1", `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")))
-  val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "4", `data_type` = "GSV", `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")))
-  val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "3", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")))
-  val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "6", `participant_id` = "PRT0000002", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")))
+  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = "BIO1" , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM"), FILE(`file_name` = "file1.crai", `file_format` = "CRAI")), `dataset` = Some("dataset1"))
+  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `dataset` = Some("dataset1"))
+  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `biospecimen_reference` = "BIO1", `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
+  val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "4", `data_type` = "GSV", `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
+  val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "3", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
+  val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "6", `participant_id` = "PRT0000002", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")), `dataset` = Some("dataset2"))
 
   val diagnosis1: DIAGNOSIS_INPUT =DIAGNOSIS_INPUT()
   val diagnosis2: DIAGNOSIS_INPUT =DIAGNOSIS_INPUT(`subject` = "PRT0000002", `fhir_id` = "DIA0000002", `diagnosis_source_text` = "Tinnitus", `diagnosis_ICD_code` = "H93.19", `age_at_diagnosis` = AGE_AT(value = 215556831))
@@ -46,10 +46,12 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val sample3: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE3", `parent` = "BIO1", `subject` = "PRT0000001")
   val sample4: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE4", `parent` = "BIO1", `subject` = "PRT0000001")
 
+  val studyDataset: Seq[DATASET_INPUT] = Seq(DATASET_INPUT(`name` = "dataset1", `description` = None), DATASET_INPUT(`name` = "dataset2", `description` = Some("desc")))
+
 
   "transform" should "prepare index study_centric" in {
     val data: Map[String, DataFrame] = Map(
-      "normalized_research_study" -> Seq(RESEARCHSTUDY()).toDF(),
+      "normalized_research_study" -> Seq(RESEARCHSTUDY(`data_sets` = studyDataset)).toDF(),
       "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
       "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6).toDF(),
       "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
@@ -64,7 +66,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val output = new StudyCentric("5", List("STU0000001"))(conf).transform(data)
 
-
     output.keys should contain("es_index_study_centric")
 
     val study_centric = output("es_index_study_centric")
@@ -74,6 +75,10 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
       `sample_count` = 4,
       `data_categories` = Seq(("Genomics","2")),
+      `datasets` = Seq(
+        DATASET(`name` = "dataset1", `data_type` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV"), `experimental_strategy` = Seq("WXS"), `participant_count` = 1, `file_count` = 6),
+        DATASET(`name` = "dataset2", `description` = Some("desc"), `data_type` = Seq("GCNV"), `experimental_strategy` = Nil, `participant_count` = 1, `file_count` = 1)
+      )
     )
 
     study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs

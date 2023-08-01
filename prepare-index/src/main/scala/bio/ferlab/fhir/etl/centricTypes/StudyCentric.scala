@@ -113,7 +113,11 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .groupBy("study_id")
       .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategies")
 
+    val studyDatasets = studyDF
+      .addDataSetToStudy(data(normalized_drs_document_reference.id), participantsRenamed, data(normalized_sequencing_experiment.id))
+
     val transformedStudyDf = studyDF
+      .join(studyDatasets, Seq("study_id"), "left_outer")
       .withColumn("sample_count", lit(samplesCount))
       .join(dataTypesCount, Seq("study_id"), "left_outer")
       .join(dataCategoryCount, Seq("study_id"), "left_outer")

@@ -206,6 +206,41 @@ object Utils {
       df.join(filesWithSeqExpGrouped, Seq("subject", "study_id", "release_id"), "inner")
     }
 
+    def addDataSetToStudy(filesDf: DataFrame, participants: DataFrame, tasks: DataFrame): DataFrame = {
+      val filesWithTaskAndParticipants = filesDf
+        .addSequencingExperiment(tasks.withColumn("experimental_strategy", col("experimental_strategy")(0)))
+        .withColumn("files_exploded", explode(col("files")))
+        .join(participants, Seq("participant_id", "study_id", "release_id"), "inner")
+        .drop("files")
+        .groupBy("study_id", "dataset")
+        .agg(
+          collect_set("data_type") as "data_type",
+          collect_set("sequencing_experiment.experimental_strategy") as "experimental_strategy",
+          size(collect_set("files_exploded")) as "file_count",
+          size(collect_set("participant_id")) as "participant_count"
+        )
+
+      val studyExpDS = df
+        .select("study_id", "data_sets")
+        .withColumn("data_sets_exp", explode(col("data_sets")))
+        .withColumn("dataset", col("data_sets_exp")("name"))
+        .withColumn("dataset_desc", col("data_sets_exp")("description"))
+
+      studyExpDS
+        .join(filesWithTaskAndParticipants, Seq("study_id", "dataset"), "left_outer")
+        .withColumn("dataset", struct(
+          col("dataset") as "name",
+          col("dataset_desc") as "description",
+          col("data_type"),
+          col("experimental_strategy"),
+          col("file_count"),
+          col("participant_count"),
+        ))
+        .select("study_id", "dataset")
+        .groupBy("study_id")
+        .agg(collect_list("dataset") as "datasets")
+    }
+
     def addParticipant(participantsDf: DataFrame): DataFrame = {
       val reformatParticipant: DataFrame = participantsDf
         .withColumn("participant", struct(participantsDf.columns.map(col): _*))

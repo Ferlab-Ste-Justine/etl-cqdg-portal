@@ -35,6 +35,9 @@
         "data_category" : {
           "type": "keyword"
         },
+        "dataset": {
+          "type": "keyword"
+        },
         "file_name": {
           "type": "keyword"
         },

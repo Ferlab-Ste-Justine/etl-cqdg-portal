@@ -15,9 +15,15 @@ case class RESEARCHSTUDY(
                           `access_requirements`: Seq[CODE_SYSTEM] = Seq(CODE_SYSTEM(`code` = "DUO:0000021", `display` = "Ethics approval required"), CODE_SYSTEM(`code` = "DUO:0000027", `display` = "Project specific restriction")),
                           `population`: String = "Adult",
                           `study_version`: String = "1",
+                          `data_sets`: Seq[DATASET_INPUT] = Seq(DATASET_INPUT()),
                         )
 
 case class CONTACT(
                     `type`: String = "url",
                     `value`: String = "https://sdas.cartagene.qc.ca",
+                  )
+
+case class DATASET_INPUT(
+                    `name`: String = "dataset1",
+                    `description`: Option[String] = Some("bla bla")
                   )

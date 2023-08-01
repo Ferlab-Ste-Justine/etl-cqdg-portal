@@ -180,8 +180,15 @@ object Transformations {
         col => struct(col("code") as "code", col("display") as "display")))
       .withColumn("population", filter(col("extension"), col => col("url") === POPULATION_S_D)(0)("valueCoding")("code"))
       .withColumn("study_version", regexp_extract(filter(col("meta")("tag"), col => col("code").contains("study_version"))(0)("code"), versionExtract, 1))
+      .withColumn("data_sets_ext", transform(
+        filter(col("extension"), col => col("url") === DATASET_SD), col => col("extension")
+      ))
+      .withColumn("data_sets", transform(col("data_sets_ext"), col => struct(
+        filter(col("url"), col => col === "name")(0)("valueString") as "name",
+        filter(col("url"), col => col === "description")(0)("valueString") as "description"
+      )))
     ),
-    Drop("extension", "category", "meta", "identifier")
+    Drop("extension", "category", "meta", "identifier", "data_sets_ext")
   )
 
   val documentreferenceMappings: List[Transformation] = List(
@@ -199,6 +206,7 @@ object Transformations {
         .withColumn("file_hash", col("content_exp")("attachment")("hash"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
+        .withColumn("data_set", regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1))
         .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category"): _*)
         .agg(
           collect_list(

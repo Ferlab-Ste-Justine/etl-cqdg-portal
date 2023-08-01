@@ -41,6 +41,7 @@ case class STUDY_CENTRIC (
                            `experimental_strategies`: Seq[String] = Seq("WXS"),
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
+                           `datasets`: Seq[DATASET] = Nil,
                          )
 
 case class STUDY_LIGHT (
@@ -61,3 +62,12 @@ case class ACCESS_REQUIREMENTS(
                               `access_requirements`: Seq[String] = Seq("Ethics approval required (DUO:0000021)", "Project specific restriction (DUO:0000027)"),
                               `access_limitations`: Seq[String] = Seq("General research use (DUO:0000005)")
                               )
+
+case class DATASET(
+                    `name`: String = "name 1",
+                    `description`: Option[String] = None,
+                    `data_type`: Seq[String] = Seq("SNV"),
+                    `experimental_strategy`: Seq[String] = Seq("WGS"),
+                    `participant_count`: Int = 100,
+                    `file_count`: Int = 100,
+                  )
