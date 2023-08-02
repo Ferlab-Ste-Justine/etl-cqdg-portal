@@ -165,7 +165,7 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix".replace("{ENV}","qa"))}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}","qa")}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-qa-app-clinical-data-service", S3) //TODO change to Actual VCF bucket -test only
       ),
       sources = populateTable(sources, conf(project)("qaDbName")),
@@ -175,7 +175,7 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix".replace("{ENV}","prod"))}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}","prod")}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
