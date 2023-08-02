@@ -70,6 +70,29 @@
             }
           }
         },
+        "datasets": {
+          "type": "nested",
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "description": {
+              "type": "keyword"
+            },
+            "data_type": {
+              "type": "keyword"
+            },
+            "experimental_strategy": {
+              "type": "keyword"
+            },
+            "participant_count": {
+              "type": "integer"
+            },
+            "file_count": {
+              "type": "integer"
+            }
+          }
+        },
         "participant_count" : {
           "type" : "integer"
         },

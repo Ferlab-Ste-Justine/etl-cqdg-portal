@@ -10,6 +10,7 @@ package object etl {
   val DOCUMENT_DATA_TYPE = s"$SYSTEM_URL_CQDG/CodeSystem/data-type"
   val DOCUMENT_DATA_CATEGORY = s"$SYSTEM_URL_CQDG/CodeSystem/data-category"
   val TASK_BIO_INFO = s"$SYSTEM_URL_CQDG/CodeSystem/bioinfo-analysis-code"
+  val DATASETS_CS = s"$SYSTEM_URL_CQDG/CodeSystem/cqdg-dataset-cs"
 
   //  *********** STRUCTURE DEFINITION **************
   val AGE_AT_EVENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtEvent"
@@ -24,4 +25,5 @@ package object etl {
   val ACCESS_LIMITATIONS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessLimitations"
   val ACCESS_REQUIREMENTS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessRequirements"
   val POPULATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchStudy/population"
+  val DATASET_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/dataset"
 }

@@ -370,6 +370,9 @@
             "data_type": {
               "type": "keyword"
             },
+            "dataset": {
+              "type": "keyword"
+            },
             "data_category": {
               "type": "keyword"
             },

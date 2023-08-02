@@ -57,6 +57,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `ferload_url` = Some("http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a"),
             `biospecimen_reference` = Some("SAM0000001"),
             `data_type` = Some("SSUP"),
+            `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(
               BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  17174, `sample_id` = "S1")),
           ),

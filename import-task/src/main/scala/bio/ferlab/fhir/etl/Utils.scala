@@ -14,6 +14,7 @@ object Utils {
   val patientExtract = "^Patient\\/([A-Za-z0-9]+)$"
   val organizationExtract = "^Organization\\/([A-Za-z0-9]+)$"
   val versionExtract = "^study_version:(.+)$"
+  val datasetExtract = "^dataset:(.+)$"
 
   case class Coding(id: Option[String], system: Option[String], version: Option[String], code: Option[String],
                     display: Option[String], userSelected: Option[String])
