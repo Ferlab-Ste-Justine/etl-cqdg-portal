@@ -52,9 +52,6 @@ object IndexTask extends App {
   implicit val esClient: ElasticSearchClient =
     new ElasticSearchClient(s"$esUrl:$esPort", None, None)
 
-  spark.sparkContext.getConf.getAll.filterNot(e => e._1 == "spark.hadoop.fs.s3a.access.key" || e._1 == "spark.hadoop.fs.s3a.secret.key")
-    .foreach(r => println(s"${r._1} -> ${r._2}"))
-
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
     case "participant_centric" => conf.getDataset("es_index_participant_centric")
