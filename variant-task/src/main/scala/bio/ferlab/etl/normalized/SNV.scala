@@ -1,11 +1,11 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.ETLSingleDestination
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
-import bio.ferlab.etl.normalize.SNV.{getSNV, selectOccurrences}
+import bio.ferlab.etl.normalized.SNV.{getSNV, selectOccurrences}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 

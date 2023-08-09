@@ -1,12 +1,12 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
-import bio.ferlab.etl.normalize.model.{GENOTYPES, NormalizedConsequences, VCF_SNV_INPUT}
+import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
+import bio.ferlab.etl.normalized.model.{GENOTYPES, NormalizedConsequences, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
 
-class ConsequencesSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithTestConfig{
+class ConsequencesSpec extends SparkSpec with WithTestConfig {
+
   import spark.implicits._
 
   val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
@@ -22,7 +22,7 @@ class ConsequencesSpec extends AnyFlatSpec with Matchers with WithSparkSession w
 
 
   it should "generate normalized consequences from input VCF" in {
-    val results = new Consequences("STU0000001").transform(data)
+    val results = Consequences(TestETLContext(), "STU0000001").transform(data)
 
     val result = results("normalized_consequences").as[NormalizedConsequences].collect()
 
