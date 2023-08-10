@@ -1,8 +1,8 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.spark3.SparkApp
 
-object Normalize extends SparkApp {
+object Normalized extends SparkApp {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
   val Array(_, _, jobName, studyId) = args
@@ -13,7 +13,6 @@ object Normalize extends SparkApp {
 
   jobName match {
     case "snv" => new SNV(studyId).run()
-    case "consequences" => new Consequences(studyId).run()
   }
 
 }

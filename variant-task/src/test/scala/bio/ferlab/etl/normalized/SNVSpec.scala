@@ -1,7 +1,7 @@
-package bio.ferlab.etl.normalize
+package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
-import bio.ferlab.etl.normalize.model._
+import bio.ferlab.etl.normalized.model._
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
