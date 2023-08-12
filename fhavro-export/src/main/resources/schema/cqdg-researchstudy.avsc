@@ -200,6 +200,39 @@
               "type": "bio.ferlab.fhir.Coding",
               "name": "valueCoding",
               "default": {}
+            },
+            {
+              "name": "extension",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "record",
+                  "name": "ExtensionDataset",
+                  "doc": "An Extension",
+                  "namespace": "bio.ferlab.fhir",
+                  "fields": [
+                    {
+                      "name": "url",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "default": null
+                    },
+                    {
+                      "name":"valueString",
+                      "type":[
+                        "null",
+                        "string"
+                      ],
+                      "default":null
+                    }
+                  ],
+                  "default": {}
+                },
+                "default": []
+              },
+              "default": []
             }
           ],
           "default": {}

@@ -1,13 +1,11 @@
-package bio.ferlab.fhir.etl
-
-import bio.ferlab.fhir.etl.Utils.{age_on_set, extractFirstForSystem, retrieveRepository, sanitizeFilename}
+import bio.ferlab.fhir.etl.Utils.{age_on_set, retrieveRepository, sanitizeFilename}
 import org.apache.spark.sql.functions.col
-import org.scalatest.matchers.should._
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should._
 
 class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
-
   import spark.implicits._
+
 
   "retrieveRepository" should "return dcf, gen3 or null" in {
     val df = Seq("https://data.kidsfirstdrc.org/path", "https://api.gdc.cancer.gov/path", "other", null).toDF("repository")

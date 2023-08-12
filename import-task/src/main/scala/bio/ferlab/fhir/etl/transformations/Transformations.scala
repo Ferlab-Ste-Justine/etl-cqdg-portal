@@ -184,8 +184,8 @@ object Transformations {
         filter(col("extension"), col => col("url") === DATASET_SD), col => col("extension")
       ))
       .withColumn("data_sets", transform(col("data_sets_ext"), col => struct(
-        filter(col("url"), col => col === "name")(0)("valueString") as "name",
-        filter(col("url"), col => col === "description")(0)("valueString") as "description"
+        filter(col, col => col("url") === "name")(0)("valueString") as "name",
+        filter(col, col => col("url") === "description")(0)("valueString") as "description"
       )))
     ),
     Drop("extension", "category", "meta", "identifier", "data_sets_ext")
@@ -193,7 +193,7 @@ object Transformations {
 
   val documentreferenceMappings: List[Transformation] = List(
     Custom { input =>
-      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id")
+      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id", "meta")
       val df = input
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
@@ -221,7 +221,7 @@ object Transformations {
         )
       df
     },
-    Drop("id", "type", "category", "subject", "content", "context")
+    Drop("id", "type", "category", "subject", "content", "context", "meta")
   )
 
   val groupMappings: List[Transformation] = List(
