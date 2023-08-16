@@ -1,5 +1,3 @@
-package bio.ferlab.fhir.etl
-
 import org.apache.hadoop.security.UserGroupInformation
 import org.apache.spark.sql.SparkSession
 

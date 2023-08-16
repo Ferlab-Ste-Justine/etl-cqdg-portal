@@ -34,6 +34,7 @@ libraryDependencies ++= Seq(
 )
 
 Test / fork := true
+Test / envVars := Map("AWS_ACCESS_KEY" -> "access_key", "AWS_SECRET_KEY" -> "secret_key")
 
 resolvers ++= Seq("Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 

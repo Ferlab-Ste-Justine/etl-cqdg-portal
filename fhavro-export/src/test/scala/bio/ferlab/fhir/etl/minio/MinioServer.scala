@@ -20,7 +20,7 @@ trait MinioServer {
 
   implicit val s3Client: S3Client =
     S3Client.builder()
-      .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("minioadmin", "minioadmin")))
+      .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("access_key", "secret_key")))
       .endpointOverride(URI.create(minioEndpoint))
       .region(Region.US_EAST_1)
       .serviceConfiguration(S3Configuration.builder()

@@ -1,13 +1,12 @@
 package bio.ferlab.fhir.etl
 
+import org.apache.spark.sql.Column
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, functions}
 
 
 object Utils {
 
-  val extractSystemUrl = "^(http[s]?:\\/\\/[A-Za-z0-9-.\\/]+)\\/[A-za-z0-9-?.]+[a-z\\/=]{1}$"
   val gen3Host = "data.kidsfirstdrc.org"
   val dcfHost = "api.gdc.cancer.gov"
   val specimenExtract = "^Specimen\\/([A-Za-z0-9]+)$"
@@ -20,8 +19,6 @@ object Utils {
                     display: Option[String], userSelected: Option[String])
 
   case class ValueAge(id: Option[String], value: Option[Long], comparator: Option[String], unit: Option[String], system: Option[String], code: Option[String])
-
-  val extractFirstForSystem: (Column, Seq[String]) => Column = (column: Column, system: Seq[String]) => filter(column, c => regexp_extract(c("system"), extractSystemUrl, 1).isin(system: _*))(0)
 
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
 

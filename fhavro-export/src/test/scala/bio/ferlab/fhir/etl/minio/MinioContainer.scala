@@ -13,8 +13,8 @@ case object MinioContainer extends IContainer {
     exposedPorts = Seq(port),
     labels = Map("name" -> name),
     env = Map(
-      "AWS_ACCESS_KEY" -> "minioadmin",
-      "AWS_SECRET_KEY" -> "minioadmin",
+      "MINIO_ACCESS_KEY" -> "access_key",
+      "MINIO_SECRET_KEY" -> "secret_key",
       "AWS_REGION" -> "us-east-1"
     )
   )
