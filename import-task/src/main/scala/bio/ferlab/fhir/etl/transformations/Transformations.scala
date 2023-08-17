@@ -207,7 +207,7 @@ object Transformations {
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn("data_set", regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1))
-        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category"): _*)
+        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "data_set"): _*)
         .agg(
           collect_list(
             struct(
