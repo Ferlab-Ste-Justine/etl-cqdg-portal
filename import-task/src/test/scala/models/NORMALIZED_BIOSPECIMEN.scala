@@ -13,6 +13,7 @@ case class NORMALIZED_BIOSPECIMEN(`fhir_id`: String = "BIO0000001",
                                   `age_biospecimen_collection`: AGE_BIOSPECIMEN_COLLECTION = AGE_BIOSPECIMEN_COLLECTION(),
                                   `submitter_biospecimen_id`: String = "biospecimen21162",
                                   `study_id`: String = "STU0000001",
+                                  `security`: String = "R",
                                   `release_id`: Int = 1)
 
 case class BIOSPECIMEN_TISSUE_SOURCE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",

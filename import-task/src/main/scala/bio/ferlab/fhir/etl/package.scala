@@ -5,6 +5,7 @@ package object etl {
   val SYSTEM_URL_CQDG = "https://fhir.cqdg.ca"
   val SYSTEM_MONDO = "http://purl.obolibrary.org/obo/mondo.owl"
   val SYSTEM_ICD = "http://terminology.hl7.org/CodeSystem/icd10-CA"
+  val SYSTEM_CONFIDENTIALITY = "http://terminology.hl7.org/CodeSystem/v3-Confidentiality"
 
 //  *********** CODE SYSTEMS **************
   val DOCUMENT_DATA_TYPE = s"$SYSTEM_URL_CQDG/CodeSystem/data-type"

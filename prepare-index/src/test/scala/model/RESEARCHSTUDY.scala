@@ -15,6 +15,7 @@ case class RESEARCHSTUDY(
                           `access_requirements`: Seq[CODE_SYSTEM] = Seq(CODE_SYSTEM(`code` = "DUO:0000021", `display` = "Ethics approval required"), CODE_SYSTEM(`code` = "DUO:0000027", `display` = "Project specific restriction")),
                           `population`: String = "Adult",
                           `study_version`: String = "1",
+                          `security`: String = "R",
                           `data_sets`: Seq[DATASET_INPUT] = Seq(DATASET_INPUT()),
                         )
 

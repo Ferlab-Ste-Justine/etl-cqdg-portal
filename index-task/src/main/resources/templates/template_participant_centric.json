@@ -32,6 +32,9 @@
         "vital_status": {
           "type": "keyword"
         },
+        "security": {
+          "type": "keyword"
+        },
         "age_at_recruitment": {
           "type": "long"
         },

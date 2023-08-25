@@ -38,6 +38,9 @@
         "dataset": {
           "type": "keyword"
         },
+        "security": {
+          "type": "keyword"
+        },
         "file_name": {
           "type": "keyword"
         },

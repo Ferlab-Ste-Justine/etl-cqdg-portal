@@ -15,6 +15,7 @@ case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000019",
                                          `dataset`: String = "ds_name 1",
                                          `files`: Seq[FILES] = Seq(FILES()),
                                          `study_id`: String = "STU0000001",
+                                         `security`: String = "R",
                                          `release_id`: Int = 1)
 
 case class FILES(`file_name`: String = "mpsMetrics_S03344.tar.gz",
