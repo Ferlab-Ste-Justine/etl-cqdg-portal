@@ -39,6 +39,9 @@
           "type": "keyword",
           "normalizer" : "custom_normalizer"
         },
+        "security": {
+          "type": "keyword"
+        },
         "domain": {
           "type": "keyword"
         },

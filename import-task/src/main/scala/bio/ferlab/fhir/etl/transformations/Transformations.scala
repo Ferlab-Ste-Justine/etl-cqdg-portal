@@ -10,7 +10,7 @@ object Transformations {
 
   val patientMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean")
+      .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
       .withColumn("age_at_recruitment", firstNonNull(transform(
         filter(col("extension"), col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueAge"),
         col => col("value")
@@ -24,8 +24,9 @@ object Transformations {
           .otherwise(lit("Unknown"))
       )
       .withColumn("age_of_death", filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)(0)("valueAge")("value"))
+      .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
-    Drop("identifier", "extension")
+    Drop("identifier", "extension", "meta")
   )
 
   val taskMappings: List[Transformation] = List(
@@ -63,15 +64,16 @@ object Transformations {
 
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
-      .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type")
+      .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type", "meta")
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
       .withColumn("age_biospecimen_collection", extractValueAge(AGE_AT_EVENT_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
+      .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     },
-    Drop("type", "extension", "identifier")
+    Drop("type", "extension", "identifier", "meta")
   )
 
   val sampleRegistrationMappings: List[Transformation] = List(
@@ -187,6 +189,7 @@ object Transformations {
         filter(col, col => col("url") === "name")(0)("valueString") as "name",
         filter(col, col => col("url") === "description")(0)("valueString") as "description"
       )))
+      .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
     Drop("extension", "category", "meta", "identifier", "data_sets_ext")
   )
@@ -207,7 +210,8 @@ object Transformations {
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn("dataset", regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1))
-        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "dataset"): _*)
+        .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
+        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "dataset", "security"): _*)
         .agg(
           collect_list(
             struct(

@@ -13,6 +13,7 @@ case class PARTICIPANT_CENTRIC(
                                 `age_of_death`: Int = 12,
                                 `cause_of_death`: String = null,
                                 `is_affected`: String = null,
+                                `security`: String = "R",
                                 `biospecimens`: Seq[BIOSPECIMEN] = Seq.empty,
                                 `diagnoses`: Seq[DIAGNOSIS] = Seq.empty,
                                 `icd_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,

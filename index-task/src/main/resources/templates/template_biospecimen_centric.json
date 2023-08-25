@@ -31,6 +31,9 @@
         "submitter_biospecimen_id": {
           "type": "keyword"
         },
+        "security": {
+          "type": "keyword"
+        },
         "study": {
           "properties": {
             "study_code" : {

@@ -23,6 +23,7 @@ case class PATIENT_INPUT(
                     `age_at_recruitment`: Int = 19328,
                     `ethnicity`: String = "European",
                     `submitter_participant_id`: String = "35849427674",
+                    `security`: String = "R",
                     `age_of_death`: Int = 12,
                   )
 

@@ -21,6 +21,7 @@ case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "STU0000001",
                                      `study_version`: String = "1",
                                      `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "ds_name 2", `description`= "description 2")),
                                      `study_id`: String = "STU0000001",
+                                     `security` : String = "R",
                                      `release_id`: Int = 1)
 
 case class CONTACT(`type`: String = "url",
