@@ -67,8 +67,8 @@ case class ACCESS_REQUIREMENTS(
 case class DATASET(
                     `name`: String = "name 1",
                     `description`: Option[String] = None,
-                    `data_type`: Seq[String] = Seq("SNV"),
-                    `experimental_strategy`: Seq[String] = Seq("WGS"),
+                    `data_types`: Seq[String] = Seq("SNV"),
+                    `experimental_strategies`: Seq[String] = Seq("WGS"),
                     `participant_count`: Int = 100,
                     `file_count`: Int = 100,
                   )

@@ -16,6 +16,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val data: Map[String, DataFrame] = Map(
       "normalized_document_reference" -> Seq(
         DOCUMENTREFERENCE(`fhir_id` = "11", `participant_id` = "P1", `biospecimen_reference` = "B1", `files` = Seq(FILE())),
+        DOCUMENTREFERENCE(`fhir_id` = "12", `participant_id` = "P1", `biospecimen_reference` = "B2", `files` = Seq(FILE(`file_name` = "file.1", `file_format` = "CRAM"), FILE(`file_name` = "file.2", `file_format` = "CRAI"))),
       ).toDF(),
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
@@ -42,6 +43,8 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     output.keys should contain("es_index_file_centric")
 
     val file_centric = output("es_index_file_centric").as[FILE_CENTRIC].collect()
+
+    output("es_index_file_centric").count() shouldEqual 2 //CRAI files are excluded
 
     file_centric.find(_.file_id == "11") shouldBe Some(
         FILE_CENTRIC(
