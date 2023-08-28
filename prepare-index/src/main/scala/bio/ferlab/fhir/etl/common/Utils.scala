@@ -210,12 +210,14 @@ object Utils {
       val filesWithTaskAndParticipants = filesDf
         .addSequencingExperiment(tasks.withColumn("experimental_strategy", col("experimental_strategy")(0)))
         .withColumn("files_exploded", explode(col("files")))
+        // remove CRAI files from count (not required in portal)
+        .filter(col("files_exploded.file_format") =!= "CRAI")
         .join(participants, Seq("participant_id", "study_id", "release_id"), "inner")
         .drop("files")
         .groupBy("study_id", "dataset")
         .agg(
-          collect_set("data_type") as "data_type",
-          collect_set("sequencing_experiment.experimental_strategy") as "experimental_strategy",
+          collect_set("data_type") as "data_types",
+          collect_set("sequencing_experiment.experimental_strategy") as "experimental_strategies",
           size(collect_set("files_exploded")) as "file_count",
           size(collect_set("participant_id")) as "participant_count"
         )
@@ -231,8 +233,8 @@ object Utils {
         .withColumn("dataset", struct(
           col("dataset") as "name",
           col("dataset_desc") as "description",
-          col("data_type"),
-          col("experimental_strategy"),
+          col("data_types"),
+          col("experimental_strategies"),
           col("file_count"),
           col("participant_count"),
         ))

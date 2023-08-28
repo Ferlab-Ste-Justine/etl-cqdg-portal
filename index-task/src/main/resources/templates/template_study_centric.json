@@ -82,10 +82,10 @@
             "description": {
               "type": "keyword"
             },
-            "data_type": {
+            "data_types": {
               "type": "keyword"
             },
-            "experimental_strategy": {
+            "experimental_strategies": {
               "type": "keyword"
             },
             "participant_count": {
