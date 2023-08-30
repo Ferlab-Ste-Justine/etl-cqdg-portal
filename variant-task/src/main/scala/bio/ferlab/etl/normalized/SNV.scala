@@ -1,23 +1,22 @@
 package bio.ferlab.etl.normalized
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
-import bio.ferlab.datalake.spark3.etl.ETLSingleDestination
+import bio.ferlab.datalake.commons.config.{DatasetConf, RuntimeETLContext}
+import bio.ferlab.datalake.spark3.etl.v3.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
-import bio.ferlab.etl.normalized.SNV.{getSNV, selectOccurrences}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-class SNV(studyId: String)(implicit configuration: Configuration) extends ETLSingleDestination {
+case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+                       currentRunDateTime: LocalDateTime = LocalDateTime.now()): Map[String, DataFrame] = {
 
     Map(
       "raw_vcf" -> vcf(raw_variant_calling.location.replace("{{STUDY_ID}}", s"${studyId}_test"), referenceGenomePath = None) //TODO remove "test" when server is available
@@ -27,7 +26,7 @@ class SNV(studyId: String)(implicit configuration: Configuration) extends ETLSin
 
   }
 
-  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime)(implicit spark: SparkSession): DataFrame = {
+  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
 
     val vcf = getSNV(data("raw_vcf"))
     val enrichedSpecimenDF = data(enriched_specimen.id)
@@ -50,45 +49,6 @@ class SNV(studyId: String)(implicit configuration: Configuration) extends ETLSin
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId'")
-
-}
-
-object SNV{
-  def getSNV(inputDF: DataFrame): DataFrame = {
-    inputDF
-      .withColumn("annotation", firstCsq)
-      .withColumn("hgvsg", hgvsg)
-      .withColumn("variant_class", variant_class)
-      .drop("annotation", "INFO_CSQ")
-      .withColumn("INFO_DS", lit(null).cast("boolean"))
-      .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
-      .withColumn("genotype", explode(col("genotypes")))
-      .drop("genotypes")
-      .withColumn(
-        "genotype",
-        struct(
-          col("genotype.sampleId"),
-          col("genotype.conditionalQuality"),
-//          col("genotype.SQ"),
-//          col("genotype.PRI"),
-//          col("genotype.posteriorProbabilities"),
-          col("genotype.SB"),
-          col("genotype.alleleDepths"),
-//          col("genotype.ICNT"),
-//          col("genotype.AF"),
-          col("genotype.phased"),
-          col("genotype.calls"),
-          col("genotype.MIN_DP"),
-          col("genotype.phredLikelihoods"),
-          col("genotype.depth"),
-          col("genotype.RGQ"),
-          col("genotype.PGT"),
-//          col("genotype.SPL"),
-//          col("genotype.PS"),
-//          col("genotype.MB"), //TODO confirm is ok
-        )
-      )
-  }
 
   private def selectOccurrences(inputDF: DataFrame, studyId: String): DataFrame = {
     val occurrences = inputDF
@@ -136,12 +96,50 @@ object SNV{
         col("INFO_ExcessHet") as "info_excess_het",
         col("INFO_OLD_MULTIALLELIC") as "info_old_multiallelic",
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
-//        col("file_name"),
+        //        col("file_name"),
         lit(studyId) as "study_id",
+        lit(releaseId) as "releaseId",
         is_normalized
       )
       .drop("annotation")
       .withColumn("zygosity", zygosity(col("calls")))
     occurrences
   }
+
+  def getSNV(inputDF: DataFrame): DataFrame = {
+    inputDF
+      .withColumn("annotation", firstCsq)
+      .withColumn("hgvsg", hgvsg)
+      .withColumn("variant_class", variant_class)
+      .drop("annotation", "INFO_CSQ")
+      .withColumn("INFO_DS", lit(null).cast("boolean"))
+      .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
+      .withColumn("genotype", explode(col("genotypes")))
+      .drop("genotypes")
+      .withColumn(
+        "genotype",
+        struct(
+          col("genotype.sampleId"),
+          col("genotype.conditionalQuality"),
+          //          col("genotype.SQ"),
+          //          col("genotype.PRI"),
+          //          col("genotype.posteriorProbabilities"),
+          col("genotype.SB"),
+          col("genotype.alleleDepths"),
+          //          col("genotype.ICNT"),
+          //          col("genotype.AF"),
+          col("genotype.phased"),
+          col("genotype.calls"),
+          col("genotype.MIN_DP"),
+          col("genotype.phredLikelihoods"),
+          col("genotype.depth"),
+          col("genotype.RGQ"),
+          col("genotype.PGT"),
+          //          col("genotype.SPL"),
+          //          col("genotype.PS"),
+          //          col("genotype.MB"), //TODO confirm is ok
+        )
+      )
+  }
+
 }
