@@ -90,6 +90,17 @@ object ConfigurationGenerator extends App {
       )
     }) ++ Seq(
       DatasetConf(
+        id = "raw_vcf",
+        storageid = storage_vcf,
+        path = "/vcf/{{STUDY_ID}}/*.vep.vcf.gz",
+        format = VCF,
+        loadtype = OverWrite,
+        partitionby = List("chromosome"),
+        table = Some(TableConf("database", "raw_vcf")),
+        keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
+        repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(10)))
+      ),
+      DatasetConf(
         id = "normalized_snv",
         storageid = storage,
         path = s"/normalized/snv",

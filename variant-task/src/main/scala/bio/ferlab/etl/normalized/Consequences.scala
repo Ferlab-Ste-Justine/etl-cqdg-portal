@@ -7,11 +7,11 @@ import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
 import bio.ferlab.etl.mainutils.Study
 import mainargs.{ParserForMethods, main}
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, lit}
 
 import java.time.LocalDateTime
 
-case class Consequences(rc: RuntimeETLContext, studyId: String) extends BaseConsequences(rc: RuntimeETLContext, annotationsColumn = csq, groupByLocus = true) {
+case class Consequences(rc: RuntimeETLContext, studyId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends BaseConsequences(rc: RuntimeETLContext, annotationsColumn = csq, groupByLocus = true) {
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_consequences")
 
@@ -22,13 +22,9 @@ case class Consequences(rc: RuntimeETLContext, studyId: String) extends BaseCons
         .where(col("contigName").isin(validContigNames: _*))
     )
   }
-}
 
-object Consequences {
-  @main
-  def run(rc: RuntimeETLContext, study: Study): Unit = {
-    Consequences(rc, study.id).run()
+  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
+    super.transformSingle(data, lastRunDateTime, currentRunDateTime)
+      .withColumn("study_id", lit(studyId))
   }
-
-  def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args)
 }
