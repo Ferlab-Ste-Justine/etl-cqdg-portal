@@ -17,7 +17,5 @@ object ImportTask extends SparkApp {
     .mappings(releaseId)
     .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, releaseId, studyList) }
 
-  Thread.sleep(3600000) // wait for 3600 seconds
-
   jobs.foreach(_.run())
 }
