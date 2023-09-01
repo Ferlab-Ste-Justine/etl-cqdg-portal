@@ -63,6 +63,8 @@ class SpecimenEnricher(studyIds: List[String])(implicit configuration: Configura
       .addParticipant(participantWithFam)
       .addSamplesToBiospecimen(data(sample_registration.id))
       .withColumnRenamed("fhir_id", "biospecimen_id")
+      .withColumnRenamed("sample_id", "fhir_sample_id")
+      .withColumnRenamed("submitter_sample_id", "sample_id")
       .join(parents, Seq("subject"), "left_outer")
       .drop("subject")
       .join(studyShort, Seq("study_id"))

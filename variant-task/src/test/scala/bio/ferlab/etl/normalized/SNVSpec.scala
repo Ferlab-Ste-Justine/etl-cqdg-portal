@@ -1,6 +1,7 @@
 package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
+import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
 import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.etl.normalized.model._
 import org.apache.spark.sql.DataFrame
@@ -19,20 +20,8 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
     SPECIMEN_ENRICHED(`participant` = PARTICIPANT_ENRICHED(`participant_id` = "P3", `relationship_to_proband` = "mother", `is_affected` = true), `sample_id` = "S3")
   ).toDF
 
-
-  val data: Map[String, DataFrame] = Map(
-    raw_variant_calling.id -> Seq(VCF_SNV_INPUT(
-      `genotypes` = List(
-        GENOTYPES(),
-        GENOTYPES(`sampleId` = "S20279", `calls` = List(0, 0)),
-        GENOTYPES(`sampleId` = "S20280"))
-    )).toDF(),
-    specimenEnriched.id -> specimenEnrichedDf,
-  )
-
   it should "generate NormalizedSNV from input raw VCF" in {
     val dataFomVCFFile: Map[String, DataFrame] = Map(
-//      raw_variant_calling.id -> vcf(List("variant-task/src/test/resources/S03329.vep.vcf"), None),
       raw_variant_calling.id -> Seq(VCF_SNV_INPUT(`genotypes` = List(
         GENOTYPES(`sampleId` = "S1"),
         GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
