@@ -36,7 +36,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
     val columnNames = Seq("gq", "dp", "info_qd", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls","affected_status", "zygosity")
     //missing "filters"
 
-    occurrences.join(enrichedSpecimenDF, Seq("sample_id", "study_id"))
+    occurrences.join(enrichedSpecimenDF, Seq("sample_id"))
       .withColumn("affected_status", col("participant.is_affected"))
       .withAlleleDepths()
       .withRelativesGenotype(columnNames,

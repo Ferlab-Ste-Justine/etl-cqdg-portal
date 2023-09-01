@@ -13,9 +13,9 @@ case class SPECIMEN_ENRICHED(`biospecimen_id`: String = "FHIR_BS_2",
                              `participant`: PARTICIPANT_ENRICHED = PARTICIPANT_ENRICHED(),
                              `father_id`: String = "P2",
                              `mother_id`: String = "P3",
-                             `sample_id`: String = "SAMPLE2",
+                             `fhir_sample_id`: String = "FHIR_SAMPLE2",
                              `sample_type`: String = "DNA (NCIT:C449)",
-                             `submitter_sample_id`: String = "SAMPLE2")
+                             `sample_id`: String = "SAMPLE2")
 
 case class PARTICIPANT_ENRICHED(`participant_id`: String = "P2",
                        `study_id`: String = "STU0000001",

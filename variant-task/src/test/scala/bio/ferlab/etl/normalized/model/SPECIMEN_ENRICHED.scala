@@ -5,7 +5,6 @@
 package bio.ferlab.etl.normalized.model
 
 case class SPECIMEN_ENRICHED(`biospecimen_id`: String = "FHIR_BS_2",
-                             `study_id`: String = "STU0000001",
                              `release_id`: String = "5",
                              `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
                              `age_biospecimen_collection`: AGE_AT = AGE_AT(),

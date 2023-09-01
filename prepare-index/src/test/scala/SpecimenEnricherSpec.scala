@@ -24,8 +24,8 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
         GROUP(internal_family_id = "FAMO1", family_members = Seq("P1", "P2", "P3")),
       ).toDF(),
       "normalized_sample_registration" -> Seq(
-        SAMPLE_INPUT(`fhir_id` = "SAMPLE1", subject = "P1", parent = "FHIR_BS_1", `submitter_sample_id` = "SAMPLE1"),
-        SAMPLE_INPUT(`fhir_id` = "SAMPLE2", `subject` = "P2", parent = "FHIR_BS_2", `submitter_sample_id` = "SAMPLE2"),
+        SAMPLE_INPUT(`fhir_id` = "FHIR_SAMPLE1", subject = "P1", parent = "FHIR_BS_1", `submitter_sample_id` = "SAMPLE1"),
+        SAMPLE_INPUT(`fhir_id` = "FHIR_SAMPLE2", `subject` = "P2", parent = "FHIR_BS_2", `submitter_sample_id` = "SAMPLE2"),
       ).toDF(),
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_1", subject = "P1", `submitter_biospecimen_id` = "BS_1"),
@@ -59,7 +59,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_1") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_1", `age_biospecimen_collection` = AGE_AT(17174), `submitter_biospecimen_id` = "BS_1",
         `participant` = PARTICIPANT_ENRICHED(`participant_id` = "P1",`fhir_id` = "P1", `gender` = "male", `submitter_participant_id` = "P1_internal", `family_relationships` = outputFamily, `relationship_to_proband` = "is_proband", `is_affected` = Some(true), `age_of_death` = Some(12)),
-        `sample_id` = "SAMPLE1", `submitter_sample_id` = "SAMPLE1")
+        `sample_id` = "SAMPLE1", `fhir_sample_id` = "FHIR_SAMPLE1")
     )
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_2") shouldBe Some(SPECIMEN_ENRICHED(
       `age_biospecimen_collection` = AGE_AT(17174),
@@ -68,7 +68,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_3") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_3", `age_biospecimen_collection` = AGE_AT(17174), `submitter_biospecimen_id` = "BS_3",
         `participant` = PARTICIPANT_ENRICHED(`participant_id` = "P3",`fhir_id` = "P3", `submitter_participant_id` = "P3_internal", `family_relationships` = outputFamily, `relationship_to_proband` = "mother", `is_affected` = Some(false), `age_of_death` = Some(12)),
-        `sample_id` = null, `sample_type` = null, `submitter_sample_id` = null)
+        `sample_id` = null, `sample_type` = null, `fhir_sample_id` = null)
     )
   }
 
