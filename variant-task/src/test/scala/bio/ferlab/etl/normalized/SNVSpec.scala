@@ -40,7 +40,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `participant` = PARTICIPANT(`participant_id` = "P2", `relationship_to_proband` = "father", `is_affected` = false),
         `affected_status` = false,
         `calls`= Seq(0, 0),
-        `has_alt` = 0,
+        `has_alt` = false,
         `zygosity` = "WT",
         `parental_origin` = null,
         `transmission_mode` = "non_carrier_proband"
