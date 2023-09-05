@@ -31,9 +31,6 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
     val vcf = getSNV(data("raw_vcf"))
     val enrichedSpecimenDF = data(enriched_specimen.id)
 
-    enrichedSpecimenDF.printSchema()
-    vcf.printSchema()
-
     val occurrences = selectOccurrences(vcf, studyId)
 
     val columnNames = Seq("gq", "dp", "info_qd", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls","affected_status", "zygosity")
