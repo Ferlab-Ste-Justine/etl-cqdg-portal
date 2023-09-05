@@ -50,7 +50,7 @@ object IndexTask extends App {
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
   implicit val esClient: ElasticSearchClient =
-    new ElasticSearchClient(s"$esUrl:$esPort", None, None)
+    new ElasticSearchClient(s"$esUrl:$esPort", esConfigs.get("es.net.http.auth.user"), esConfigs.get("es.net.http.auth.pass"))
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")

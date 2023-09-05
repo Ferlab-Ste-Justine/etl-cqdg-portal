@@ -5,6 +5,7 @@
 package bio.ferlab.etl.normalized.model
 
 case class SPECIMEN_ENRICHED(`biospecimen_id`: String = "FHIR_BS_2",
+                             `study_id`: String = "STU0000001",
                              `release_id`: String = "5",
                              `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
                              `age_biospecimen_collection`: AGE_AT = AGE_AT(),
@@ -12,9 +13,9 @@ case class SPECIMEN_ENRICHED(`biospecimen_id`: String = "FHIR_BS_2",
                              `participant`: PARTICIPANT_ENRICHED = PARTICIPANT_ENRICHED(),
                              `mother_id`: String = "P3",
                              `father_id`: String = "P2",
-                             `sample_id`: String = "SAMPLE2",
+                             `fhir_sample_id`: String = "FHIR_SAMPLE2",
                              `sample_type`: String = "DNA (NCIT:C449)",
-                             `submitter_sample_id`: String = "SAMPLE2")
+                             `sample_id`: String = "SAMPLE2")
 
 case class PARTICIPANT_ENRICHED(`participant_id`: String = "P2",
                        `study_id`: String = "STU0000001",
