@@ -68,7 +68,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
         col("genotype.depth") as "dp",
         col("genotype.conditionalQuality") as "gq",
         col("genotype.calls") as "calls",
-        has_alt,
+        array_contains(col("genotype.calls"), 1) as "has_alt",
         is_multi_allelic,
         old_multi_allelic,
         col("qual") as "quality",
