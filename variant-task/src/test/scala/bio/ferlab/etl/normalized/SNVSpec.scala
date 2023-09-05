@@ -43,7 +43,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `has_alt` = 0,
         `zygosity` = "WT",
         `parental_origin` = null,
-        `transmission` = "non_carrier_proband"
+        `transmission_mode` = "non_carrier_proband"
       )
     result.filter(e => e.`sample_id` === "S3").head shouldBe
       NormalizedSNV(

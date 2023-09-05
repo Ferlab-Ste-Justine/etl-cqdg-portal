@@ -6,6 +6,7 @@ package bio.ferlab.etl.normalized.model
 
 case class NormalizedSNV(`sample_id`: String = "S1",
                          `study_id`: String = "STU0000001",
+                         `study_code`: String = "study_code1",
                          `chromosome`: String = "1",
                          `start`: Long = 14464,
                          `end`: Long = 14465,
@@ -86,7 +87,7 @@ case class NormalizedSNV(`sample_id`: String = "S1",
                          `father_ad_ratio`: Double = 0.75,
                          `father_ad_total`: Int = 4,
                          `parental_origin`: String = "mother",
-                         `transmission`: String = "autosomal_dominant")
+                         `transmission_mode`: String = "autosomal_dominant")
 
 case class AGE_BIOSPECIMEN_COLLECTION(`value`: Long = 12,
                                       `unit`: String = "days")
