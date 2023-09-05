@@ -5,6 +5,7 @@ import bio.ferlab.datalake.spark3.etl.v3.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
+import bio.ferlab.etl.Constants.columns.{GENES_SYMBOL, TRANSMISSION_MODE}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 
@@ -44,7 +45,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
         familyIdColumn = col("participant.family_id")
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      .withGenotypeTransmission("transmission", `gender_name` = "participant.gender")
+      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "participant.gender")
 //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
@@ -59,6 +60,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
         reference,
         alternate,
         name,
+        col(GENES_SYMBOL),
         col("hgvsg"),
         col("variant_class"),
         col("genotype.sampleId") as "sample_id",
@@ -110,6 +112,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
       .withColumn("annotation", firstCsq)
       .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
+      .withColumn(GENES_SYMBOL, array_distinct(csq("symbol")))
       .drop("annotation", "INFO_CSQ")
       .withColumn("INFO_DS", lit(null).cast("boolean"))
       .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
