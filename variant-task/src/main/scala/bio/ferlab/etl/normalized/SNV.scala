@@ -38,14 +38,14 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
     //missing "filters"
 
     occurrences.join(enrichedSpecimenDF, Seq("sample_id"))
-      .withColumn("affected_status", col("participant.is_affected"))
+      .withColumn("affected_status", col("is_affected"))
       .withAlleleDepths()
       .withRelativesGenotype(columnNames,
-        participantIdColumn = col("participant.participant_id"),
-        familyIdColumn = col("participant.family_id")
+        participantIdColumn = col("participant_id"),
+        familyIdColumn = col("family_id")
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "participant.gender")
+      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
 //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 

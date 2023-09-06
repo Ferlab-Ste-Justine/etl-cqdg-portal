@@ -4,45 +4,28 @@
  */
 package bio.ferlab.etl.normalized.model
 
-case class SPECIMEN_ENRICHED(`biospecimen_id`: String = "FHIR_BS_2",
-                             `study_id`: String = "STU0000001",
-                             `study_code`: String = "study_code1",
+case class SPECIMEN_ENRICHED(`study_id`: String = "STU0000001",
+                             `participant_id`: String = "P2",
+                             `biospecimen_id`: String = "FHIR_BS_2",
                              `release_id`: String = "5",
+                             `security`: String = "R",
+                             `submitter_participant_id`: String = "P2_internal",
                              `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
                              `age_biospecimen_collection`: AGE_AT = AGE_AT(),
                              `submitter_biospecimen_id`: String = "BS_2",
-                             `participant`: PARTICIPANT_ENRICHED = PARTICIPANT_ENRICHED(),
-                             `mother_id`: String = "P3",
-                             `father_id`: String = "P2",
+                             `gender`: String = "female",
+                             `vital_status`: String = "Unknown",
+                             `ethnicity`: String = "European",
+                             `is_a_proband`: Option[Boolean] = Some(false),
+                             `is_affected`: Option[Boolean] = Some(false),
+                             `participant_fhir_id`: String = "P2",
                              `fhir_sample_id`: String = "FHIR_SAMPLE2",
                              `sample_type`: String = "DNA (NCIT:C449)",
-                             `sample_id`: String = "SAMPLE2")
-
-case class PARTICIPANT_ENRICHED(`participant_id`: String = "P2",
-                       `study_id`: String = "STU0000001",
-                       `release_id`: String = "5",
-                       `fhir_id`: String = "P2",
-                       `gender`: String = "female",
-                       `deceasedBoolean`: Boolean = false,
-                       `age_at_recruitment`: Int = 19328,
-                       `ethnicity`: String = "European",
-                       `submitter_participant_id`: String = "P2_internal",
-                       `age_of_death`: Option[String] = None,
-                       `is_affected`: Boolean = false,
-                       `family_relationships`: Seq[FAMILY_RELATIONSHIPS_ENRICHED] = Seq(FAMILY_RELATIONSHIPS_ENRICHED()),
-                       `is_a_proband`: Boolean = false,
-                       `relationship_to_proband`: String = "father",
-                       `family_id`: String = "FAMO1",
-                       `family_type`: String = "trio")
-
-case class FAMILY_RELATIONSHIPS_ENRICHED(`submitter_participant_id`: String = "P1",
-                                `focus_participant_id`: String = "P1",
-                                `relationship_to_proband`: String = "is_proband",
-                                `family_id`: String = "FAMO1",
-                                `family_type`: String = "trio",
-                                `submitter_family_id`: String = "1",
-                                `is_affected`: Option[String] = None)
-
+                             `sample_id`: String = "SAMPLE2",
+                             `mother_id`: String = "P3",
+                             `father_id`: String = "P2",
+                             `family_id`: String = "FAMO1",
+                             `study_code`: String = "study_code1")
 case class AGE_AT(
                    value: Long = 12,
                    unit: String = "days",

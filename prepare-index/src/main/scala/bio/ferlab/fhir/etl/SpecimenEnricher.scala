@@ -57,16 +57,22 @@ class SpecimenEnricher(studyIds: List[String])(implicit configuration: Configura
       .withColumn("mother_id",  extractParent("mother")(col("groupedFam")))
       .withColumn("expFamily", explode(col("groupedFam")))
       .withColumn("subject", col("expFamily.submitter_participant_id"))
-      .select("subject","mother_id", "father_id")
+      .withColumnRenamed("internal_family_relationship_id", "family_id")
+      .select("subject","mother_id", "father_id", "family_id")
+
+    val patientDf = participantWithFam
+      .withColumnRenamed("participant_id", "subject")
+      .withColumnRenamed("fhir_id", "participant_fhir_id")
+      .select("subject", "gender", "vital_status", "ethnicity", "is_a_proband", "is_affected", "participant_fhir_id", "submitter_participant_id")
 
     data(specimen.id)
-      .addParticipant(participantWithFam)
+      .join(patientDf, Seq("subject"))
       .addSamplesToBiospecimen(data(sample_registration.id))
       .withColumnRenamed("fhir_id", "biospecimen_id")
       .withColumnRenamed("sample_id", "fhir_sample_id")
       .withColumnRenamed("submitter_sample_id", "sample_id")
       .join(parents, Seq("subject"), "left_outer")
-      .drop("subject")
+      .withColumnRenamed("subject", "participant_id")
       .join(studyShort, Seq("study_id"))
   }
 }
