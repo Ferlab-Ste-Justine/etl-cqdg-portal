@@ -1,7 +1,6 @@
 package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
-import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
 import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.etl.normalized.model._
 import org.apache.spark.sql.DataFrame
@@ -15,9 +14,9 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
   val specimenEnriched: DatasetConf = conf.getDataset("enriched_specimen")
 
   val specimenEnrichedDf: DataFrame = Seq(
-    SPECIMEN_ENRICHED(`participant` = PARTICIPANT_ENRICHED(`participant_id` = "P1", `relationship_to_proband` = "is_proband", `is_affected` = true), `sample_id` = "S1"),
-    SPECIMEN_ENRICHED(`participant` = PARTICIPANT_ENRICHED(`participant_id` = "P2", `relationship_to_proband` = "father"), `sample_id` = "S2"),
-    SPECIMEN_ENRICHED(`participant` = PARTICIPANT_ENRICHED(`participant_id` = "P3", `relationship_to_proband` = "mother", `is_affected` = true), `sample_id` = "S3")
+    SPECIMEN_ENRICHED(`participant_id` = "P1", `is_affected` = Some(true), `sample_id` = "S1"),
+    SPECIMEN_ENRICHED(`participant_id` = "P2", `sample_id` = "S2"),
+    SPECIMEN_ENRICHED(`participant_id` = "P3", `is_affected` = Some(true), `sample_id` = "S3")
   ).toDF
 
   it should "generate NormalizedSNV from input raw VCF" in {
@@ -31,13 +30,14 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
 
     val results = SNV(TestETLContext(),"STU0000001", releaseId = "1", vcfPattern = "", None).transform(dataFomVCFFile)
 
-    val result = results("normalized_snv").as[NormalizedSNV].collect()
+    val result = results("normalized_snv").as[NORMALIZED_SNV].collect()
 
-    result.filter(e => e.`sample_id` === "S1").head shouldBe NormalizedSNV()
+    result.filter(e => e.`sample_id` === "S1").head shouldBe NORMALIZED_SNV()
     result.filter(e => e.`sample_id` === "S2").head shouldBe
-      NormalizedSNV(
+      NORMALIZED_SNV(
         `sample_id` = "S2",
-        `participant` = PARTICIPANT(`participant_id` = "P2", `relationship_to_proband` = "father", `is_affected` = false),
+        `participant_id` = "P2",
+        `is_affected` = false,
         `affected_status` = false,
         `calls`= Seq(0, 0),
         `has_alt` = false,
@@ -46,10 +46,17 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `transmission_mode` = "non_carrier_proband"
       )
     result.filter(e => e.`sample_id` === "S3").head shouldBe
-      NormalizedSNV(
+      NORMALIZED_SNV(
         `sample_id` = "S3",
-        `participant` = PARTICIPANT(`participant_id` = "P3", `relationship_to_proband` = "mother"),
+        `participant_id` = "P3"
       )
+
+//    ClassGenerator.writeClassFile(
+//      "bio.ferlab.etl.variant-task.model",
+//      "NORMALIZED_SNV",
+//      results("normalized_snv"),
+//      "variant-task/src/test/scala/")
+
   }
 }
 

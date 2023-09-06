@@ -1,3 +1,4 @@
+import bio.ferlab.datalake.testutils.ClassGenerator
 import bio.ferlab.fhir.etl.SpecimenEnricher
 import model._
 import org.apache.spark.sql.DataFrame
@@ -50,33 +51,28 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     val resultDF = output("enriched_specimen")
 
     val specimensEnriched = resultDF.as[SPECIMEN_ENRICHED].collect()
-    val outputFamily = Seq(
-      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P1" ,`submitter_participant_id` = "P1_internal", `is_affected` = Some(true)),
-      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P2", `submitter_participant_id` = "P2_internal", `relationship_to_proband` = "father", `is_affected` = Some(false)),
-      FAMILY_RELATIONSHIPS_ENRICHED(`participant_id` = "P3", `submitter_participant_id` = "P3_internal", `relationship_to_proband` = "mother", `is_affected` = Some(false)),
-    )
 
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_1") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_1", `age_biospecimen_collection` = AGE_AT(17174), `submitter_biospecimen_id` = "BS_1",
-        `participant` = PARTICIPANT_ENRICHED(`participant_id` = "P1",`fhir_id` = "P1", `gender` = "male", `submitter_participant_id` = "P1_internal", `family_relationships` = outputFamily, `relationship_to_proband` = "is_proband", `is_affected` = Some(true), `age_of_death` = Some(12)),
+        `participant_id` = "P1", `participant_fhir_id` = "P1", `submitter_participant_id` = "P1_internal", `gender` = "male", `is_affected` = Some(true),
         `sample_id` = "SAMPLE1", `fhir_sample_id` = "FHIR_SAMPLE1")
     )
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_2") shouldBe Some(SPECIMEN_ENRICHED(
-      `age_biospecimen_collection` = AGE_AT(17174),
-      `participant` = PARTICIPANT_ENRICHED(`family_relationships` = outputFamily, `is_affected` = Some(false), `age_of_death` = Some(12)),
+      `age_biospecimen_collection` = AGE_AT(17174), `is_affected` = Some(false)
     ))
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_3") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_3", `age_biospecimen_collection` = AGE_AT(17174), `submitter_biospecimen_id` = "BS_3",
-        `participant` = PARTICIPANT_ENRICHED(`participant_id` = "P3",`fhir_id` = "P3", `submitter_participant_id` = "P3_internal", `family_relationships` = outputFamily, `relationship_to_proband` = "mother", `is_affected` = Some(false), `age_of_death` = Some(12)),
+        `participant_id` = "P3",`participant_fhir_id` = "P3", `submitter_participant_id` = "P3_internal", `is_affected` = Some(false),
         `sample_id` = null, `sample_type` = null, `fhir_sample_id` = null)
     )
+
+//    ClassGenerator.writeClassFile(
+//        "bio.ferlab.etl.prepare-index.model",
+//        "SPECIMEN_ENRICHED2",
+//        resultDF,
+//        "prepare-index/src/test/scala/")
   }
 
-  //    ClassGenerator
-  //      .writeCLassFile(
-  //        "bio.ferlab.etl.prepare-index.model",
-  //        "SPECIMEN_ENRICHED",
-  //        resultDF,
-  //        "prepare-index/src/test/scala/")
+
 }
 
