@@ -22,7 +22,10 @@ object IndexTask extends App {
   esPort
   ) = args
 
-  val esConfigs = Map(
+  private val esUsername = sys.env.get("ES_USERNAME")
+  private val esPassword = sys.env.get("ES_PASSWORD")
+
+  private val defaultEsConfigs = Map(
     "spark.master" -> "local[*]",
     "es.index.auto.create" -> "true",
     "es.net.ssl" -> "true",
@@ -32,6 +35,11 @@ object IndexTask extends App {
     "es.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
     "es.port" -> esPort) //9200
+
+  private val esConfigs = (esUsername, esPassword) match {
+    case (Some(u), Some(p)) => defaultEsConfigs ++ Map("es.net.http.auth.user" -> u, "es.net.http.auth.pass" -> p)
+    case _ => defaultEsConfigs
+  }
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
@@ -50,7 +58,7 @@ object IndexTask extends App {
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
   implicit val esClient: ElasticSearchClient =
-    new ElasticSearchClient(s"$esUrl:$esPort", esConfigs.get("es.net.http.auth.user"), esConfigs.get("es.net.http.auth.pass"))
+    new ElasticSearchClient(s"$esUrl:$esPort", esUsername, esPassword)
 
   val ds: DatasetConf = jobType.toLowerCase match {
     case "study_centric" => conf.getDataset("es_index_study_centric")
