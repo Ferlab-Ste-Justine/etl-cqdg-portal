@@ -70,6 +70,21 @@ object IndexTask extends App {
       .where(col("release_id") === release_id)
       .where(col("study_id") === studyId)
 
+    //fixme // to remove
+    esConfigs.get("es.net.http.auth.user") match {
+      case Some(_) => println("the user exits")
+      case None => println("no user")
+    }
+
+    esConfigs.get("es.net.http.auth.pass") match {
+      case Some(_) => println("the user exits")
+      case None => println("no user")
+    }
+
+    Thread.sleep(3600000)
+    //FIXME---
+
+
     new Indexer("index", templatePath, indexName)
       .run(df)
   })
