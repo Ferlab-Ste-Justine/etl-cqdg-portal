@@ -6,8 +6,10 @@ import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOper
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 
+case class ServiceConf(esConfig: Map[String, String])
 object IndexTask extends App {
 
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
@@ -42,6 +44,14 @@ object IndexTask extends App {
   }
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
+
+  /// TODO - remove
+  val serviceConf: ServiceConf = ConfigSource.resources(s"config/$env-$project.conf").loadOrThrow[ServiceConf]
+  serviceConf.esConfig.get("es.net.http.auth.pass") match {
+    case Some(_) => println("user from config")
+    case _ => println("no user in config")
+  }
+  //TODO remove
 
   val sparkConfigs: SparkConf =
     (conf.sparkconf ++ esConfigs)
