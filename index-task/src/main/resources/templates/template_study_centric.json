@@ -17,10 +17,12 @@
     "mappings": {
       "properties": {
         "keyword": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "description": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "contact": {
           "properties": {
@@ -43,7 +45,8 @@
           "type": "keyword"
         },
         "domain": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "population" : {
           "type" : "keyword"
@@ -141,7 +144,8 @@
           "normalizer" : "custom_normalizer"
         },
         "study_id" : {
-          "type" : "keyword"
+          "type" : "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "release_id" : {
           "type" : "keyword"
