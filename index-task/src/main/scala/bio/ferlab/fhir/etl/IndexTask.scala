@@ -1,7 +1,7 @@
 package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
-import bio.ferlab.datalake.spark3.elasticsearch.{ElasticSearchClient, Indexer}
+import bio.ferlab.datalake.spark3.elasticsearch.ElasticSearchClient
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.col
