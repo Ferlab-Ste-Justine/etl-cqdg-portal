@@ -45,7 +45,13 @@ object IndexTask extends App {
     "opensearch.port" -> esPort) //9200
 
   private val esConfigs = (esUsername, esPassword) match {
-    case (Some(u), Some(p)) => defaultEsConfigs ++ Map("es.net.http.auth.user" -> u, "es.net.http.auth.pass" -> p)
+    case (Some(u), Some(p)) => defaultEsConfigs ++
+      Map(
+        "es.net.http.auth.user" -> u,
+        "es.net.http.auth.pass" -> p,
+        "opensearch.net.http.auth.user" -> u,
+        "opensearch.net.http.auth.pass" -> p
+      )
     case _ => defaultEsConfigs
   }
 
