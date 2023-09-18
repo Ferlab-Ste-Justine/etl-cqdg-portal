@@ -29,13 +29,20 @@ object IndexTask extends App {
   private val defaultEsConfigs = Map(
     "spark.master" -> "local[*]",
     "es.index.auto.create" -> "true",
+    "opensearch.index.auto.create" -> "true",
     "es.net.ssl" -> "true",
+    "opensearch.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
+    "opensearch.net.ssl.cert.allow.self.signed" -> "true",
     "es.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
+    "opensearch.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
     "es.nodes.wan.only" -> "true",
+    "opensearch.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
+    "opensearch.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> esPort) //9200
+    "es.port" -> esPort,
+    "opensearch.port" -> esPort) //9200
 
   private val esConfigs = (esUsername, esPassword) match {
     case (Some(u), Some(p)) => defaultEsConfigs ++ Map("es.net.http.auth.user" -> u, "es.net.http.auth.pass" -> p)
