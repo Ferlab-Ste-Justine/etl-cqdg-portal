@@ -38,11 +38,11 @@ class Indexer(jobType: String,
   val log: slf4j.Logger = slf4j.LoggerFactory.getLogger(getClass.getCanonicalName)
 
   def run(df: DataFrame)(implicit esClient: ElasticSearchClient): Unit = {
-    val ES_config = Map("es.write.operation" -> jobType)
+    val ES_config = Map("es.write.operation" -> jobType, "opensearch.write.operation" -> jobType)
 
     if (jobType == "index") setupIndex(currentIndex, templateFilePath)
 
-    df.saveToOpenSearch(s"$currentIndex/_doc", ES_config)
+    df.saveToOpenSearch(s"$currentIndex", ES_config)
   }
 
   /**
