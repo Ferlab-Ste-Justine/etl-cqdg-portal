@@ -391,6 +391,9 @@
             "ferload_url": {
               "type": "keyword"
             },
+            "relates_to": {
+              "type": "keyword"
+            },
             "file_hash": {
               "type": "keyword"
             },

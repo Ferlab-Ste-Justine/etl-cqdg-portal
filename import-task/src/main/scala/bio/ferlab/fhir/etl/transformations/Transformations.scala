@@ -196,7 +196,7 @@ object Transformations {
 
   val documentreferenceMappings: List[Transformation] = List(
     Custom { input =>
-      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id", "meta")
+      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id", "meta", "relatesTo")
       val df = input
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
@@ -211,7 +211,8 @@ object Transformations {
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn("dataset", regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1))
         .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
-        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "dataset", "security"): _*)
+        .withColumn("relates_to", col("relatesTo")("target")("reference")(0))
+        .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "dataset", "security", "relates_to"): _*)
         .agg(
           collect_list(
             struct(
@@ -225,7 +226,7 @@ object Transformations {
         )
       df
     },
-    Drop("id", "type", "category", "subject", "content", "context", "meta")
+    Drop("id", "type", "category", "subject", "content", "context", "meta", "relatesTo")
   )
 
   val groupMappings: List[Transformation] = List(

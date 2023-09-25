@@ -384,6 +384,9 @@
             "file_size": {
               "type": "float"
             },
+            "relates_to": {
+              "type": "keyword"
+            },
             "ferload_url": {
               "type": "keyword"
             },

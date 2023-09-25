@@ -7,6 +7,7 @@ case class DOCUMENTREFERENCE(
                               `participant_id`: String = "PRT0000001",
                               `biospecimen_reference`: String = "SAM0000001",
                               `data_type`: String = "SSUP",
+                              `relates_to`: Option[String] = None,
                               `data_category`: String = "Genomics",
                               `security`: String = "R",
                               `files`: Seq[FILE] = Seq(FILE()),
