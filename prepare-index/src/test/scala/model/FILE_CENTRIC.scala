@@ -8,6 +8,7 @@ case class FILE_CENTRIC(
                          biospecimen_reference: String = "SAM0247817",
                          data_type: String = "Germline Structural Variant",
                          dataset: Option[String] = Some("Dataset1"),
+                         `relates_to`: Option[String] = None,
                          data_category: String = "Genomics",
                          file_name: String = "NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz",
                          file_format: String = "VCF",
