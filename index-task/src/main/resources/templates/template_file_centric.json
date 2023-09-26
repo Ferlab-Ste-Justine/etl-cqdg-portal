@@ -88,6 +88,9 @@
                 "participant_id": {
                   "type": "keyword"
                 },
+                "participant_2_id": {
+                  "type": "keyword"
+                },
                 "gender": {
                   "type": "keyword"
                 },
@@ -620,6 +623,9 @@
                   "type": "keyword"
                 },
                 "sample_id": {
+                  "type": "keyword"
+                },
+                "sample_2_id": {
                   "type": "keyword"
                 },
                 "sample_type": {

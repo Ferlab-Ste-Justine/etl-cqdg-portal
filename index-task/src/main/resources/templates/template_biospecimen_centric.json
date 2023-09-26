@@ -75,6 +75,9 @@
             "participant_id": {
               "type": "keyword"
             },
+            "participant_2_id": {
+              "type": "keyword"
+            },
             "gender": {
               "type": "keyword"
             },
@@ -361,6 +364,9 @@
           "type": "nested",
           "properties": {
             "file_id": {
+              "type": "keyword"
+            },
+            "file_2_id": {
               "type": "keyword"
             },
             "biospecimen_reference": {

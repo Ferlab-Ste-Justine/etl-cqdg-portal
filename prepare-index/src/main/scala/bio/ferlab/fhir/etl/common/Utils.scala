@@ -28,7 +28,8 @@ object Utils {
 
       val biospecimenWithSamplesParticipant = biospecimenWithSamples.join(biospecimenIdWithParticipant, Seq("biospecimen_id"), "left_outer")
 
-      val participantsWithBiospecimen = participantDf.addBiospecimen(biospecimenWithSamplesParticipant)
+      val participantsWithBiospecimen = participantDf
+        .addBiospecimen(biospecimenWithSamplesParticipant)
 
       val participantsWithBiospecimens = participantsWithBiospecimen
         .withColumn("participant", struct(participantsWithBiospecimen.columns.map(col): _*))
@@ -51,6 +52,7 @@ object Utils {
             .otherwise(col("sample_type")("code"))
         )
         .withColumnRenamed("fhir_id", "sample_id")
+        .withColumn("sample_2_id", col("sample_id")) //doubling sample_id portal use
         .withColumnRenamed("parent", "fhir_id")
 
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"), "left_outer")
@@ -156,10 +158,10 @@ object Utils {
       val filesWithSeqExp = filesWithRef
         .addSequencingExperiment(seqExperiment.withColumn("experimental_strategy", col("experimental_strategy")(0)))
         .withColumnRenamed("fhir_id", "file_id")
+        .withColumn("file_2_id", col("file_id")) //Duplicate for UI use
 
       val filesWithBiospecimen = filesWithSeqExp
         .join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")
-
 
       val filesGroupedPerParticipant = filesWithBiospecimen
         .groupBy("participant_id",  "study_id", "release_id")
@@ -224,6 +226,7 @@ object Utils {
         .select("files_exp.*", filesDf.columns.filterNot(Seq("files").contains).:+("sequencing_experiment"): _*)
         .withColumnRenamed("participant_id", "subject")
         .withColumnRenamed("fhir_id", "file_id")
+        .withColumn("file_2_id", col("file_id"))
         .filter(col("file_format") =!= "CRAI")
 
       val filesWithSeqExpGrouped = filesWithSeqExp
