@@ -3,6 +3,7 @@ package model
 
 case class SIMPLE_PARTICIPANT(
                                `participant_id`: String = "PRT0483458",
+                               `participant_2_id`: String = "PRT0483458",
                                `gender`: String = "male",
                                `age_at_recruitment`: Int = 24566,
                                `vital_status`: String = "Unknown",

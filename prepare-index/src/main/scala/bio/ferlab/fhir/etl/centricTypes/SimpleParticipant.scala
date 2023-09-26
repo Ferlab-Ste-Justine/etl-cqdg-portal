@@ -62,6 +62,7 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
         )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
         .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
         .join(shortStudyCode, Seq("study_id"), "left_outer")
+        .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
 
     Map(mainDestination.id -> transformedParticipant)
   }

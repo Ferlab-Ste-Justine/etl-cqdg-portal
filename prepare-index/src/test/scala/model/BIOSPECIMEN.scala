@@ -6,6 +6,7 @@ case class BIOSPECIMEN(
                         `age_biospecimen_collection`: Long = 21,
                         `submitter_biospecimen_id`: String = "cag_sp_20832",
                         `sample_id`: String = "sam1",
+                        `sample_2_id`: String = "sam1",
                         `sample_type`: String = "DNA (NCIT:C449)",
 //                        `submitter_participant_id`: String = "35849414972"
                       )

@@ -367,6 +367,9 @@
             "file_id": {
               "type": "keyword"
             },
+            "file_2_id": {
+              "type": "keyword"
+            },
             "biospecimen_reference": {
               "type": "keyword"
             },
@@ -413,6 +416,9 @@
                   "type": "keyword"
                 },
                 "sample_id": {
+                  "type": "keyword"
+                },
+                "sample_2_id": {
                   "type": "keyword"
                 },
                 "sample_type": {

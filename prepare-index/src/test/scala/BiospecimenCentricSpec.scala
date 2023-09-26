@@ -15,8 +15,8 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
   "transform" should "prepare index biospecimen_centric" in {
     val data: Map[String, DataFrame] = Map(
       "simple_participant" -> Seq(
-        SIMPLE_PARTICIPANT(`participant_id` = "P1"), //has file
-        SIMPLE_PARTICIPANT(`participant_id` = "P2", `gender` = "female"), //does not have files
+        SIMPLE_PARTICIPANT(`participant_id` = "P1", `participant_2_id` = "P1"), //has file
+        SIMPLE_PARTICIPANT(`participant_id` = "P2", `participant_2_id` = "P2", `gender` = "female"), //does not have files
       ).toDF(),
       "normalized_document_reference" -> Seq(
         DOCUMENTREFERENCE(`fhir_id` = "D1", `participant_id` = "P1", `biospecimen_reference` = "B1", `files` = Seq(FILE())),
@@ -58,11 +58,13 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         `age_biospecimen_collection` = 17174,
         `submitter_biospecimen_id` = "cag_sp_20832",
         `participant` = SIMPLE_PARTICIPANT(
-          `participant_id` = "P1"
+          `participant_id` = "P1",
+          `participant_2_id` = "P1"
         ),
         `files` = Seq(
           FILE_WITH_SEQ_EXPERIMENT(
             `file_id` = "D1",
+            `file_2_id` = "D1",
             `file_name` = "file5.json",
             `file_format` = "TGZ",
             `file_size` = "56",
