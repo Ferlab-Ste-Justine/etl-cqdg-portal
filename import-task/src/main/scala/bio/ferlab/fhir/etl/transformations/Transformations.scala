@@ -211,7 +211,7 @@ object Transformations {
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn("dataset", regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1))
         .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
-        .withColumn("relates_to", col("relatesTo")("target")("reference")(0))
+        .withColumn("relates_to", substring_index(col("relatesTo")("target")("reference")(0), "/", -1))
         .groupBy(columns.head, columns.tail ++ Array("participant_id", "biospecimen_reference", "data_type", "data_category", "dataset", "security", "relates_to"): _*)
         .agg(
           collect_list(
