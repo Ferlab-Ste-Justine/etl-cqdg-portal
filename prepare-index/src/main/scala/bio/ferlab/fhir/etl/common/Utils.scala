@@ -153,9 +153,8 @@ object Utils {
     def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
       val biospecimenGrouped = biospecimensDf.addSamplesGroupedToBiospecimen(sampleRegistrationDF)
 
-      val filesWithRef  = addAssociatedDocumentRef(filesDf)
-
-      val filesWithSeqExp = filesWithRef
+      val filesWithSeqExp = filesDf
+        .addAssociatedDocumentRef()
         .addSequencingExperiment(seqExperiment.withColumn("experimental_strategy", col("experimental_strategy")(0)))
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("file_2_id", col("file_id")) //Duplicate for UI use
@@ -172,10 +171,10 @@ object Utils {
       df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id", "release_id"), "inner")
     }
 
-    def addAssociatedDocumentRef(filesDf: DataFrame): DataFrame = {
+    def addAssociatedDocumentRef(): DataFrame = {
       val refFileFormat = Seq("CRAI", "TBI")
 
-      val filesExp = filesDf.withColumn("files_exp", explode(col("files")))
+      val filesExp = df.withColumn("files_exp", explode(col("files")))
 
       val fileColumns =  filesExp.select("files_exp.*").columns
 
@@ -195,9 +194,7 @@ object Utils {
 
       val fileWithRefColumns = filesWithRef.columns.filterNot(_.equals("files_exp"))
 
-      val filesWithRefFlat = filesWithRef.select((fileWithRefColumns ++ fileColumns.map(c => s"files_exp.$c")).map(col): _*)
-
-      filesWithRefFlat
+      filesWithRef.select((fileWithRefColumns ++ fileColumns.map(c => s"files_exp.$c")).map(col): _*)
     }
 
 
@@ -219,15 +216,12 @@ object Utils {
     }
 
     def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
-
       val filesWithSeqExp = filesDf
+        .addAssociatedDocumentRef()
         .addSequencingExperiment(seqExperiment.withColumn("experimental_strategy", col("experimental_strategy")(0)))
-        .withColumn("files_exp", explode(col("files")))
-        .select("files_exp.*", filesDf.columns.filterNot(Seq("files").contains).:+("sequencing_experiment"): _*)
         .withColumnRenamed("participant_id", "subject")
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("file_2_id", col("file_id"))
-        .filter(col("file_format") =!= "CRAI")
 
       val filesWithSeqExpGrouped = filesWithSeqExp
         .groupBy("subject", "study_id", "release_id")
@@ -239,16 +233,13 @@ object Utils {
     def addDataSetToStudy(filesDf: DataFrame, participants: DataFrame, tasks: DataFrame): DataFrame = {
       val filesWithTaskAndParticipants = filesDf
         .addSequencingExperiment(tasks.withColumn("experimental_strategy", col("experimental_strategy")(0)))
-        .withColumn("files_exploded", explode(col("files")))
-        // remove CRAI files from count (not required in portal)
-        .filter(col("files_exploded.file_format") =!= "CRAI")
+        .addAssociatedDocumentRef()
         .join(participants, Seq("participant_id", "study_id", "release_id"), "inner")
-        .drop("files")
         .groupBy("study_id", "dataset")
         .agg(
           collect_set("data_type") as "data_types",
           collect_set("sequencing_experiment.experimental_strategy") as "experimental_strategies",
-          size(collect_set("files_exploded")) as "file_count",
+          size(collect_set("fhir_id")) as "file_count",
           size(collect_set("participant_id")) as "participant_count"
         )
 

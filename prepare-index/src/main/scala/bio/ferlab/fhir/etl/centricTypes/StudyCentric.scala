@@ -89,16 +89,15 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
 
     val fileCount =
       data(normalized_drs_document_reference.id)
-        .withColumn("files_exploded", explode(col("files")))
-        .filter(col("files_exploded.file_format") =!= "CRAI")
+        .addAssociatedDocumentRef()
         .join(participantsRenamed, Seq("participant_id", "study_id", "release_id"), "inner")
         .groupBy("study_id")
         .agg(
           size(collect_set(
             struct(
-              col("files_exploded")("file_name"),
-              col("files_exploded")("file_format"),
-              col("files_exploded")("ferload_url"))
+              col("file_name"),
+              col("file_format"),
+              col("fhir_id"))
           )) as "file_count",
           collect_set(col("data_category")) as "data_category"
         )
