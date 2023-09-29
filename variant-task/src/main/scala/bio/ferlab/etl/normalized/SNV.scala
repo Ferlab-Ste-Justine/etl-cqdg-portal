@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions._
 
 import java.time.LocalDateTime
 
-case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
@@ -20,7 +20,9 @@ case class SNV(rc:RuntimeETLContext, studyId: String, releaseId: String, vcfPatt
                        currentRunDateTime: LocalDateTime = LocalDateTime.now()): Map[String, DataFrame] = {
 
     Map(
-      "raw_vcf" -> vcf(raw_variant_calling.location.replace("{{STUDY_ID}}", s"${studyId}_test"), referenceGenomePath = None) //TODO remove "test" when server is available
+      "raw_vcf" -> vcf(raw_variant_calling.location
+        .replace("{{STUDY_ID}}", s"$studyId")
+        .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),
       enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId)
     )

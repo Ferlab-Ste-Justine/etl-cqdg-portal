@@ -92,7 +92,7 @@ object ConfigurationGenerator extends App {
       DatasetConf(
         id = "raw_vcf",
         storageid = storage_vcf,
-        path = "/vcf/{{STUDY_ID}}/*.vep.vcf.gz",
+        path = "/{{OWNER}}/{{STUDY_ID}}/variants.chr*.vep.vcf.gz",
         format = VCF,
         loadtype = OverWrite,
         partitionby = List("chromosome"),
@@ -177,7 +177,7 @@ object ConfigurationGenerator extends App {
     ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
         StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}","qa")}", S3),
-        StorageConf(storage_vcf, "s3a://cqdg-qa-app-clinical-data-service", S3) //TODO change to Actual VCF bucket -test only
+        StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("qaDbName")),
       args = args.toList,
