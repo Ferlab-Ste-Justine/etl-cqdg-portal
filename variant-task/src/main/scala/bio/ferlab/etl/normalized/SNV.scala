@@ -110,7 +110,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
   }
 
   def getSNV(inputDF: DataFrame): DataFrame = {
-    inputDF
+    val inputDfExpGenotypes = inputDF
       .withColumn("annotation", firstCsq)
       .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
@@ -120,6 +120,8 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
       .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
       .withColumn("genotype", explode(col("genotypes")))
       .drop("genotypes")
+
+    inputDfExpGenotypes
       .withColumn(
         "genotype",
         struct(
@@ -137,7 +139,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
           col("genotype.MIN_DP"),
           col("genotype.phredLikelihoods"),
           col("genotype.depth"),
-          col("genotype.RGQ"),
+          optional_info(inputDfExpGenotypes, "genotype.RGQ", "RGQ", "int"),
           col("genotype.PGT"),
           //          col("genotype.SPL"),
           //          col("genotype.PS"),
