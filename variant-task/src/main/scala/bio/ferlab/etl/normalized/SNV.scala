@@ -140,7 +140,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
           col("genotype.phredLikelihoods"),
           col("genotype.depth"),
           optional_info(inputDfExpGenotypes, "genotype.RGQ", "RGQ", "int"),
-          col("genotype.PGT"),
+          optional_info(inputDfExpGenotypes, "genotype.PGT", "PGT", "string"),
           //          col("genotype.SPL"),
           //          col("genotype.PS"),
           //          col("genotype.MB"), //TODO confirm is ok
