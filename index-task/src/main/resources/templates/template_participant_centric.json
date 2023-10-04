@@ -59,6 +59,9 @@
             "biospecimen_id": {
               "type": "keyword"
             },
+            "biospecimen_2_id": {
+              "type": "keyword"
+            },
             "biospecimen_tissue_source": {
               "type": "keyword"
             },
@@ -404,6 +407,9 @@
               "type": "nested",
               "properties": {
                 "biospecimen_id": {
+                  "type": "keyword"
+                },
+                "biospecimen_2_id": {
                   "type": "keyword"
                 },
                 "biospecimen_tissue_source": {
