@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions._
 
 import java.time.LocalDateTime
 
-case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: String, releaseId: String, vcfPattern: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
@@ -22,6 +22,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
     Map(
       "raw_vcf" -> vcf(raw_variant_calling.location
         .replace("{{STUDY_ID}}", s"$studyId")
+        .replace("{{DATASET}}", s"$dataset")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),
       enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId)
@@ -90,6 +91,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, releaseId: 
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
         //        col("file_name"),
         lit(releaseId) as "releaseId",
+        lit(dataset) as "dataset",
         is_normalized
       )
       .drop("annotation")

@@ -92,7 +92,7 @@ object ConfigurationGenerator extends App {
       DatasetConf(
         id = "raw_vcf",
         storageid = storage_vcf,
-        path = "/{{OWNER}}/{{STUDY_ID}}/variants.chr*.vep.vcf.gz",
+        path = "/{{OWNER}}/{{STUDY_ID}}/{{DATASET}}/variants.chr*.vep.vcf.gz",
         format = VCF,
         loadtype = OverWrite,
         partitionby = List("chromosome"),
@@ -107,7 +107,7 @@ object ConfigurationGenerator extends App {
         format = DELTA,
         loadtype = OverWritePartition,
         table = Some(TableConf("database", "normalized_snv")),
-        partitionby = List("study_id", "chromosome"),
+        partitionby = List("study_id", "chromosome", "dataset"),
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
         repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
       ),
