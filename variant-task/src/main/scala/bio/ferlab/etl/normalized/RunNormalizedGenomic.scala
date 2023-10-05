@@ -10,8 +10,7 @@ object RunNormalizedGenomic {
           @arg(name = "owner", short = 's', doc = "Owner") owner: String,
           @arg(name = "dataset", short = 's', doc = "Dataset") dataset: String,
           @arg(name = "release-id", short = 'r', doc = "Release Id") releaseId: String,
-          @arg(name = "vcf-pattern", short = 'v', doc = "VCF Pattern") vcfPattern: String,
-          @arg(name = "reference-genome-path", short = 'g', doc = "Reference Genome Path") referenceGenomePath: Option[String]): Unit = SNV(rc, studyId, owner, dataset, releaseId, vcfPattern, referenceGenomePath).run()
+          @arg(name = "reference-genome-path", short = 'g', doc = "Reference Genome Path") referenceGenomePath: Option[String]): Unit = SNV(rc, studyId, owner, dataset, releaseId, referenceGenomePath).run()
 
 
   @main
@@ -19,8 +18,7 @@ object RunNormalizedGenomic {
                    @arg(name = "study-id", short = 's', doc = "Study Id") studyId: String,
                    @arg(name = "owner", short = 's', doc = "Owner") owner: String,
                    @arg(name = "dataset", short = 's', doc = "Dataset") dataset: String,
-                   @arg(name = "vcf-pattern", short = 'v', doc = "VCF Pattern") vcfPattern: String,
-                   @arg(name = "reference-genome-path", short = 'g', doc = "Reference Genome Path") referenceGenomePath: Option[String]): Unit = Consequences(rc, studyId, owner, dataset, vcfPattern, referenceGenomePath).run()
+                   @arg(name = "reference-genome-path", short = 'g', doc = "Reference Genome Path") referenceGenomePath: Option[String]): Unit = Consequences(rc, studyId, owner, dataset, referenceGenomePath).run()
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
 }

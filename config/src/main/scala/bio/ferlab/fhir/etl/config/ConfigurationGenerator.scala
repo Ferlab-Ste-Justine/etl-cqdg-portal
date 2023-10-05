@@ -107,7 +107,7 @@ object ConfigurationGenerator extends App {
         format = DELTA,
         loadtype = OverWritePartition,
         table = Some(TableConf("database", "normalized_snv")),
-        partitionby = List("study_id", "chromosome", "dataset"),
+        partitionby = List("study_id", "dataset", "chromosome"),
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
         repartition = Some(RepartitionByColumns(Seq("chromosome"), Some(100)))
       ),
