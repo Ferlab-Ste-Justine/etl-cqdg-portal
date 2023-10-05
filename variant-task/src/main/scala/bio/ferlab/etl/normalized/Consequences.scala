@@ -29,6 +29,5 @@ case class Consequences(rc: RuntimeETLContext, studyId: String, owner: String, d
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
     super.transformSingle(data, lastRunDateTime, currentRunDateTime)
       .withColumn("study_id", lit(studyId))
-      .withColumn("dataset", lit(dataset))
   }
 }
