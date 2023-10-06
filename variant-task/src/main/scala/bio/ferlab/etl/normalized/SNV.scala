@@ -5,6 +5,7 @@ import bio.ferlab.datalake.spark3.etl.v3.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
+import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import bio.ferlab.etl.Constants.columns.{GENES_SYMBOL, TRANSMISSION_MODE}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -47,7 +48,9 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: St
         participantIdColumn = col("participant_id"),
         familyIdColumn = col("family_id")
       )
+      .cacheRDD()
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
+      .cacheRDD()
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
 //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
