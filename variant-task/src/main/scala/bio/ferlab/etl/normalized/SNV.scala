@@ -50,9 +50,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: St
         participantIdColumn = col("participant_id"),
         familyIdColumn = col("family_id")
       )
-      .cacheRDD()
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      .cacheRDD()
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
 //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
