@@ -33,17 +33,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
     val result = results("normalized_snv").as[NORMALIZED_SNV].collect()
 
     result.filter(e => e.`sample_id` === "S1").head shouldBe NORMALIZED_SNV()
-    result.filter(e => e.`sample_id` === "S2").head shouldBe
-      NORMALIZED_SNV(
-        `sample_id` = "S2",
-        `participant_id` = "P2",
-        `affected_status` = false,
-        `calls`= Seq(0, 0),
-        `has_alt` = false,
-        `zygosity` = "WT",
-        `parental_origin` = null,
-        `transmission_mode` = "non_carrier_proband"
-      )
+
     result.filter(e => e.`sample_id` === "S3").head shouldBe
       NORMALIZED_SNV(
         `sample_id` = "S3",

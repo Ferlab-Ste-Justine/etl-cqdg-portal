@@ -39,15 +39,13 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
 
     val occurrences = selectOccurrences(vcf, studyId)
 
-    val columnNames = Seq("gq", "dp", "info_qd", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity")
-    //missing "filters"
-
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
-      .withAlleleDepths()
-      .withRelativesGenotype(columnNames,
+      .withRelativesGenotype(
         participantIdColumn = col("participant_id"),
         familyIdColumn = col("family_id")
       )
+      .where(col("has_alt"))
+      .withAlleleDepths()
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
     //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
