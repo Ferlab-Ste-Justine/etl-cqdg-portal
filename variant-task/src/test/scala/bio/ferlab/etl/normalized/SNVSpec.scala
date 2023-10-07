@@ -37,7 +37,6 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
       NORMALIZED_SNV(
         `sample_id` = "S2",
         `participant_id` = "P2",
-        `is_affected` = false,
         `affected_status` = false,
         `calls`= Seq(0, 0),
         `has_alt` = false,

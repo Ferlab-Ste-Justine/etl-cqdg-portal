@@ -12,7 +12,7 @@ import org.apache.spark.sql.functions._
 
 import java.time.LocalDateTime
 
-case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
@@ -34,17 +34,15 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: St
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
 
     val vcf = getSNV(data("raw_vcf"))
-    val enrichedSpecimenDF = data(enriched_specimen.id)
-
-    enrichedSpecimenDF.show(10,false)
+    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id")
+      .withColumnRenamed("is_affected", "affected_status")
 
     val occurrences = selectOccurrences(vcf, studyId)
 
-    val columnNames = Seq("gq", "dp", "info_qd", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls","affected_status", "zygosity")
+    val columnNames = Seq("gq", "dp", "info_qd", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity")
     //missing "filters"
 
-    occurrences.join(enrichedSpecimenDF, Seq("sample_id"))
-      .withColumn("affected_status", col("is_affected"))
+    occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
       .withRelativesGenotype(columnNames,
         participantIdColumn = col("participant_id"),
@@ -52,7 +50,7 @@ case class SNV(rc:RuntimeETLContext, studyId: String, owner: String, dataset: St
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
-//      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
+    //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset'")
