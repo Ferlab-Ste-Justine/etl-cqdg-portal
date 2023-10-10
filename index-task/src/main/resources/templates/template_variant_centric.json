@@ -402,6 +402,185 @@
               "type": "keyword",
               "index": false
             },
+            "consequences" : {
+              "type" : "nested",
+              "properties" : {
+                "aa_change" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "amino_acids" : {
+                  "properties" : {
+                    "reference" : {
+                      "type" : "keyword",
+                      "index" : false
+                    },
+                    "variant" : {
+                      "type" : "keyword",
+                      "index" : false
+                    }
+                  }
+                },
+                "canonical" : {
+                  "type" : "boolean"
+                },
+                "cdna_position" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "cds_position" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "coding_dna_change" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "codons" : {
+                  "properties" : {
+                    "reference" : {
+                      "type" : "keyword",
+                      "index" : false
+                    },
+                    "variant" : {
+                      "type" : "keyword",
+                      "index" : false
+                    }
+                  }
+                },
+                "consequence" : {
+                  "type" : "keyword"
+                },
+                "conservations" : {
+                  "properties" : {
+                    "phyloP100way_vertebrate" : {
+                      "type" : "float"
+                    },
+                    "phyloP17way_primate" : {
+                      "type" : "float"
+                    }
+                  }
+                },
+                "ensembl_feature_id" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "ensembl_transcript_id" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "exon" : {
+                  "properties" : {
+                    "rank" : {
+                      "type" : "keyword",
+                      "index" : false
+                    },
+                    "total" : {
+                      "type" : "long",
+                      "index" : false
+                    }
+                  }
+                },
+                "feature_type" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "hgvsc" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "hgvsp" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "impact_score" : {
+                  "type" : "long"
+                },
+                "intron" : {
+                  "properties" : {
+                    "rank" : {
+                      "type" : "keyword",
+                      "index" : false
+                    },
+                    "total" : {
+                      "type" : "long",
+                      "index" : false
+                    }
+                  }
+                },
+                "mane_plus" : {
+                  "type" : "boolean"
+                },
+                "mane_select" : {
+                  "type" : "boolean"
+                },
+                "picked" : {
+                  "type" : "boolean"
+                },
+                "predictions" : {
+                  "properties" : {
+                    "cadd_phred" : {
+                      "type" : "float"
+                    },
+                    "cadd_score" : {
+                      "type" : "float"
+                    },
+                    "dann_score" : {
+                      "type" : "float"
+                    },
+                    "fathmm_pred" : {
+                      "type" : "keyword"
+                    },
+                    "fathmm_score" : {
+                      "type" : "float"
+                    },
+                    "lrt_pred" : {
+                      "type" : "keyword"
+                    },
+                    "lrt_score" : {
+                      "type" : "float"
+                    },
+                    "polyphen2_hvar_pred" : {
+                      "type" : "keyword"
+                    },
+                    "polyphen2_hvar_score" : {
+                      "type" : "float"
+                    },
+                    "revel_score" : {
+                      "type" : "float"
+                    },
+                    "sift_pred" : {
+                      "type" : "keyword"
+                    },
+                    "sift_score" : {
+                      "type" : "float"
+                    }
+                  }
+                },
+                "protein_position" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "refseq_mrna_id" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "refseq_protein_id" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "strand" : {
+                  "type" : "keyword"
+                },
+                "uniprot_id" : {
+                  "type" : "keyword",
+                  "index" : false
+                },
+                "vep_impact" : {
+                  "type" : "keyword"
+                }
+              }
+            },
             "cosmic": {
               "type": "nested",
               "properties": {
