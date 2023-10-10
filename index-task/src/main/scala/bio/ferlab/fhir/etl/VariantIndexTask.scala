@@ -21,17 +21,37 @@ object VariantIndexTask extends App {
   esUrl
   ) = args
 
+  private val esUsername = sys.env.get("ES_USERNAME")
+  private val esPassword = sys.env.get("ES_PASSWORD")
+
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](configFile)
 
-  private val esConfigs = Map(
+  private val defaultEsConfigs = Map(
     "es.index.auto.create" -> "true",
     "es.net.ssl" -> "true",
+    "opensearch.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
+    "opensearch.net.ssl.cert.allow.self.signed" -> "true",
     "es.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
+    "opensearch.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
     "es.nodes.wan.only" -> "true",
+    "opensearch.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
+    "opensearch.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
-    "es.port" -> esPort)
+    "es.port" -> esPort,
+    "opensearch.port" -> esPort)
+
+  private val esConfigs = (esUsername, esPassword) match {
+    case (Some(u), Some(p)) => defaultEsConfigs ++
+      Map(
+        "es.net.http.auth.user" -> u,
+        "es.net.http.auth.pass" -> p,
+        "opensearch.net.http.auth.user" -> u,
+        "opensearch.net.http.auth.pass" -> p
+      )
+    case _ => defaultEsConfigs
+  }
 
   private val sparkConfigs: SparkConf =
     (conf.sparkconf ++ esConfigs)
@@ -47,7 +67,8 @@ object VariantIndexTask extends App {
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
-  implicit val esClient: ElasticSearchClient = new ElasticSearchClient(s"$esUrl:$esPort", None, None)
+  implicit val esClient: ElasticSearchClient =
+    new ElasticSearchClient(s"$esUrl:$esPort", esUsername, esPassword)
 
   val indexName = chromosome match {
     case "all" => s"${jobType}_$release_id".toLowerCase
