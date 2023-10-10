@@ -29,7 +29,6 @@ object RunEnrichGenomic {
         AtLeastNElements(name = "participant_ids", c = col("participant_id"), n = 10),
         SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)),
         SimpleAggregation(name = "zygosity", c = col("zygosity")),
-        FirstElement(name = "study_code", c = col("study_code"))
       )
     ),
     FrequencySplit("internal_frequencies", byAffected = false)))
