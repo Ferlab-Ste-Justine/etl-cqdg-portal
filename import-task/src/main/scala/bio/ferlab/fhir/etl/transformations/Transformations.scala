@@ -43,9 +43,7 @@ object Transformations {
       .withColumn("run_date", filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDateTime").cast("string"))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
       .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
-      .withColumn("experimental_strategy", transform(
-        filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy") , col => col("valueCoding")("code")
-      ))
+      .withColumn("experimental_strategy", filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code"))
       .withColumn("sequencer_id", filter(col("seq_exp")("extension"), col => col("url") === "sequencerId")(0)("valueString"))
       .withColumn("workflow_name", filter(col("workflow")("extension"), col => col("url") === "workflowName")(0)("valueString"))
       .withColumn("workflow_version", filter(col("workflow")("extension"), col => col("url") === "workflowVersion")(0)("valueString"))
