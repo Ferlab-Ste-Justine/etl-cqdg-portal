@@ -34,18 +34,17 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
 
     val vcf = getSNV(data("raw_vcf"))
-    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id")
+    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
-    val occurrences = selectOccurrences(vcf, studyId)
+    val occurrences = selectOccurrences(vcf)
 
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
-      .withRelativesGenotype(
+      .withAlleleDepths()
+      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
         participantIdColumn = col("participant_id"),
         familyIdColumn = col("family_id")
       )
-      .where(col("has_alt"))
-      .withAlleleDepths()
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
     //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
@@ -53,7 +52,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset'")
 
-  private def selectOccurrences(inputDF: DataFrame, studyId: String): DataFrame = {
+  private def selectOccurrences(inputDF: DataFrame): DataFrame = {
     val occurrences = inputDF
       .select(
         chromosome,

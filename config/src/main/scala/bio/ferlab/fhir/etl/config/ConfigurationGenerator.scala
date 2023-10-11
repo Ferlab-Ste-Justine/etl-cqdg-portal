@@ -107,7 +107,7 @@ object ConfigurationGenerator extends App {
         format = DELTA,
         loadtype = OverWritePartition,
         table = Some(TableConf("database", "normalized_snv")),
-        partitionby = List("study_id", "dataset", "chromosome"),
+        partitionby = List("study_id", "dataset", "has_alt", "chromosome"),
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
         repartition = Some(RepartitionByRange(Seq("chromosome", "start"), Some(100)))
       ),
@@ -140,7 +140,7 @@ object ConfigurationGenerator extends App {
     "spark.sql.autoBroadcastJoinThreshold" -> "-1",
     "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
     "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
-    "spark.sql.legacy.parquet.datetimeRebaseModeInWrite"->"CORRECTED",
+    "spark.sql.legacy.parquet.datetimeRebaseModeInWrite" -> "CORRECTED",
     "spark.sql.legacy.timeParserPolicy" -> "CORRECTED",
     "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
   )
@@ -164,7 +164,7 @@ object ConfigurationGenerator extends App {
   )
 
   conf.foreach { case (project, _) =>
-    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local ,DatalakeConf(
+    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local, DatalakeConf(
       storages = List(
         StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
@@ -176,7 +176,7 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}","qa")}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "qa")}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("qaDbName")),
@@ -186,7 +186,7 @@ object ConfigurationGenerator extends App {
 
     ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}","prod")}", S3),
+        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "prod")}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
