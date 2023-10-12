@@ -17,6 +17,10 @@
           "type": "keyword",
           "index": false
         },
+        "assembly_version": {
+          "type": "keyword",
+          "index": false
+        },
         "chromosome": {
           "type": "keyword"
         },
@@ -218,10 +222,10 @@
             }
           }
         },
-        "gene_external_reference": {
+        "dna_change": {
           "type": "keyword"
         },
-        "variant_external_reference": {
+        "gene_external_reference": {
           "type": "keyword"
         },
         "external_study_ids": {
@@ -399,6 +403,10 @@
           "type": "nested",
           "properties": {
             "alias": {
+              "type": "keyword",
+              "index": false
+            },
+            "biotype": {
               "type": "keyword",
               "index": false
             },
@@ -664,6 +672,13 @@
                 }
               }
             },
+            "spliceai" : {
+              "properties" : {
+                "type": {
+                  "type": "keyword"
+                }
+              }
+            },
             "symbol": {
               "type": "keyword"
             }
@@ -679,9 +694,6 @@
         "hgvsg": {
           "type": "keyword",
           "index": false
-        },
-        "vep_impacts": {
-          "type": "keyword"
         },
         "max_impact_score": {
           "type": "long"
@@ -793,19 +805,21 @@
               "type": "keyword",
               "index": false
             },
-            "transmissions": {
-              "type": "keyword",
-              "index": false
+            "transmission": {
+              "type": "keyword"
+            },
+            "zygosity": {
+              "type": "keyword"
             }
           }
-        },
-        "transmissions": {
-          "type": "keyword"
         },
         "variant_class": {
           "type": "keyword"
         },
-        "zygosity": {
+        "variant_external_reference": {
+          "type": "keyword"
+        },
+        "vep_impacts": {
           "type": "keyword"
         }
       }
