@@ -352,6 +352,9 @@
             "participant_id": {
               "type": "keyword"
             },
+            "participant_2_id": {
+              "type": "keyword"
+            },
             "study_id": {
               "type": "keyword"
             },
