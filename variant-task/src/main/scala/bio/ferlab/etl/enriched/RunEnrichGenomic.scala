@@ -26,6 +26,7 @@ object RunEnrichGenomic {
       "studies",
       splitBy = Some(col("study_id")), byAffected = false,
       extraAggregations = Seq(
+        FirstElement("study_code", col("study_code")),
         AtLeastNElements(name = "participant_ids", c = col("participant_id"), n = 10),
         SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)),
         SimpleAggregation(name = "zygosity", c = col("zygosity")),
