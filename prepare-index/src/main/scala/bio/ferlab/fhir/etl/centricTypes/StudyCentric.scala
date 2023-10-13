@@ -108,9 +108,8 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .agg(size(collect_set(col("internal_family_id"))) as "family_count")
 
     val experimentalStrategyGrouped = data(normalized_task.id)
-      .withColumn("experimental_strategy_exp", explode(col("experimental_strategy")))
       .groupBy("study_id")
-      .agg(collect_set(col("experimental_strategy_exp")) as "experimental_strategies")
+      .agg(collect_set(col("experimental_strategy")) as "experimental_strategies")
 
     val studyDatasets = studyDF
       .addDataSetToStudy(data(normalized_drs_document_reference.id), participantsRenamed, data(normalized_sequencing_experiment.id))

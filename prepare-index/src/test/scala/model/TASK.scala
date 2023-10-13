@@ -14,7 +14,7 @@ case class TASK(
                  `run_date`: String = null,
                  `capture_kit`: String = "RocheKapaHyperExome",
                  `platform`: String = "Illumina",
-                 `experimental_strategy`: Seq[String] = Seq("WXS"),
+                 `experimental_strategy`: String = "WXS",
                  `sequencer_id`: String = "NB552318",
                  `workflow_name`: String = "Dragen",
                  `workflow_version`: String = "1.1.0",

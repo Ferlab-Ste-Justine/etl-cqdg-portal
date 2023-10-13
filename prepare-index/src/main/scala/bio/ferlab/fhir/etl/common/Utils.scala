@@ -155,7 +155,7 @@ object Utils {
 
       val filesWithSeqExp = filesDf
         .addAssociatedDocumentRef()
-        .addSequencingExperiment(seqExperiment.withColumn("experimental_strategy", col("experimental_strategy")(0)))
+        .addSequencingExperiment(seqExperiment)
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("file_2_id", col("file_id")) //Duplicate for UI use
 
@@ -218,7 +218,7 @@ object Utils {
     def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
       val filesWithSeqExp = filesDf
         .addAssociatedDocumentRef()
-        .addSequencingExperiment(seqExperiment.withColumn("experimental_strategy", col("experimental_strategy")(0)))
+        .addSequencingExperiment(seqExperiment)
         .withColumnRenamed("participant_id", "subject")
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("file_2_id", col("file_id"))
@@ -232,7 +232,7 @@ object Utils {
 
     def addDataSetToStudy(filesDf: DataFrame, participants: DataFrame, tasks: DataFrame): DataFrame = {
       val filesWithTaskAndParticipants = filesDf
-        .addSequencingExperiment(tasks.withColumn("experimental_strategy", col("experimental_strategy")(0)))
+        .addSequencingExperiment(tasks)
         .addAssociatedDocumentRef()
         .join(participants, Seq("participant_id", "study_id", "release_id"), "inner")
         .groupBy("study_id", "dataset")
