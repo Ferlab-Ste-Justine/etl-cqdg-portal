@@ -36,6 +36,7 @@ object Transformations {
       .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT_S_D)(0))
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
       .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
+      .withColumn("ldm_sample_id", filter(col("seq_exp")("extension"), col => col("url") === "ldmSampleId")(0)("valueString"))
       .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
       .withColumn("read_length", split(filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"), ",")(0))
       .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
