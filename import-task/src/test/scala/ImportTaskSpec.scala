@@ -9,8 +9,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import utils.MinioServer
 
-import scala.sys.process.Process
-
 case class ETLConfiguration(`es-config`: Map[String, String], datalake: DatalakeConf) extends ConfigurationWrapper(datalake)
 
 class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
