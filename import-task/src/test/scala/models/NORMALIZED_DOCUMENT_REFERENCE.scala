@@ -21,6 +21,6 @@ case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000019",
 
 case class FILES(`file_name`: String = "mpsMetrics_S03344.tar.gz",
                  `file_format`: String = "TGZ",
-                 `file_size`: Float = 0.0f,
+                 `file_size`: Float = 8.0f,
                  `ferload_url`: String = "http://flerloadurl/03fe6239ff7db8a5706103d3f0dd08441004ed5b",
                  `file_hash`: Option[String] = None)

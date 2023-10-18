@@ -24,4 +24,6 @@ case class SPECIMEN_ENRICHED(`study_id`: String = "STU0000001",
                               `mother_id`: String = "P3",
                               `father_id`: String = "P2",
                               `family_id`: String = "FAMO1",
-                              `study_code`: String = "study_code1")
+                              `study_code`: String = "study_code1",
+                              // experimental_strategy
+                            )
