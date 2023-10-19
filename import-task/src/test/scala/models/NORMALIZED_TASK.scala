@@ -31,5 +31,5 @@ case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000003",
                            `gsv`: String = "FIL0000009",
                            `ssup`: String = "FIL0000010",
                            `study_id`: String = "STU0000001",
-                           `release_id`: Int = 1)
+                           `release_id`: String = "1")
 

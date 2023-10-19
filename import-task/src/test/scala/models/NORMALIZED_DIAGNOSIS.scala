@@ -14,7 +14,7 @@ case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000001",
                                 `diagnosis_ICD_code`: String = "L20.9",
                                 `age_at_diagnosis`: AGE_AT_DIAGNOSIS = AGE_AT_DIAGNOSIS(),
                                 `study_id`: String = "STU0000001",
-                                `release_id`: Int = 1)
+                                `release_id`: String = "1")
 
 case class AGE_AT_DIAGNOSIS(`value`: Int = 0,
                             `unit`: String = "days")

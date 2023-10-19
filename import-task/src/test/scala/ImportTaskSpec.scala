@@ -1,10 +1,8 @@
-import bio.ferlab.datalake.commons.config.{ConfigurationWrapper, DatalakeConf}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, ConfigurationWrapper, DatalakeConf, SimpleConfiguration}
 import bio.ferlab.fhir.etl.ImportRawToNormalizedETL
 import bio.ferlab.fhir.etl.fhavro.FhavroToNormalizedMappings
-import etl.{SOURCES, STORAGES}
 import models._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.internal.SQLConf.LegacyBehaviorPolicy.CORRECTED
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import utils.MinioServer
@@ -59,25 +57,7 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
 
     addObjectToBucket(objects)
 
-    val sparkConfWithExcludeCollectionEntry = Map(
-      "spark.master" -> "local[*]",
-      "spark.databricks.delta.retentionDurationCheck.enabled" -> "false",
-      "spark.delta.merge.repartitionBeforeWrite" -> "true",
-      "spark.sql.catalog.spark_catalog" -> "org.apache.spark.sql.delta.catalog.DeltaCatalog",
-      "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
-      "spark.sql.legacy.parquet.datetimeRebaseModeInWrite" -> CORRECTED.toString,
-      "spark.sql.legacy.timeParserPolicy" -> CORRECTED.toString,
-      "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
-    )
-    implicit val c1 = ETLConfiguration(
-      Map.empty[String, String],
-      datalake = DatalakeConf(
-        STORAGES,
-        SOURCES,
-        List.empty,
-        sparkConfWithExcludeCollectionEntry
-      )
-    )
+    implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
     val jobs = FhavroToNormalizedMappings
       .mappings(release)
