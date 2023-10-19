@@ -2,9 +2,9 @@ package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.testutils.TestETLContext
-import bio.ferlab.etl.normalized.model._
+import bio.ferlab.etl.{WithSparkSession, WithTestConfig}
+import bio.ferlab.etl.model.{GENOTYPES, NORMALIZED_SNV, NORMALIZED_TASK, SPECIMEN_ENRICHED, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{collect_list, lit, struct}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -14,6 +14,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
 
   val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   val specimenEnriched: DatasetConf = conf.getDataset("enriched_specimen")
+  val normalized_task: DatasetConf = conf.getDataset("normalized_task")
 
   val specimenEnrichedDf: DataFrame = Seq(
     SPECIMEN_ENRICHED(`participant_id` = "P1", `is_affected` = Some(true), `sample_id` = "S1"),
@@ -28,6 +29,11 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
         GENOTYPES(`sampleId` = "S3")))).toDF(),
       specimenEnriched.id -> specimenEnrichedDf,
+      normalized_task.id -> Seq(
+        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S1", `experimental_strategy` = "WGS"),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S2", `experimental_strategy` = "WGS"),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S3", `experimental_strategy` = "WXS"),
+      ).toDF()
     )
 
     val results = SNV(TestETLContext(), "STU0000001", "owner", "dataset_default", releaseId = "1", None).transform(dataFomVCFFile)
@@ -40,7 +46,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `sample_id` = "S2",
         `participant_id` = "P2",
         `affected_status` = false,
-        `calls`= Seq(0, 0),
+        `calls` = Seq(0, 0),
         `has_alt` = false,
         `zygosity` = "WT",
         `parental_origin` = null,
@@ -49,7 +55,8 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
     result.filter(e => e.`sample_id` === "S3").head shouldBe
       NORMALIZED_SNV(
         `sample_id` = "S3",
-        `participant_id` = "P3"
+        `participant_id` = "P3",
+        `source` = "WXS"
       )
 
   }

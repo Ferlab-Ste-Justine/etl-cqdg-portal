@@ -805,7 +805,7 @@
               "type": "keyword",
               "index": false
             },
-            "transmission": {
+            "transmissions": {
               "type": "keyword"
             },
             "zygosity": {
@@ -820,6 +820,9 @@
           "type": "keyword"
         },
         "vep_impacts": {
+          "type": "keyword"
+        },
+        "sources": {
           "type": "keyword"
         }
       }
