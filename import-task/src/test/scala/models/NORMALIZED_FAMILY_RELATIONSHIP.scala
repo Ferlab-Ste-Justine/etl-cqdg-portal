@@ -13,5 +13,5 @@ case class NORMALIZED_FAMILY_RELATIONSHIP(`internal_family_relationship_id`: Str
                                           `focus_participant_id`: String = "PRT0000003",
                                           `relationship_to_proband`: String = "Mother",
                                           `study_id`: String = "STU0000001",
-                                          `release_id`: Int = 1)
+                                          `release_id`: String = "1")
 

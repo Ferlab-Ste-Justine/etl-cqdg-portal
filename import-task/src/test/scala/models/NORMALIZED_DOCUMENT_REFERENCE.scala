@@ -17,7 +17,7 @@ case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000019",
                                          `study_id`: String = "STU0000001",
                                          `relates_to`: Option[String] = None,
                                          `security`: String = "R",
-                                         `release_id`: Int = 1)
+                                         `release_id`: String = "1")
 
 case class FILES(`file_name`: String = "mpsMetrics_S03344.tar.gz",
                  `file_format`: String = "TGZ",
