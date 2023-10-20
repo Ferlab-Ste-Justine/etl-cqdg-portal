@@ -638,15 +638,13 @@
                             "default": null
                           },
                           {
-                            "name": "valueDecimal",
+                            "name" : "fileSize",
+                            "aliases": [
+                              "ext:https://fhir.cqdg.ca/StructureDefinition/FullSizeExtension"
+                            ],
                             "type": [
                               "null",
-                              {
-                                "type": "float",
-                                "logicalType": "decimal",
-                                "precision": 18,
-                                "scale": 0
-                              }
+                              "bytes"
                             ],
                             "default": null
                           }

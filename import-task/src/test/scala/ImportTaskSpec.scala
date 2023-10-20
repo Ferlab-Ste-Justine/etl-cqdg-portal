@@ -93,7 +93,7 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     normalizedSampleRegistration.filter(_.`subject` == "PRT0000001").head shouldEqual NORMALIZED_SAMPLE_REGISTRATION()
     normalizedResearchStudy.head shouldEqual NORMALIZED_RESEARCH_STUDY()
     normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000019").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
-    group.filter(_.`internal_family_id` == "12345STU0000001").head shouldEqual NORMALIZED_GROUP()
+    group.filter(_.`internal_family_id` == "FM00000001").head shouldEqual NORMALIZED_GROUP()
     task.filter(_.`fhir_id` == "SXP0000003").head shouldEqual NORMALIZED_TASK()
   }
 }
