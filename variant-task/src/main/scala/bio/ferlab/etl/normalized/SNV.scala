@@ -5,16 +5,17 @@ import bio.ferlab.datalake.spark3.etl.v3.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
-import bio.ferlab.datalake.spark3.implicits.SparkUtils._
 import bio.ferlab.etl.Constants.columns.{GENES_SYMBOL, TRANSMISSION_MODE}
-import org.apache.spark.sql.DataFrame
+import bio.ferlab.etl.normalized.SNV._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
 case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
+  private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
@@ -26,7 +27,8 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
         .replace("{{DATASET}}", s"$dataset")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),
-      enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId)
+      enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId),
+      normalized_task.id -> normalized_task.read.where(col("study_id") === studyId && col("release_id") === releaseId),
     )
 
   }
@@ -37,7 +39,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
     val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
-    val occurrences = selectOccurrences(vcf)
+    val occurrences = selectOccurrences(vcf, releaseId, dataset)
 
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
@@ -47,12 +49,27 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
+      .withSource(data(normalized_task.id))
     //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset'")
 
-  private def selectOccurrences(inputDF: DataFrame): DataFrame = {
+}
+
+object SNV {
+  implicit class DataFrameOps(df: DataFrame) {
+    def withSource(task: DataFrame)(implicit spark: SparkSession): DataFrame = {
+      import spark.implicits._
+      val taskDf = task
+        .select($"ldm_sample_id" as "sample_id",
+          $"experimental_strategy" as "source")
+
+      df.join(taskDf, Seq("sample_id"), "left")
+    }
+  }
+
+  private def selectOccurrences(inputDF: DataFrame, releaseId: String, dataset: String): DataFrame = {
     val occurrences = inputDF
       .select(
         chromosome,
@@ -88,7 +105,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
         col("INFO_MQRankSum") as "info_m_qrank_sum",
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
         //        col("file_name"),
-        lit(releaseId) as "releaseId",
+        lit(releaseId) as "release_id",
         lit(dataset) as "dataset",
         is_normalized
       )

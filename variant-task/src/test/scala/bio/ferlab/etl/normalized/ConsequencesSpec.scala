@@ -2,7 +2,8 @@ package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
-import bio.ferlab.etl.normalized.model.{GENOTYPES, NormalizedConsequences, VCF_SNV_INPUT}
+import bio.ferlab.etl.WithTestConfig
+import bio.ferlab.etl.model.{GENOTYPES, NormalizedConsequences, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
 
 class ConsequencesSpec extends SparkSpec with WithTestConfig {
