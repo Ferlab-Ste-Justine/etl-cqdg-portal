@@ -3,11 +3,11 @@ package bio.ferlab.etl.enriched
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.spark3.genomics.enriched.Variants
 import bio.ferlab.datalake.testutils.models.enriched._
-import bio.ferlab.datalake.testutils.models.frequency.{Frequency, FrequencyByStudyId, GlobalFrequency}
+import bio.ferlab.datalake.testutils.models.frequency.{FrequencyByStudyId, GlobalFrequency}
 import bio.ferlab.datalake.testutils.models.normalized._
 import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
 import bio.ferlab.etl.WithTestConfig
-import bio.ferlab.etl.model.NORMALIZED_SNV
+import bio.ferlab.etl.model._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.explode
 
@@ -100,32 +100,33 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     val studiesFreq = result
       .select(explode($"studies") as "studies")
       .select("studies.*")
-      .as[FrequencyByStudyId]
+      .as[STUDY]
       .collect()
 
     val internalFreqWgs = result
       .select($"internal_frequencies_wgs.*")
-      .as[GlobalFrequency]
+      .as[INTERNAL_FREQUENCIES_WGS]
       .collect()
 
     studiesFreq should contain theSameElementsAs Seq(
-      FrequencyByStudyId(study_id = "S1",
-        total = Frequency(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
+      STUDY(study_id = "S1",
+        total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
         participant_ids = Set("PA0001", "PA0002", "PA0003", "PA0004", "PA0005", "PA0006", "PA0007", "PA0008", "PA0009", "PA0010"),
-        transmissions = Set("autosomal_dominant"),
+        transmission = Set("autosomal_dominant"),
+        zygosity = Set("HET"),
         study_code = "study_code1"
       ),
-      FrequencyByStudyId(study_id = "S3",
-        total = Frequency(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
+      STUDY(study_id = "S3",
+        total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
         participant_ids = null,
-        transmissions = Set("autosomal_dominant"),
+        transmission = Set("autosomal_dominant"),
+        zygosity = Set("HET"),
         study_code = "CAG"
       )
     )
 
     internalFreqWgs should contain theSameElementsAs Seq(
-      GlobalFrequency(total = Frequency(ac = 20, an = 40, pc = 20, pn = 20, hom = 0, af = 0.5, pf = 1.0),
-        zygosities = Set("HET"))
+      INTERNAL_FREQUENCIES_WGS(total = TOTAL(ac = 20, an = 40, pc = 20, pn = 20, hom = 0, af = 0.5, pf = 1.0))
     )
   }
 

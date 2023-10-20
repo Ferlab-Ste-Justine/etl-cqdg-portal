@@ -44,16 +44,14 @@ object RunEnrichGenomic {
           FirstElement("study_code", col("study_code")),
           AtLeast10ParticipantsExceptCag(),
           SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)),
+          SimpleAggregation(name = "zygosity", c = col("zygosity"))
         )
       ),
       FrequencySplit(
         "internal_frequencies_wgs",
         filter = Some(col("source") === "WGS"),
         splitBy = None,
-        byAffected = false,
-        extraAggregations = Seq(
-          SimpleAggregation(name = "zygosities", c = col("zygosity"))
-        )
+        byAffected = false
       )))
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
