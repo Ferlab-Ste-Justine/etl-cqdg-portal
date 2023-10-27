@@ -12,7 +12,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
@@ -23,7 +23,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: S
 
     Map(
       "raw_vcf" -> vcf(raw_variant_calling.location
-        .replace("{{STUDY_ID}}", s"$studyId")
+        .replace("{{STUDY_CODE}}", s"$studyCode")
         .replace("{{DATASET}}", s"$dataset")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),

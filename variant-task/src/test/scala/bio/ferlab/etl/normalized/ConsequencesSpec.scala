@@ -26,7 +26,7 @@ class ConsequencesSpec extends SparkSpec with WithTestConfig {
 
 
   it should "generate normalized consequences from input VCF" in {
-    val results = Consequences(TestETLContext(), "STU0000001", "owner", "dataset_default", None).transform(data)
+    val results = Consequences(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", None).transform(data)
 
     val result = results("normalized_consequences").as[NormalizedConsequences].collect()
 

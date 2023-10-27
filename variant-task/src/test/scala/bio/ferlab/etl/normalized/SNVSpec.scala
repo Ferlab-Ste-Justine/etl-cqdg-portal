@@ -41,7 +41,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
       ).toDF()
     )
 
-    val results = SNV(TestETLContext(), "STU0000001", "owner", "dataset_default", releaseId = "1", None).transform(dataFomVCFFile)
+    val results = SNV(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", releaseId = "1", None).transform(dataFomVCFFile)
 
     val result = results("normalized_snv").as[NORMALIZED_SNV].collect()
 
