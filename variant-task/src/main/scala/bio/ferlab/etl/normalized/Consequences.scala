@@ -4,10 +4,8 @@ import bio.ferlab.datalake.commons.config.{DatasetConf, RuntimeETLContext}
 import bio.ferlab.datalake.spark3.genomics.normalized.BaseConsequences
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.vcf
-import bio.ferlab.etl.mainutils.Study
-import mainargs.{ParserForMethods, main}
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{col, lit}
+import org.apache.spark.sql.functions.{array_contains, col, lit}
 
 import java.time.LocalDateTime
 
@@ -27,7 +25,10 @@ case class Consequences(rc: RuntimeETLContext, studyId: String, owner: String, d
   }
 
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
-    super.transformSingle(data, lastRunDateTime, currentRunDateTime)
+    // Remove low quality variants
+    val filteredVcf = data(raw_vcf).filter(!array_contains(col("INFO_FILTERS"), "PASS"))
+
+    super.transformSingle(data + (raw_vcf -> filteredVcf), lastRunDateTime, currentRunDateTime)
       .withColumn("study_id", lit(studyId))
   }
 }

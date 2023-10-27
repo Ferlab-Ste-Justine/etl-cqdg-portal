@@ -24,10 +24,15 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
 
   it should "generate NormalizedSNV from input raw VCF" in {
     val dataFomVCFFile: Map[String, DataFrame] = Map(
-      raw_variant_calling.id -> Seq(VCF_SNV_INPUT(`genotypes` = List(
-        GENOTYPES(`sampleId` = "S1"),
-        GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
-        GENOTYPES(`sampleId` = "S3")))).toDF(),
+      raw_variant_calling.id -> Seq(
+        VCF_SNV_INPUT(`contigName` = "chr1", `INFO_FILTERS` = Seq("DRAGENSnpHardQUAL"),
+        `genotypes` = List(
+          GENOTYPES(`sampleId` = "S1"),
+          GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
+          GENOTYPES(`sampleId` = "S3"))),
+        VCF_SNV_INPUT(`contigName` = "chr2", `INFO_FILTERS` = Seq("PASS"),
+          `genotypes` = List(GENOTYPES(`sampleId` = "S4"))) // Should be filtered out
+      ).toDF(),
       specimenEnriched.id -> specimenEnrichedDf,
       normalized_task.id -> Seq(
         NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S1", `experimental_strategy` = "WGS"),
@@ -59,6 +64,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `source` = "WXS"
       )
 
+    result.filter(e => e.`sample_id` === "S4") shouldBe empty // Low quality variant
   }
 }
 
