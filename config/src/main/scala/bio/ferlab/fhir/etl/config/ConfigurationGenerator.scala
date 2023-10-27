@@ -126,7 +126,7 @@ object ConfigurationGenerator extends App {
   val cqdgConf = Map(
     "fhir" -> "http://localhost:8080",
     "qaDbName" -> "cqdg_portal_qa",
-    "prdDbName" -> "cqdg_portal_prd",
+    "prdDbName" -> "cqdg_portal_prod",
     "localDbName" -> "normalized",
     "bucketNamePrefix" -> "cqdg-{ENV}-app-datalake"
   )
@@ -184,7 +184,7 @@ object ConfigurationGenerator extends App {
       sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
     )))
 
-    ConfigurationWriter.writeTo(s"config/output/config/prd-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
+    ConfigurationWriter.writeTo(s"config/output/config/prod-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
         StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "prod")}", S3),
         StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
