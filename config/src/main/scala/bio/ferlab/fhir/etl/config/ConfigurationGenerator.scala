@@ -187,7 +187,7 @@ object ConfigurationGenerator extends App {
     ConfigurationWriter.writeTo(s"config/output/config/prod-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
       storages = List(
         StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "prod")}", S3),
-        StorageConf(storage_vcf, "s3a://cqdg-qa-file-import", S3)
+        StorageConf(storage_vcf, "s3a://cqdg-prod-file-import", S3)
       ),
       sources = populateTable(sources, conf(project)("prdDbName")),
       args = args.toList,
