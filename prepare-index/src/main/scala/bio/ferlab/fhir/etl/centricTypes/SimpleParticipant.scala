@@ -49,6 +49,7 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
 
     val shortStudyCode = data(normalized_researchstudy.id)
       .select("fhir_id", "study_code")
+      .filter(col("study_code") =!= "CAG") // CAG participants should not be indexed
       .withColumn("study", struct(col("study_code")))
       .withColumnRenamed("fhir_id", "study_id")
 
