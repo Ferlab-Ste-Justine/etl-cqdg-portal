@@ -95,8 +95,6 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
   "variants ETL" should "only compute frequencies for whole genomes" in {
     val result = variantsETL.transformSingle(data)
 
-    result.show(false)
-
     val studiesFreq = result
       .select(explode($"studies") as "studies")
       .select("studies.*")
@@ -111,14 +109,12 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     studiesFreq should contain theSameElementsAs Seq(
       STUDY(study_id = "S1",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
-        participant_ids = Set("PA0001", "PA0002", "PA0003", "PA0004", "PA0005", "PA0006", "PA0007", "PA0008", "PA0009", "PA0010"),
         transmission = Set("autosomal_dominant"),
         zygosity = Set("HET"),
         study_code = "study_code1"
       ),
       STUDY(study_id = "S3",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
-        participant_ids = null,
         transmission = Set("autosomal_dominant"),
         zygosity = Set("HET"),
         study_code = "CAG"

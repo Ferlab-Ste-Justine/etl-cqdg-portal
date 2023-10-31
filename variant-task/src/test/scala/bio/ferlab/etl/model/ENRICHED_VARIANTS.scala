@@ -111,7 +111,6 @@ case class HPO(`hpo_term_id`: Option[String] = None,
 case class STUDY(`study_id`: String = "S1",
                  `total`: TOTAL = TOTAL(),
                  `study_code`: String = "study_code1",
-                 `participant_ids`: Set[String] = Set("PA0010", "PA0005", "PA0003", "PA0001", "PA0008", "PA0009", "PA0004", "PA0002", "PA0006", "PA0007"),
                  `transmission`: Set[String] = Set("autosomal_dominant"),
                  `zygosity`: Set[String] = Set("HET"))
 

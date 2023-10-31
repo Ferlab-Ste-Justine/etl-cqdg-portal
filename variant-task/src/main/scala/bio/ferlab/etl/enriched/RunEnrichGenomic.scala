@@ -22,14 +22,6 @@ object RunEnrichGenomic {
     consequences(rc)
   }
 
-  private case class AtLeast10ParticipantsExceptCag() extends OccurrenceAggregation {
-    override val name: String = "participant_ids"
-    override val c: Column = col("participant_id")
-    override val filter: Column => Column = aggColumn => when(col("study_code") === "CAG", lit(null))
-      .when(size(aggColumn) >= 10, aggColumn)
-      .otherwise(lit(null))
-  }
-
   def variants(rc: RuntimeETLContext): Variants = Variants(
     rc = rc,
     snvDatasetId = "normalized_snv",
@@ -42,7 +34,6 @@ object RunEnrichGenomic {
         byAffected = false,
         extraAggregations = Seq(
           FirstElement("study_code", col("study_code")),
-          AtLeast10ParticipantsExceptCag(),
           SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)),
           SimpleAggregation(name = "zygosity", c = col("zygosity"))
         )

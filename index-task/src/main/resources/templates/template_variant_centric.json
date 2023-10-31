@@ -545,10 +545,6 @@
                 }
               }
             },
-            "participant_ids": {
-              "type": "keyword",
-              "index": false
-            },
             "study_code": {
               "type": "keyword"
             },
