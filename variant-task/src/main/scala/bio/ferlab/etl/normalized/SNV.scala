@@ -65,7 +65,7 @@ object SNV {
         .select($"ldm_sample_id" as "sample_id",
           $"experimental_strategy" as "source")
 
-      df.join(taskDf, Seq("sample_id"), "left")
+      df.join(broadcast(taskDf), Seq("sample_id"), "left")
     }
   }
 
