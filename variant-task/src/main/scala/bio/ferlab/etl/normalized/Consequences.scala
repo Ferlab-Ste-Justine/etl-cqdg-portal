@@ -26,7 +26,7 @@ case class Consequences(rc: RuntimeETLContext, studyId: String, studyCode: Strin
 
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
     // Remove low quality variants
-    val filteredVcf = data(raw_vcf).filter(!array_contains(col("INFO_FILTERS"), "PASS"))
+    val filteredVcf = data(raw_vcf).filter(array_contains(col("INFO_FILTERS"), "PASS"))
 
     super.transformSingle(data + (raw_vcf -> filteredVcf), lastRunDateTime, currentRunDateTime)
       .withColumn("study_id", lit(studyId))

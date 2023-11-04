@@ -14,12 +14,12 @@ class ConsequencesSpec extends SparkSpec with WithTestConfig {
 
   val data: Map[String, DataFrame] = Map(
     raw_variant_calling.id -> Seq(
-      VCF_SNV_INPUT(`contigName` = "chr1", `INFO_FILTERS` = Seq("DRAGENSnpHardQUAL"),
+      VCF_SNV_INPUT(`contigName` = "chr1", `INFO_FILTERS` = Seq("PASS"),
         `genotypes` = List(
           GENOTYPES(),
           GENOTYPES(`sampleId` = "S20279", `calls` = List(0, 0)),
           GENOTYPES(`sampleId` = "S20280"))),
-      VCF_SNV_INPUT(`contigName` = "chr2", `INFO_FILTERS` = Seq("PASS"),
+      VCF_SNV_INPUT(`contigName` = "chr2", `INFO_FILTERS` = Seq("DRAGENSnpHardQUAL"),
         `genotypes` = List(GENOTYPES(`sampleId` = "S20281"))) // Should be filtered out
     ).toDF(),
   )
