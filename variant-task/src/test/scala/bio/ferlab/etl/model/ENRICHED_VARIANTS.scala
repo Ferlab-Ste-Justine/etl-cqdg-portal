@@ -114,6 +114,11 @@ case class STUDY(`study_id`: String = "S1",
                  `transmission`: Set[String] = Set("autosomal_dominant"),
                  `zygosity`: Set[String] = Set("HET"))
 
+case class STUDY_WITHOUT_TRANSMISSION(`study_id`: String = "S1",
+                                      `total`: TOTAL = TOTAL(),
+                                      `study_code`: String = "study_code1",
+                                      `zygosity`: Set[String] = Set("HET"))
+
 case class SPLICEAI(`ds`: Option[Double] = None,
                     `type`: Option[Seq[String]] = None)
 
