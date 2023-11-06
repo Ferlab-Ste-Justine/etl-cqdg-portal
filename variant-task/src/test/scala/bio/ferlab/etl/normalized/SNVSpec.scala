@@ -3,7 +3,7 @@ package bio.ferlab.etl.normalized
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.etl.{WithSparkSession, WithTestConfig}
-import bio.ferlab.etl.model.{GENOTYPES, NORMALIZED_SNV, NORMALIZED_TASK, SPECIMEN_ENRICHED, VCF_SNV_INPUT}
+import bio.ferlab.etl.model.{GENOTYPES, NORMALIZED_SNV, NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN, NORMALIZED_TASK, SPECIMEN_ENRICHED, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -43,22 +43,22 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
 
     val results = SNV(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", releaseId = "1", None).transform(dataFomVCFFile)
 
-    val result = results("normalized_snv").as[NORMALIZED_SNV].collect()
+    val result = results("normalized_snv").as[NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN].collect()
 
-    result.filter(e => e.`sample_id` === "S1").head shouldBe NORMALIZED_SNV()
+    result.filter(e => e.`sample_id` === "S1").head shouldBe NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN()
     result.filter(e => e.`sample_id` === "S2").head shouldBe
-      NORMALIZED_SNV(
+      NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(
         `sample_id` = "S2",
         `participant_id` = "P2",
         `affected_status` = false,
         `calls` = Seq(0, 0),
         `has_alt` = false,
         `zygosity` = "WT",
-        `parental_origin` = null,
-        `transmission_mode` = "non_carrier_proband"
+//        `parental_origin` = null,
+//        `transmission_mode` = "non_carrier_proband"
       )
     result.filter(e => e.`sample_id` === "S3").head shouldBe
-      NORMALIZED_SNV(
+      NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(
         `sample_id` = "S3",
         `participant_id` = "P3",
         `source` = "WXS"

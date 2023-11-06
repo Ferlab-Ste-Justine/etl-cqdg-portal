@@ -43,12 +43,14 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
 
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
-      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
-        participantIdColumn = col("participant_id"),
-        familyIdColumn = col("family_id")
-      )
-      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
+      // Parental origin + transmission computation were removed for performance
+
+//      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
+//        participantIdColumn = col("participant_id"),
+//        familyIdColumn = col("family_id")
+//      )
+//      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
+//      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
       .withSource(data(normalized_task.id))
     //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }

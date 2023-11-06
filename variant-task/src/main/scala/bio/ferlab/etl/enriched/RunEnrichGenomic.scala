@@ -34,7 +34,7 @@ object RunEnrichGenomic {
         byAffected = false,
         extraAggregations = Seq(
           FirstElement("study_code", col("study_code")),
-          SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)),
+//          SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)), ----> Removed in SNV for performance
           SimpleAggregation(name = "zygosity", c = col("zygosity"))
         )
       ),

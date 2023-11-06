@@ -548,6 +548,9 @@
             "study_code": {
               "type": "keyword"
             },
+            "transmission": {
+              "type": "keyword"
+            },
             "zygosity": {
               "type": "keyword"
             }
