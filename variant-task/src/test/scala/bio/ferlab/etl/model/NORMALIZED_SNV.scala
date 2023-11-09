@@ -7,6 +7,7 @@ package bio.ferlab.etl.model
 case class NORMALIZED_SNV(`sample_id`: String = "S1",
                           `chromosome`: String = "1",
                           `dataset`: String = "dataset_default",
+                          `batch`: String = "annotated_vcf",
                           `start`: Long = 14464,
                           `end`: Long = 14465,
                           `reference`: String = "A",

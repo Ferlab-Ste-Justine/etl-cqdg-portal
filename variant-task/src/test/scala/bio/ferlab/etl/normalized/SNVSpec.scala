@@ -26,10 +26,10 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
     val dataFomVCFFile: Map[String, DataFrame] = Map(
       raw_variant_calling.id -> Seq(
         VCF_SNV_INPUT(`contigName` = "chr1", `INFO_FILTERS` = Seq("PASS"),
-        `genotypes` = List(
-          GENOTYPES(`sampleId` = "S1"),
-          GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
-          GENOTYPES(`sampleId` = "S3"))),
+          `genotypes` = List(
+            GENOTYPES(`sampleId` = "S1"),
+            GENOTYPES(`sampleId` = "S2", `calls` = List(0, 0)),
+            GENOTYPES(`sampleId` = "S3"))),
         VCF_SNV_INPUT(`contigName` = "chr2", `INFO_FILTERS` = Seq("DRAGENSnpHardQUAL"),
           `genotypes` = List(GENOTYPES(`sampleId` = "S4"))) // Should be filtered out
       ).toDF(),
@@ -41,7 +41,7 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
       ).toDF()
     )
 
-    val results = SNV(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", releaseId = "1", None).transform(dataFomVCFFile)
+    val results = SNV(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", "annotated_vcf", releaseId = "1", None).transform(dataFomVCFFile)
 
     val result = results("normalized_snv").as[NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN].collect()
 
@@ -54,8 +54,8 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
         `calls` = Seq(0, 0),
         `has_alt` = false,
         `zygosity` = "WT",
-//        `parental_origin` = null,
-//        `transmission_mode` = "non_carrier_proband"
+        //        `parental_origin` = null,
+        //        `transmission_mode` = "non_carrier_proband"
       )
     result.filter(e => e.`sample_id` === "S3").head shouldBe
       NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(
