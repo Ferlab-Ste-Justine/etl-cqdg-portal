@@ -1,7 +1,7 @@
 package bio.ferlab.fhir.etl.config
 
 import bio.ferlab.datalake.commons.config.Format.{AVRO, DELTA, JSON, PARQUET, VCF}
-import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition, Scd1}
+import bio.ferlab.datalake.commons.config.LoadType.{OverWrite, OverWritePartition, Read, Scd1}
 import bio.ferlab.datalake.commons.config._
 import bio.ferlab.datalake.commons.file.FileSystemType.S3
 import bio.ferlab.datalake.spark3.genomics.GenomicDatasets
@@ -92,9 +92,9 @@ object ConfigurationGenerator extends App {
       DatasetConf(
         id = "raw_vcf",
         storageid = storage_vcf,
-        path = "/{{OWNER}}/{{STUDY_CODE}}/{{DATASET}}/variants.*.vep.vcf.gz",
+        path = "/{{OWNER}}/{{STUDY_CODE}}/{{DATASET}}/{{BATCH}}/variants.*.vep.vcf.gz",
         format = VCF,
-        loadtype = OverWrite,
+        loadtype = Read,
         partitionby = List("chromosome"),
         table = Some(TableConf("database", "raw_vcf")),
         keys = List("chromosome", "start", "reference", "alternate", "ensembl_transcript_id"),
@@ -107,7 +107,7 @@ object ConfigurationGenerator extends App {
         format = DELTA,
         loadtype = OverWritePartition,
         table = Some(TableConf("database", "normalized_snv")),
-        partitionby = List("study_id", "dataset", "has_alt", "chromosome"),
+        partitionby = List("study_id", "dataset", "batch", "has_alt", "chromosome"),
         writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
         repartition = Some(RepartitionByRange(Seq("chromosome", "start"), Some(100)))
       ),

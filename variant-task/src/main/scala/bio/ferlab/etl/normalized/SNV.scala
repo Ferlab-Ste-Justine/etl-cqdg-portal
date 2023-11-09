@@ -12,7 +12,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner: String, dataset: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner: String, dataset: String, batch: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
@@ -25,6 +25,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
       "raw_vcf" -> vcf(raw_variant_calling.location
         .replace("{{STUDY_CODE}}", s"$studyCode")
         .replace("{{DATASET}}", s"$dataset")
+        .replace("{{BATCH}}", s"$batch")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),
       enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId),
@@ -39,23 +40,23 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
     val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
-    val occurrences = selectOccurrences(vcf, releaseId, dataset)
+    val occurrences = selectOccurrences(vcf, releaseId, dataset, batch)
 
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
       // Parental origin + transmission computation were removed for performance
 
-//      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
-//        participantIdColumn = col("participant_id"),
-//        familyIdColumn = col("family_id")
-//      )
-//      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-//      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
+      //      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
+      //        participantIdColumn = col("participant_id"),
+      //        familyIdColumn = col("family_id")
+      //      )
+      //      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
+      //      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
       .withSource(data(normalized_task.id))
     //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
-  override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset'")
+  override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset' and batch='$batch' ")
 
 }
 
@@ -71,7 +72,7 @@ object SNV {
     }
   }
 
-  private def selectOccurrences(inputDF: DataFrame, releaseId: String, dataset: String): DataFrame = {
+  private def selectOccurrences(inputDF: DataFrame, releaseId: String, dataset: String, batch:String): DataFrame = {
     val occurrences = inputDF
       .select(
         chromosome,
@@ -109,6 +110,7 @@ object SNV {
         //        col("file_name"),
         lit(releaseId) as "release_id",
         lit(dataset) as "dataset",
+        lit(batch) as "batch",
         is_normalized
       )
       .drop("annotation")
