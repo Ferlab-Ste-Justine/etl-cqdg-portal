@@ -171,7 +171,9 @@ object Transformations {
       .withColumn(
         "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
       )
-      .withColumn("domain", col("category")("coding")(0)("code"))
+      .withColumn("domain", transform(col("category")("coding")(0),  col => when(
+        isnull(col("display")), col("code")
+      ).otherwise(col("display"))))
       .withColumn("study_code", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
       .withColumn("access_limitations", transform(
         filter(col("extension"), col => col("url") === ACCESS_LIMITATIONS_S_D)(0)("valueCodeableConcept")("coding"),
