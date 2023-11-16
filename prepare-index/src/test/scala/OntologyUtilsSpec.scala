@@ -1,6 +1,6 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.OntologyUtils.{getDiagnosis, getTaggedPhenotypes}
-import model.{AGE_AT, DIAGNOSIS, DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS, PHENOTYPE_TAGGED_WITH_OBSERVED}
+import model.{DIAGNOSIS, DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS, PHENOTYPE_TAGGED_WITH_OBSERVED}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -14,9 +14,9 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
   "getTaggedPhenotypes" should "return tagged phenotypes and tagged phenotypes with ancestors" in {
 
-    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1))
-    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(2))
-    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG", `age_at_phenotype` = Some(3))
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Young"))
+    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Old"))
+    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG", `age_at_phenotype` = Some("Super Old"))
 
     val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 
@@ -27,8 +27,8 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some(1), `source_text` = "text"),
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some(2), `source_text` = "text"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Old"), `source_text` = "text"),
       ))
 
     //observed phenotypes tagged
@@ -36,7 +36,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     notTaggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "3", `parents` = Seq("A Name (HP:A)"), `name` = "C Name (HP:C)", `age_at_event` = Some(3), `source_text` = "text"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "3", `parents` = Seq("A Name (HP:A)"), `name` = "C Name (HP:C)", `age_at_event` = Some("Super Old"), `source_text` = "text"),
       ))
 
     //observed phenotypes with ancestors
@@ -44,16 +44,16 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
       Seq(
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(2), `name` = "C Name (HP:C)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq(2), `name` = "E Name (HP:E)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Seq(1), `name` = "G Name (HP:G)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1, 2), `name` = "B Name (HP:B)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq(1, 2), `name` = "A Name (HP:A)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq("Old"), `name` = "C Name (HP:C)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq("Old"), `name` = "E Name (HP:E)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Seq("Young"), `name` = "G Name (HP:G)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq("Old", "Young"), `name` = "B Name (HP:B)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq( "Old", "Young"), `name` = "A Name (HP:A)"),
       )
   }
 
   it should "return replace phenotypes that are obsolete" in {
-    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1), `phenotype_source_text` = "text")
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Young"), `phenotype_source_text` = "text")
     val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:D"), `cqdg_participant_id` = "1", `phenotype_source_text` = "text")
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
@@ -65,7 +65,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some(1), `source_text` = "text"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Young"), `source_text` = "text"),
         // HP:D (obsolete) should be changed to HP:G (alternate)
         PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = None, `source_text` = "text"),
       ))
@@ -75,16 +75,16 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
       Seq(
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1), `name` = "C Name (HP:C)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq(1), `name` = "E Name (HP:E)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq("Young"), `name` = "C Name (HP:C)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Seq("Young"), `name` = "E Name (HP:E)"),
         PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Nil, `name` = "G Name (HP:G)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1), `name` = "B Name (HP:B)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq(1), `name` = "A Name (HP:A)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq("Young"), `name` = "B Name (HP:B)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq("Young"), `name` = "A Name (HP:A)"),
       )
   }
 
   it should "return phenotypes when no age at phenotype present" in {
-    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1), `phenotype_source_text` = "text")
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Young"), `phenotype_source_text` = "text")
     val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `phenotype_source_text` = "text")
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
@@ -96,7 +96,7 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some(1), `source_text` = "text"),
+        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text"),
         PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = None, `source_text` = "text"),
       ))
 
@@ -107,9 +107,9 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
       Seq(
         PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Nil, `name` = "C Name (HP:C)"),
         PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Nil, `name` = "E Name (HP:E)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Seq(1), `name` = "G Name (HP:G)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq(1), `name` = "B Name (HP:B)"),
-        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq(1), `name` = "A Name (HP:A)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`is_leaf` = true, `is_tagged` = true, `parents` = Seq("B Name (HP:B)"), `age_at_event` = Seq("Young"), `name` = "G Name (HP:G)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Seq("A Name (HP:A)"), `age_at_event` = Seq("Young"), `name` = "B Name (HP:B)"),
+        PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq("Young"), `name` = "A Name (HP:A)"),
       )
   }
 
@@ -160,9 +160,9 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
   }
 
   it should "return phenotypes tagged observed and non observed" in {
-    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(1))
-    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some(2))
-    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG", `age_at_phenotype` = Some(3))
+    val phenotype1 = PHENOTYPE(`fhir_id` = "1", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Young"))
+    val phenotype2 = PHENOTYPE(`fhir_id` = "2", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:E"), `cqdg_participant_id` = "1", `age_at_phenotype` = Some("Old"))
+    val phenotype3 = PHENOTYPE(`fhir_id` = "3", `phenotype_source_text` = "text", `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:C"), `cqdg_participant_id` = "1", `phenotype_observed` = "NEG", `age_at_phenotype` = Some("Old"))
 
     val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 

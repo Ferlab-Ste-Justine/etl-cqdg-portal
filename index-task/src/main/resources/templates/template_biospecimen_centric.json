@@ -26,7 +26,7 @@
           "type": "keyword"
         },
         "age_biospecimen_collection": {
-          "type": "long"
+          "type": "keyword"
         },
         "submitter_biospecimen_id": {
           "type": "keyword"
@@ -85,7 +85,7 @@
               "type": "keyword"
             },
             "age_at_recruitment": {
-              "type": "integer"
+              "type": "keyword"
             },
             "ethnicity": {
               "type": "keyword"
@@ -94,7 +94,7 @@
               "type": "keyword"
             },
             "age_of_death": {
-              "type": "integer"
+              "type": "keyword"
             },
             "cause_of_death": {
               "type": "keyword"
@@ -118,7 +118,7 @@
                   "type": "keyword"
                 },
                 "age_at_diagnosis": {
-                  "type": "long"
+                  "type": "keyword"
                 },
                 "diagnosis_mondo_display": {
                   "type": "keyword"
@@ -150,7 +150,7 @@
                   "type": "keyword"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },
@@ -176,7 +176,7 @@
                   "type": "keyword"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },
@@ -196,7 +196,7 @@
                   "type": "boolean"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },
@@ -222,7 +222,7 @@
                   "type": "boolean"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },
@@ -248,7 +248,7 @@
                   "type": "boolean"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },
@@ -274,7 +274,7 @@
                   "type": "boolean"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 },
                 "is_observed": {
                   "type": "boolean"
@@ -297,7 +297,7 @@
                   "type": "boolean"
                 },
                 "age_at_event": {
-                  "type": "integer"
+                  "type": "keyword"
                 }
               }
             },

@@ -92,7 +92,6 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     biospecimen_centricCollect.find(_.`biospecimen_id` == "B1") shouldBe Some(
       BIOSPECIMEN_CENTRIC(
         `biospecimen_id` = "B1",
-        `age_biospecimen_collection` = 17174,
         `submitter_biospecimen_id` = "cag_sp_20832",
         `participant` = SIMPLE_PARTICIPANT(
           `participant_id` = "P1",
@@ -119,7 +118,6 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     biospecimen_centricCollect.find(_.`biospecimen_id` == "B4") shouldBe Some(
       BIOSPECIMEN_CENTRIC(
         `biospecimen_id` = "B4",
-        `age_biospecimen_collection` = 17174,
         `submitter_biospecimen_id` = "cag_sp_20832",
         `participant` = SIMPLE_PARTICIPANT(
           `participant_id` = "P3",

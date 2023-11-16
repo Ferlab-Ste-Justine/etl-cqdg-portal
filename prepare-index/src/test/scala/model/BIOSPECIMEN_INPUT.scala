@@ -7,14 +7,9 @@ case class BIOSPECIMEN_INPUT(
                         `release_id`: String = "5",
                         `security`: String = "R",
                         `biospecimen_tissue_source`: CODE_SYSTEM = CODE_SYSTEM(`code` = "NCIT:C12434", `display` = "Blood"),
-                        `age_biospecimen_collection`: AGE_AT_COLLECTION = AGE_AT_COLLECTION(),
+                        `age_biospecimen_collection`: String = "Young",
                         `submitter_biospecimen_id`: String = "cag_sp_20832",
                       )
-
-case class AGE_AT_COLLECTION (
-                               `value`: Long = 17174,
-                               `unit`: String = "days",
-                             )
 
 case class SAMPLE_INPUT(
                        `subject`: String = "PRT0504459",

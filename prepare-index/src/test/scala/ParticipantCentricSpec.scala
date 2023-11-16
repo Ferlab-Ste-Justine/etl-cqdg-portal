@@ -47,7 +47,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       PARTICIPANT_CENTRIC(
         `participant_id`= "P1",
         `vital_status` = Some("Unknown"),
-        `biospecimens` = Seq(BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  17174, `sample_id` = "S1", `sample_2_id` = "S1")),
+        `biospecimens` = Seq(BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1", `sample_2_id` = "S1")),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(
             `file_id` = Some("F1"),
@@ -60,7 +60,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `data_type` = Some("SSUP"),
             `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(
-              BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  17174, `sample_id` = "S1",  `sample_2_id` = "S1")),
+              BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1",  `sample_2_id` = "S1")),
           ),
         )
       )

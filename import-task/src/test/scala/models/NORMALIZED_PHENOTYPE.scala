@@ -8,7 +8,7 @@ package models
 
 
 case class NORMALIZED_PHENOTYPE(`fhir_id`: String = "PHE0000002",
-                                `age_at_phenotype`: Int = 19710,
+                                `age_at_phenotype`: String = "HP:0003596",
                                 `phenotype_source_text`: String = "Hypertension",
                                 `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
                                 `cqdg_participant_id`: String = "PRT0000002",

@@ -106,7 +106,7 @@ object OntologyUtils {
     val mondoWithTerms = diagnosisDf
       .withColumnRenamed("diagnosis_mondo_code", "phenotype_id")
       .join(mondoTerms, col("phenotype_id") === col("id"), "left_outer")
-      .withColumn("age_at_event", col("age_at_diagnosis")("value"))
+      .withColumn("age_at_event", col("age_at_diagnosis"))
       .withColumnRenamed("subject", "cqdg_participant_id")
       .withColumnRenamed("diagnosis_source_text", "source_text")
 
@@ -122,7 +122,7 @@ object OntologyUtils {
     val icdWithTerms = diagnosisDf
       .withColumnRenamed("diagnosis_ICD_code", "phenotype_id")
       .join(icdSplitId, col("phenotype_id") === col("id"), "left_outer")
-      .withColumn("age_at_event", col("age_at_diagnosis")("value"))
+      .withColumn("age_at_event", col("age_at_diagnosis"))
       .withColumnRenamed("subject", "cqdg_participant_id")
       .withColumnRenamed("diagnosis_source_text", "source_text")
 
@@ -130,7 +130,6 @@ object OntologyUtils {
       .withColumnRenamed("cqdg_participant_id", "subject")
 
     (diagnosisDf
-      .withColumn("age_at_diagnosis", col("age_at_diagnosis")("value"))
       .join(mondoTerms, col("diagnosis_mondo_code") === col("id"), "left_outer")
       .withColumn("diagnosis_mondo_display",
         when(col("id").isNotNull,

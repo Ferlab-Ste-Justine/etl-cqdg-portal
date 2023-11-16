@@ -12,9 +12,6 @@ case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000001",
                                 `diagnosis_source_text`: String = "Eczema",
                                 `diagnosis_mondo_code`: String = "MONDO:0004980",
                                 `diagnosis_ICD_code`: String = "L20.9",
-                                `age_at_diagnosis`: AGE_AT_DIAGNOSIS = AGE_AT_DIAGNOSIS(),
+                                `age_at_diagnosis`: String = "HP:0003577",
                                 `study_id`: String = "STU0000001",
                                 `release_id`: String = "1")
-
-case class AGE_AT_DIAGNOSIS(`value`: Int = 0,
-                            `unit`: String = "days")

@@ -7,7 +7,7 @@ case class PATIENT(
                     `fhir_id`: String = "PRT0483534",
                     `gender`: String = "male",
                     `deceasedBoolean`: Boolean = false,
-                    `age_at_recruitment`: Int = 19328,
+                    `age_at_recruitment`: String = "Young",
                     `ethnicity`: String = "European",
                     `submitter_participant_id`: String = "35849427674",
                     `age_of_death`: String = null,
@@ -20,11 +20,11 @@ case class PATIENT_INPUT(
                     `fhir_id`: String = "PRT0483534",
                     `gender`: String = "male",
                     `vital_status`: String = "Unknown",
-                    `age_at_recruitment`: Int = 19328,
+                    `age_at_recruitment`: String = "Young",
                     `ethnicity`: String = "European",
                     `submitter_participant_id`: String = "35849427674",
                     `security`: String = "R",
-                    `age_of_death`: Int = 12,
+                    `age_of_death`: String = "Old",
                   )
 
 
