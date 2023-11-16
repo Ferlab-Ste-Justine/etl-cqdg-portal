@@ -3,7 +3,7 @@ package model
 case class BIOSPECIMEN(
                         `biospecimen_id`: String = "BIO0041635",
                         `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
-                        `age_biospecimen_collection`: Long = 21,
+                        `age_biospecimen_collection`: String = "Young",
                         `submitter_biospecimen_id`: String = "cag_sp_20832",
                         `sample_id`: String = "sam1",
                         `sample_2_id`: String = "sam1",

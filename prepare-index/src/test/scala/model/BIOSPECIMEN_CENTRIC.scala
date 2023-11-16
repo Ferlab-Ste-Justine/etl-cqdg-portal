@@ -6,7 +6,7 @@ case class BIOSPECIMEN_CENTRIC(
                                 `release_id`: String = "5",
                                 `security`: String = "R",
                                 `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
-                                `age_biospecimen_collection`: Long = 19044,
+                                `age_biospecimen_collection`: String = "Young",
                                 `submitter_biospecimen_id`: String = "cag_sp_00076",
                                 `study`: STUDY_LIGHT = STUDY_LIGHT(),
                                 `participant`: SIMPLE_PARTICIPANT = SIMPLE_PARTICIPANT(),

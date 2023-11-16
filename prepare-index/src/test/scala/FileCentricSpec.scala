@@ -62,11 +62,9 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `biospecimens` = Set(
             BIOSPECIMEN(
               `biospecimen_id` = "B1",
-              `age_biospecimen_collection` = 17174
             ),
             BIOSPECIMEN(
               `biospecimen_id` = "B2",
-              `age_biospecimen_collection` = 17174,
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
             )
@@ -75,15 +73,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
             `participant_id` = "P1",
             `participant_2_id` = "P1",
             `gender` = "male",
-            `age_at_recruitment` = 24566,
             `biospecimens` = Set(
               BIOSPECIMEN(
                 `biospecimen_id` = "B1",
-                `age_biospecimen_collection` = 17174
               ),
               BIOSPECIMEN(
                 `biospecimen_id` = "B2",
-                `age_biospecimen_collection` = 17174,
                 `sample_id` = "sam2",
                 `sample_2_id` = "sam2",
               )
@@ -109,11 +104,9 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `biospecimens` = Set(
           BIOSPECIMEN(
             `biospecimen_id` = "B1",
-            `age_biospecimen_collection` = 17174
           ),
           BIOSPECIMEN(
             `biospecimen_id` = "B2",
-            `age_biospecimen_collection` = 17174,
             `sample_id` = "sam2",
             `sample_2_id` = "sam2",
           )
@@ -122,15 +115,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `participant_id` = "P1",
           `participant_2_id` = "P1",
           `gender` = "male",
-          `age_at_recruitment` = 24566,
           `biospecimens` = Set(
             BIOSPECIMEN(
               `biospecimen_id` = "B1",
-              `age_biospecimen_collection` = 17174
             ),
             BIOSPECIMEN(
               `biospecimen_id` = "B2",
-              `age_biospecimen_collection` = 17174,
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
             )

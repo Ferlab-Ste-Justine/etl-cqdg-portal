@@ -5,7 +5,7 @@ case class DIAGNOSIS(
                       `diagnosis_source_text`: String = "Rheumatoid arthritis",
                       `diagnosis_mondo_code`: String = "MONDO:0008383",
                       `diagnosis_ICD_code`: String = "M06.9",
-                      `age_at_diagnosis`: Long = 12,
+                      `age_at_diagnosis`: String = "Young",
                     )
 
 case class DIAGNOSIS_INPUT(
@@ -16,10 +16,5 @@ case class DIAGNOSIS_INPUT(
                             `diagnosis_source_text`: String = "Rheumatoid arthritis",
                             `diagnosis_mondo_code`: String = "MONDO:0008383",
                             `diagnosis_ICD_code`: String = "M06.9",
-                            `age_at_diagnosis`: AGE_AT = AGE_AT(),
+                            `age_at_diagnosis`: String = "Young",
                     )
-
-case class AGE_AT(
-                             value: Long = 12,
-                             unit: String = "days",
-                           )

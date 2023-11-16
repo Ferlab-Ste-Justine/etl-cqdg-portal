@@ -21,6 +21,7 @@ object Utils {
   case class ValueAge(id: Option[String], value: Option[Long], comparator: Option[String], unit: Option[String], system: Option[String], code: Option[String])
 
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
+  def extractDisplay: Column => Column = col => when(isnull(col("coding")(0)("display")), col("coding")(0)("code")).otherwise(col("coding")(0)("display"))
   val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
 
   val extractValueAge: String => UserDefinedFunction = (url: String) =>

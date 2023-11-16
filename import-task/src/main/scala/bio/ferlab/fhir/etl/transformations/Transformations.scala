@@ -12,8 +12,8 @@ object Transformations {
     Custom(_
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
       .withColumn("age_at_recruitment", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueAge"),
-        col => col("value")
+        filter(col("extension"), col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueCodeableConcept"),
+        extractDisplay
       )))
       .withColumn("ethnicity",
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
@@ -23,7 +23,9 @@ object Transformations {
           .when(!col("deceasedBoolean"), lit("Alive"))
           .otherwise(lit("Unknown"))
       )
-      .withColumn("age_of_death", filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)(0)("valueAge")("value"))
+      .withColumn("age_of_death", firstNonNull(transform(
+        filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)("valueCodeableConcept"), extractDisplay
+      )))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
     Drop("identifier", "extension", "meta")
@@ -63,16 +65,19 @@ object Transformations {
 
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
-      .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type", "meta")
+      .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type", "meta", "parent")
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
-      .withColumn("age_biospecimen_collection", extractValueAge(AGE_AT_EVENT_S_D)(col("extension")).cast("struct<value:long,unit:string>"))
+      .withColumn("age_biospecimen_collection", firstNonNull(transform(
+        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
+        extractDisplay
+      )))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     },
-    Drop("type", "extension", "identifier", "meta")
+    Drop("type", "extension", "identifier", "meta", "parent")
   )
 
   val sampleRegistrationMappings: List[Transformation] = List(
@@ -133,16 +138,19 @@ object Transformations {
 
   val conditionDiagnosisMappings: List[Transformation] = List(
     Custom(_
-      .select("identifier", "code", "subject", "onsetAge", "study_id", "release_id", "fhir_id")
+      .select("identifier", "code", "subject", "study_id", "release_id", "fhir_id", "extension")
       .withColumn("diagnosis_source_text", col("code")("text"))
       .withColumn("diagnosis_mondo_code",
         firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_MONDO))("code")))
       .withColumn("diagnosis_ICD_code",
         firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_ICD))("code")))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("age_at_diagnosis", struct(col("onsetAge")("value") as "value", col("onsetAge")("unit") as "unit"))
+      .withColumn("age_at_diagnosis", firstNonNull(transform(
+        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
+        extractDisplay
+      )))
     ),
-    Drop("identifier", "code", "onsetAge")
+    Drop("identifier", "code", "extension")
   )
 
   val observationPhenotypeMappings: List[Transformation] = List(
@@ -150,8 +158,8 @@ object Transformations {
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("age_at_phenotype", firstNonNull(transform(
-        filter(col("extension"),col => col("url") === AGE_AT_EVENT_S_D)("valueAge"),
-        col => col("value")
+        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
+        extractDisplay
       )))
       .withColumn("phenotype_source_text", col("code")("text"))
       .withColumn("phenotype_HPO_code",
