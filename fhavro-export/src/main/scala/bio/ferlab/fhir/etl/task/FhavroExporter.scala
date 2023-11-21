@@ -5,11 +5,10 @@ import bio.ferlab.fhir.etl.config.FhirRequest
 import bio.ferlab.fhir.etl.fhir.FhirUtils
 import bio.ferlab.fhir.etl.logging.LoggerUtils
 import bio.ferlab.fhir.etl.s3.S3Utils.{buildKey, writeFile}
-import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import org.apache.avro.Schema
 import org.apache.avro.generic.GenericRecord
-import org.hl7.fhir.r4.model.{Bundle, DomainResource, Observation, Patient, ResearchStudy}
+import org.hl7.fhir.r4.model.{Bundle, DomainResource, ResearchStudy}
 import org.slf4j.{Logger, LoggerFactory}
 import software.amazon.awssdk.services.s3.S3Client
 
@@ -20,7 +19,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-class FhavroExporter(bucketName: String, releaseId: String, studyId: String, studyVersion: String)
+class FhavroExporter(bucketName: String, releaseId: String, studyId: String)
                     (implicit val s3Client: S3Client, val fhirClient: IGenericClient) {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
@@ -33,9 +32,32 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String, stu
       .forResource(request.`type`)
       .returnBundle(classOf[Bundle])
 
+    val fhirStudyBundle = fhirClient.search()
+      .forResource("ResearchStudy")
+      .where(ResearchStudy.IDENTIFIER.exactly().code(studyId))
+      .returnBundle(classOf[Bundle])
+      .execute()
+
+    //should only be one matched
+    val fhirStudy = fhirStudyBundle.getEntry.asScala.toList.headOption.map(_.getResource.asInstanceOf[ResearchStudy])
+
+    val bundleWithStudy = bundle.withTag(null, s"study:$studyId")
+
+    val bundleEnrichedWithVersion = fhirStudy match {
+      case Some(study) => {
+        val studyVersion = extractVersionFromRessource(study)
+        if(studyVersion.isDefined){
+          bundleWithStudy.withTag(null, s"study_version:$studyVersion")
+        } else {
+          bundleWithStudy
+        }
+      }
+      case None => bundleWithStudy
+    }
+
     val bundleEnriched = request.`type` match {
       case "Organization" => bundle
-      case _ => bundle.withTag(null, s"study:$studyId").withTag(null, s"study_version:$studyVersion")
+      case _ => bundleEnrichedWithVersion
     }
 
     request.profile.foreach(bundleEnriched.withProfile)
@@ -61,6 +83,11 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String, stu
     val file = convertResources(fhirRequest, resources)
     writeFile(bucketName, key, file)
     LOGGER.info(s"Uploaded ${fhirRequest.schema} successfully!")
+  }
+
+  def extractVersionFromRessource(fhirResource: DomainResource): Option[String] = {
+    val metaTags = fhirResource.getMeta.getTag.asScala.toList
+    metaTags.map(_.getCode).find(_.startsWith("study_version"))
   }
 
   def convertResources(fhirRequest: FhirRequest, resources: List[DomainResource]): File = {
