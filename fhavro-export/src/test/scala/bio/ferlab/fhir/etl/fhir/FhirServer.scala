@@ -42,7 +42,7 @@ trait FhirServer {
     patient.addName().setFamily(lastName).addGiven(firstName)
     patient.setIdElement(IdType.of(patient.setId(identifier)))
     patient.setGender(Enumerations.AdministrativeGender.MALE)
-    patient.setMeta(new Meta().setTag(List(new Coding(null, tag, null)).asJava))
+    patient.setMeta(new Meta().setTag(List(new Coding(null, tag, null), new Coding(null, "study_version:1", null)).asJava))
 
     fhirClient.create()
       .resource(patient)
@@ -53,7 +53,7 @@ trait FhirServer {
   def loadCondition(system:String = "http://purl.obolibrary.org/obo/mondo.owl", code: String = "0007186", tag: String = "SD_ABC") ={
     val cond = new Condition()
     cond.setSubject(new Reference("Patient/1"))
-    cond.setMeta(new Meta().setTag(List(new Coding(null, tag, null)).asJava))
+    cond.setMeta(new Meta().setTag(List(new Coding(null, tag, null), new Coding(null, "study_version:1", null)).asJava))
     cond.setCode(new CodeableConcept().addCoding(new Coding(system, code, "")))
     fhirClient.create()
       .resource(cond)

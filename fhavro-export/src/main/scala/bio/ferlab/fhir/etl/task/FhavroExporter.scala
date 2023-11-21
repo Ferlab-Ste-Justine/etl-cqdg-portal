@@ -20,7 +20,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-class FhavroExporter(bucketName: String, releaseId: String, studyId: String)(implicit val s3Client: S3Client, val fhirClient: IGenericClient) {
+class FhavroExporter(bucketName: String, releaseId: String, studyId: String, studyVersion: String)
+                    (implicit val s3Client: S3Client, val fhirClient: IGenericClient) {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
@@ -34,7 +35,7 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String)(imp
 
     val bundleEnriched = request.`type` match {
       case "Organization" => bundle
-      case _ => bundle.withTag(null, s"study:$studyId")
+      case _ => bundle.withTag(null, s"study:$studyId").withTag(null, s"study_version:$studyVersion")
     }
 
     request.profile.foreach(bundleEnriched.withProfile)
