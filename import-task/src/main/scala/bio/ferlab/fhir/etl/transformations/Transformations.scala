@@ -11,10 +11,7 @@ object Transformations {
   val patientMappings: List[Transformation] = List(
     Custom(_
       .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
-      .withColumn("age_at_recruitment", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_AT_RECRUITMENT_S_D)("valueCodeableConcept"),
-        extractDisplay
-      )))
+      .withColumn("age_at_recruitment", ageFromExtension(col("extension"), AGE_AT_RECRUITMENT_S_D))
       .withColumn("ethnicity",
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
       )
@@ -23,9 +20,7 @@ object Transformations {
           .when(!col("deceasedBoolean"), lit("Alive"))
           .otherwise(lit("Unknown"))
       )
-      .withColumn("age_of_death", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_OF_DEATH_S_D)("valueCodeableConcept"), extractDisplay
-      )))
+      .withColumn("age_of_death", ageFromExtension(col("extension"), AGE_OF_DEATH_S_D))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
     Drop("identifier", "extension", "meta")
@@ -70,10 +65,7 @@ object Transformations {
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
-      .withColumn("age_biospecimen_collection", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
-        extractDisplay
-      )))
+      .withColumn("age_biospecimen_collection", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     },
@@ -145,10 +137,7 @@ object Transformations {
       .withColumn("diagnosis_ICD_code",
         firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_ICD))("code")))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("age_at_diagnosis", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
-        extractDisplay
-      )))
+      .withColumn("age_at_diagnosis", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
     ),
     Drop("identifier", "code", "extension")
   )
@@ -157,10 +146,7 @@ object Transformations {
     Custom(_
       .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
-      .withColumn("age_at_phenotype", firstNonNull(transform(
-        filter(col("extension"), col => col("url") === AGE_AT_EVENT_S_D)("valueCodeableConcept"),
-        extractDisplay
-      )))
+      .withColumn("age_at_phenotype", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
       .withColumn("phenotype_source_text", col("code")("text"))
       .withColumn("phenotype_HPO_code",
          firstNonNull(transform(col("valueCodeableConcept")("coding"), col => struct(col("system") as "system", col("code") as "code")))
