@@ -7,8 +7,6 @@ import org.apache.spark.sql.functions._
 
 object Utils {
 
-  val gen3Host = "data.kidsfirstdrc.org"
-  val dcfHost = "api.gdc.cancer.gov"
   val specimenExtract = "^Specimen\\/([A-Za-z0-9]+)$"
   val patientExtract = "^Patient\\/([A-Za-z0-9]+)$"
   val organizationExtract = "^Organization\\/([A-Za-z0-9]+)$"
@@ -18,35 +16,29 @@ object Utils {
   case class Coding(id: Option[String], system: Option[String], version: Option[String], code: Option[String],
                     display: Option[String], userSelected: Option[String])
 
-  case class ValueAge(id: Option[String], value: Option[Long], comparator: Option[String], unit: Option[String], system: Option[String], code: Option[String])
-
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
   def extractDisplay: Column => Column = col => when(isnull(col("coding")(0)("display")), col("coding")(0)("code")).otherwise(col("coding")(0)("display"))
   val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
-
-  val extractValueAge: String => UserDefinedFunction = (url: String) =>
-    udf(
-      (arr: Seq[(Option[String], Option[ValueAge])])
-      => arr
-        .find(c => c._1.getOrElse("") == url)
-        .map{ case (_, Some(valueAge)) => (valueAge.value, valueAge.unit) })
-
 
   val extractKeywords: UserDefinedFunction =
     udf(
       (arr: Seq[(Option[String], Seq[Coding], Option[String])])
       => arr.map(_._3))
 
-  val retrieveRepository: Column => Column = url => when(url like s"%$gen3Host%", "gen3")
-    .when(url like s"%$dcfHost%", "dcf")
-    .otherwise(null)
+  val ageFromExtension : (Column, String) => Column = (extension, url) => transformAgeSortable(firstNonNull(transform(
+    filter(extension, col => col("url") === url)("valueCodeableConcept"),
+    extractDisplay
+  )))
 
-  val sanitizeFilename: Column => Column = fileName => slice(split(fileName, "/"), -1, 1)(0)
-
-  val age_on_set: (Column, Seq[(Int, Int)]) => Column = (c, intervals) => {
-    val (_, lastHigh) = intervals.last
-    intervals.foldLeft(when(c > lastHigh, s"$lastHigh+")) { case (column, (low, high)) =>
-      column.when(c >= low && c < high, s"$low - $high")
-    }
-  }
+  // see issue CQDG-490
+  val transformAgeSortable: Column => Column = age => when(age contains "Antenatal", "A-antenatal")
+      .when(age like "Congenital%", "B-congenital")
+      .when(age like "Neonatal%", "C-neonatal")
+      .when(age like "Infantile%", "D-infantile")
+      .when(age like "Childhood%", "E-childhood")
+      .when(age like "Juvenile%", "F-juvenile")
+      .when(age like "Young Adult%", "G-young adult")
+      .when(age like "Middle Age%", "H-middle age")
+      .when(age like "Senior%", "I-senior")
+      .otherwise(age)
 }
