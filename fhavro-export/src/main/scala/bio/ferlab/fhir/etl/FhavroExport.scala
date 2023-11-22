@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.S3Client
 object FhavroExport extends App {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
-  val Array(releaseId, studyIds, studyVersion, env) = args
+  val Array(releaseId, studyIds, env) = args
 
   val studyList = studyIds.split(",").toList
 
