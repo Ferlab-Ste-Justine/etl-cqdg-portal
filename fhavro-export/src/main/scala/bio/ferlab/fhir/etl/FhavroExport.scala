@@ -21,7 +21,7 @@ object FhavroExport extends App {
           implicit val s3Client: S3Client = buildS3Client(configuration)
           implicit val fhirClient: GenericClient = buildFhirClient(configuration)
 
-          val fhavroExporter = new FhavroExporter(configuration.awsConfig.bucketName, releaseId, studyId, studyVersion)
+          val fhavroExporter = new FhavroExporter(configuration.awsConfig.bucketName, releaseId, studyId)
 
           configuration.fhirConfig.resources.foreach { fhirRequest =>
             val resources = fhavroExporter.requestExportFor(fhirRequest)
