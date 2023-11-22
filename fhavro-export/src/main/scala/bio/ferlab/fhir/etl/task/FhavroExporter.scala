@@ -47,7 +47,7 @@ class FhavroExporter(bucketName: String, releaseId: String, studyId: String)
       case Some(study) => {
         val studyVersion = extractVersionFromRessource(study)
         if(studyVersion.isDefined){
-          bundleWithStudy.withTag(null, s"study_version:$studyVersion")
+          bundleWithStudy.withTag(null, studyVersion.get)
         } else {
           bundleWithStudy
         }
