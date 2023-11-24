@@ -73,7 +73,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "duo_terms" -> read(getClass.getResource("/duo_terms.csv").toString, "csv", Map("header" -> "true"), None, None),
     )
 
-    val output = new StudyCentric("5", List("STU0000001"))(conf).transform(data)
+    val output = new StudyCentric(List("STU0000001"))(conf).transform(data)
 
     output.keys should contain("es_index_study_centric")
 

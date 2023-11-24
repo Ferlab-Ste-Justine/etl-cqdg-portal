@@ -37,7 +37,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
     )
 
-    val output = new ParticipantCentric("re_000001", List("SD_Z6MWD3H0"))(conf).transform(data)
+    val output = new ParticipantCentric(List("SD_Z6MWD3H0"))(conf).transform(data)
 
     output.keys should contain("es_index_participant_centric")
 

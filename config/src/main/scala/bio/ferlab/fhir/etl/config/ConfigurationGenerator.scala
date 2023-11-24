@@ -17,7 +17,7 @@ object ConfigurationGenerator extends App {
     sources.map(ds => ds.copy(table = ds.table.map(t => TableConf(tableName, t.name))))
   }
 
-  private val partitionByStudyIdAndReleaseId = List("study_id", "release_id")
+  private val partitionByStudyIdAndReleaseId = List("study_id")
   val sourceNames: Seq[SourceConfig] = Seq(
     SourceConfig("patient", None, partitionByStudyIdAndReleaseId),
     SourceConfig("condition", Some("diagnosis"), partitionByStudyIdAndReleaseId),
@@ -47,7 +47,7 @@ object ConfigurationGenerator extends App {
         path = s"/fhir/$rawPath",
         format = AVRO,
         loadtype = OverWrite,
-        partitionby = source.partitionBy
+        partitionby = source.partitionBy :+ "release_id"
       ),
       DatasetConf(
         id = s"normalized_$tableName",
