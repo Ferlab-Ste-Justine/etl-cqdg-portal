@@ -66,8 +66,8 @@ object ConfigurationGenerator extends App {
     PublicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
       GenomicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
       rawsAndNormalized ++ Seq(
-      DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", table = Some(TableConf("database", "hpo_terms")), format = JSON, loadtype = OverWrite),
-      DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = JSON, loadtype = OverWrite),
+      DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", table = Some(TableConf("database", "hpo_terms")), format = DELTA, loadtype = OverWrite),
+      DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = DELTA, loadtype = OverWrite),
       DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", table = Some(TableConf("database", "icd_terms")), format = JSON, loadtype = OverWrite)
     ) ++ Seq(
       DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
