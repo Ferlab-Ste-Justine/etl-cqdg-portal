@@ -3,5 +3,5 @@ import pureconfig.generic.auto._
 
 //TODO re-use
 trait WithTestConfig {
-   lazy val conf: SimpleConfiguration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
+   implicit lazy val conf: SimpleConfiguration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 }

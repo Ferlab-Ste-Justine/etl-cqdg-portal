@@ -1,12 +1,12 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
-import bio.ferlab.datalake.spark3.etl.ETLSingleDestination
+import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RuntimeETLContext}
+import bio.ferlab.datalake.spark3.etl.v4.SingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{DataFrame, SparkSession, functions}
 import bio.ferlab.fhir.etl.common.Utils._
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
+import org.apache.spark.sql.functions._
 
 import java.time.LocalDateTime
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime
  * @param studyIds
  * @param configuration
  */
-class SpecimenEnricher(studyIds: List[String])(implicit configuration: Configuration) extends ETLSingleDestination {
+case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extends SingleETL(rc) {
   override val mainDestination: DatasetConf = conf.getDataset("enriched_specimen")
   private val patient: DatasetConf = conf.getDataset("normalized_patient")
   private val group: DatasetConf = conf.getDataset("normalized_group")
@@ -31,14 +31,14 @@ class SpecimenEnricher(studyIds: List[String])(implicit configuration: Configura
       (arr: Seq[(String, String)])
       => arr.find(e => e._2 == parent).map(e=> e._1))
 
-  override def extract(lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime)(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): Map[String, DataFrame] = {
     Seq(patient, specimen, group, family_relationship, sample_registration, study, disease, disease_status)
       .map(ds => ds.id -> ds.read
         .where(col("study_id").isin(studyIds: _*))
       ).toMap
   }
 
-  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime)(implicit spark: SparkSession): DataFrame = {
+  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
     val participantWithFam = data(patient.id)
       .withColumn("participant_id", col("fhir_id"))
       .join(data(disease_status.id).drop("fhir_id", "study_id", "release_id"), col("participant_id") === col("subject"), "left_outer")

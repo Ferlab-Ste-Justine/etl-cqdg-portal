@@ -1,7 +1,7 @@
 package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.{DatasetConf, RuntimeETLContext}
-import bio.ferlab.datalake.spark3.etl.v3.SimpleSingleETL
+import bio.ferlab.datalake.spark3.etl.v4.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
@@ -18,7 +18,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
   private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
+  override def extract(lastRunDateTime: LocalDateTime = minValue,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now()): Map[String, DataFrame] = {
 
     Map(

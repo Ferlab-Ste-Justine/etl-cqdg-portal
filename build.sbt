@@ -1,6 +1,6 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
-val datalakeSpark3Version = "10.6.1"
+val datalakeSpark3Version = "11.2.2"
 val deltaCoreVersion = "2.1.1"
 val glowVersion = "1.2.1"
 

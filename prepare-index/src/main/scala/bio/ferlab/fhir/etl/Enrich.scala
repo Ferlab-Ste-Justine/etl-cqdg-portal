@@ -1,20 +1,13 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.spark3.SparkApp
+import bio.ferlab.datalake.commons.config.RuntimeETLContext
+import bio.ferlab.fhir.etl.mainutils.Studies
+import mainargs.{ParserForMethods, main}
 
-object Enrich extends SparkApp {
-  println(s"ARGS: " + args.mkString("[", ", ", "]"))
-  val Array(_, _, jobName, studyIds) = args
+object Enrich {
+  @main
+  def specimen(rc: RuntimeETLContext, studies: Studies): Unit = SpecimenEnricher(rc, studies.ids).run()
 
-  implicit val (conf, _, spark) = init()
 
-  spark.sparkContext.setLogLevel("WARN")
-
-  private val studies = studyIds.split(",").toList
-
-  jobName match {
-    case "specimen" => new SpecimenEnricher(studies).run()
-    case "all" =>
-      new SpecimenEnricher(studies).run()
-  }
+  def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
 }
