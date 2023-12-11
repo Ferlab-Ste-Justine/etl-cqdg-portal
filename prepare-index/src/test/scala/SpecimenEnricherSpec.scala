@@ -1,4 +1,4 @@
-import bio.ferlab.datalake.testutils.ClassGenerator
+import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.fhir.etl.SpecimenEnricher
 import model._
 import org.apache.spark.sql.DataFrame
@@ -46,7 +46,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
       ).toDF()
     )
 
-    val output = new SpecimenEnricher(List("SD_Z6MWD3H0"))(conf).transform(data)
+    val output = SpecimenEnricher(TestETLContext(), Seq("SD_Z6MWD3H0")).transform(data)
 
     val resultDF = output("enriched_specimen")
 

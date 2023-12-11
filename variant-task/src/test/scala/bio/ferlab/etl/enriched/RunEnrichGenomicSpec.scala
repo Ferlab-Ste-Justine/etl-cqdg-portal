@@ -9,7 +9,7 @@ import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
 import bio.ferlab.etl.WithTestConfig
 import bio.ferlab.etl.model._
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.explode
+import org.apache.spark.sql.functions.{explode, lit}
 
 class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
 
@@ -124,6 +124,17 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     internalFreqWgs should contain theSameElementsAs Seq(
       INTERNAL_FREQUENCIES_WGS(total = TOTAL(ac = 20, an = 40, pc = 20, pn = 20, hom = 0, af = 0.5, pf = 1.0))
     )
+  }
+
+  "variants ETL" should "return variants even when only WXS" in {
+    val newOccurrencesDf = occurrencesDf
+      .drop("source")
+      .withColumn("source", lit("WXS"))
+    val newData = data.updated(normalized_snv.id, newOccurrencesDf)
+
+    val result = variantsETL.transformSingle(newData)
+
+    result.isEmpty shouldBe false
   }
 
 }
