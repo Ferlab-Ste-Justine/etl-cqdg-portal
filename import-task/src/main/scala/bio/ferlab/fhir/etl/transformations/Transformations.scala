@@ -196,7 +196,11 @@ object Transformations {
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
         .withColumn("biospecimen_reference", regexp_extract(col("context")("related")(0)("reference"), specimenExtract, 1))
-        .withColumn("data_type", filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)("code"))
+        .withColumn("data_type_filtered",
+           filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)
+        )
+        .withColumn("data_type",
+          coalesce(col("data_type_filtered")("display"), col("data_type_filtered")("code")))
         .withColumn("data_category", filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)("code"))
         .withColumn("content_exp", explode(col("content")))
         .withColumn("file_size", retrieveSize(firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D))("fileSize")))
