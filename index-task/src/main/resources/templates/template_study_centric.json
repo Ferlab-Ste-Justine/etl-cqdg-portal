@@ -111,8 +111,16 @@
         "family_count" : {
           "type" : "integer"
         },
-        "experimental_strategies" : {
-          "type" : "keyword"
+        "experimental_strategies": {
+          "type": "nested",
+          "properties": {
+            "experimental_strategy": {
+              "type": "keyword"
+            },
+            "file_count": {
+              "type": "integer"
+            }
+          }
         },
         "hpo_terms" : {
           "type" : "keyword"

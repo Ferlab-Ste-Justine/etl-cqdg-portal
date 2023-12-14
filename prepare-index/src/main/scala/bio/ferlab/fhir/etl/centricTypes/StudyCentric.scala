@@ -109,10 +109,6 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .groupBy("study_id")
       .agg(size(collect_set(col("internal_family_id"))) as "family_count")
 
-    val experimentalStrategyGrouped = data(normalized_task.id)
-      .groupBy("study_id")
-      .agg(collect_set(col("experimental_strategy")) as "experimental_strategies")
-
     val studyDatasets = studyDF
       .addDataSetToStudy(data(normalized_drs_document_reference.id), participantsRenamed, data(normalized_sequencing_experiment.id))
 
@@ -124,7 +120,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       .join(participantCount, Seq("study_id"), "left_outer")
       .join(fileCount, Seq("study_id"), "left_outer")
       .join(familyCount, Seq("study_id"), "left_outer")
-      .join(experimentalStrategyGrouped, Seq("study_id"), "left_outer")
+      .expStrategiesCountPerStudy(data(normalized_task.id), data(normalized_drs_document_reference.id))
       .withColumn("family_data", col("family_count").gt(0))
       .withColumn("access_limitations", sparkTransform(filter(col("access_limitations"), col => col("display").isNotNull),
         col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))

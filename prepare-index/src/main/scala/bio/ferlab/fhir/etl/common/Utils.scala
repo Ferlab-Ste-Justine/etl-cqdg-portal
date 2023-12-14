@@ -271,6 +271,31 @@ object Utils {
       df.join(reformatParticipant, Seq("subject"), "inner")
     }
 
+    def expStrategiesCountPerStudy(taskDf: DataFrame, filesDf: DataFrame): DataFrame = {
+      val filesCols = Seq("alir", "snv", "gcnv", "gsv", "ssup")
+
+      val cleanFilesDF = filesDf
+        .select("study_id", "fhir_id", "files")
+        .withColumn("file", explode(col("files")))
+        .withColumnRenamed("fhir_id", "pivot")
+        .drop("files")
+
+      val cleanTask = taskDf
+        .groupBy(taskDf.columns.filter(cn => !filesCols.contains(cn)).map(col): _*)
+        .agg(first(array(filesCols.map(col): _*)) as "files")
+        .withColumn("pivot", explode(col("files")))
+        .drop("files")
+
+      val experimentalStrategiesCount = cleanTask
+        .join(cleanFilesDF, Seq("pivot", "study_id"), "inner")
+        .groupBy("study_id", "experimental_strategy")
+        .agg(size(collect_set(col("file")("file_name"))) as "file_count")
+        .groupBy("study_id")
+        .agg(collect_list(struct(col("experimental_strategy"), col("file_count"))) as "experimental_strategies")
+
+      df.join(experimentalStrategiesCount, Seq("study_id"), "left_outer")
+    }
+
     def addFamily(familyDf: DataFrame, familyRelationshipDf: DataFrame): DataFrame = {
       val explodedFamilyDF = familyDf
         .withColumn("family_members_exp", explode(col("family_members")))
