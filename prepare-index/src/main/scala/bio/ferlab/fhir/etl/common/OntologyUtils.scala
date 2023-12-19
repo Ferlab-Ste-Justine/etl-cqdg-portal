@@ -57,7 +57,7 @@ object OntologyUtils {
       .agg(collect_list(col("phenotype_with_age_grouped")) as colName)
   }
 
-  def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame, DataFrame) = {
+  def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame) = {
     val hpoExplodedAlt = hpoTerms
       .withColumn("alt_id", explode(col("alt_ids")))
 
@@ -85,8 +85,6 @@ object OntologyUtils {
       .withColumnRenamed("age_at_phenotype", "age_at_event")
       .withColumnRenamed("phenotype_source_text", "source_text")
 
-
-
     val observedPhenotypesWithAncestors = generatePhenotypeWithAncestors(observedPhenotypes, "observed_phenotypes")
 
     val taggedObservedPhenotypes = generateTaggedPhenotypes(observedPhenotypes, "observed_phenotype_tagged")
@@ -99,7 +97,7 @@ object OntologyUtils {
       .groupBy("cqdg_participant_id")
       .agg(collect_list("exp_phenotypes") as "phenotypes_tagged")
 
-    (taggedObservedPhenotypes, taggedNonObservedPhenotypes, observedPhenotypesWithAncestors.drop("study_id"), phenotypes_tagged)
+    (taggedObservedPhenotypes, observedPhenotypesWithAncestors.drop("study_id"), phenotypes_tagged)
   }
 
   def getDiagnosis(diagnosisDf: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): (DataFrame, DataFrame) = {

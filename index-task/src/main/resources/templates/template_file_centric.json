@@ -239,32 +239,6 @@
                     }
                   }
                 },
-                "non_observed_phenotype_tagged": {
-                  "type": "nested",
-                  "properties": {
-                    "internal_phenotype_id": {
-                      "type": "keyword"
-                    },
-                    "name": {
-                      "type": "keyword"
-                    },
-                    "parents": {
-                      "type": "keyword"
-                    },
-                    "is_leaf": {
-                      "type": "boolean"
-                    },
-                    "is_tagged": {
-                      "type": "boolean"
-                    },
-                    "source_text": {
-                      "type": "keyword"
-                    },
-                    "age_at_event": {
-                      "type": "keyword"
-                    }
-                  }
-                },
                 "observed_phenotypes": {
                   "type": "nested",
                   "properties": {
@@ -503,32 +477,6 @@
                 },
                 "is_tagged": {
                   "type": "boolean"
-                },
-                "age_at_event": {
-                  "type": "keyword"
-                }
-              }
-            },
-            "non_observed_phenotype_tagged": {
-              "type": "nested",
-              "properties": {
-                "internal_phenotype_id": {
-                  "type": "keyword"
-                },
-                "name": {
-                  "type": "keyword"
-                },
-                "parents": {
-                  "type": "keyword"
-                },
-                "is_leaf": {
-                  "type": "boolean"
-                },
-                "is_tagged": {
-                  "type": "boolean"
-                },
-                "source_text": {
-                  "type": "keyword"
                 },
                 "age_at_event": {
                   "type": "keyword"

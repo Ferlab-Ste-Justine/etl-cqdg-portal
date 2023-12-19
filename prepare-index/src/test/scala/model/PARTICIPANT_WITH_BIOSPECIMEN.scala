@@ -15,8 +15,6 @@ case class PARTICIPANT_WITH_BIOSPECIMEN(
 //                                         `mondo_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
 //                                         `observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
 //                                         `non_observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
-                                         //`observed_phenotype`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
-                                         //`non_observed_phenotype`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
 //                                         `familyRelationships`: FAMILY = null,
 //                                         `is_a_proband`: Boolean = false,
 //                                         `family_type`: String = "probant_only",
