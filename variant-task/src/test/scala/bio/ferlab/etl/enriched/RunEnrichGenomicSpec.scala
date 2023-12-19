@@ -3,7 +3,6 @@ package bio.ferlab.etl.enriched
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.spark3.genomics.enriched.Variants
 import bio.ferlab.datalake.testutils.models.enriched._
-import bio.ferlab.datalake.testutils.models.frequency.{FrequencyByStudyId, GlobalFrequency}
 import bio.ferlab.datalake.testutils.models.normalized._
 import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
 import bio.ferlab.etl.WithTestConfig
@@ -40,10 +39,10 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0008", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
     NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0009", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
     NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0010", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0011", study_id = "S1", study_code = "study_code1", `source` = "WXS"),
+    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0011", study_id = "S1", study_code = "study_code1", `source` = "WXS", `zygosity` = "HOM"),
 
-    // Source WXS should be added to the source list
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0012", study_id = "S2", `study_code` = "study_code2", `zygosity` = "WT", `calls` = List(0, 0), has_alt = false),
+    // WXS occurrence should be added to the source and studies lists
+    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0012", study_id = "S2", `study_code` = "study_code2", `source` = "WXS", `zygosity` = "HOM", `calls` = List(0, 0)),
 
     // Study is CAG so participant_ids won't be included in frequencies
     NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0013", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
@@ -92,13 +91,29 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
       .head() should contain theSameElementsAs Set("WGS", "WXS")
   }
 
-  "variants ETL" should "only compute frequencies for whole genomes" in {
+  it should "collect all studies" in {
     val result = variantsETL.transformSingle(data)
-
-    val studiesFreq = result
       .select(explode($"studies") as "studies")
       .select("studies.*")
-      .as[STUDY_WITHOUT_TRANSMISSION]
+      .as[STUDY]
+      .collect()
+
+    val expected = Seq(
+      STUDY(`study_id` = "S1", `study_code` = "study_code1", `zygosity` = Set("HET", "HOM")),
+      STUDY(`study_id` = "S2", `study_code` = "study_code2", `zygosity` = Set("HOM")),
+      STUDY(`study_id` = "S3", `study_code` = "CAG", `zygosity` = Set("HET")),
+    )
+
+    result should contain theSameElementsAs expected
+  }
+
+  it should "only compute frequencies for whole genomes" in {
+    val result = variantsETL.transformSingle(data)
+
+    val studyFreqWgs = result
+      .select(explode($"study_frequencies_wgs") as "study_frequencies_wgs")
+      .select("study_frequencies_wgs.*")
+      .as[STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION]
       .collect()
 
     val internalFreqWgs = result
@@ -106,17 +121,15 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
       .as[INTERNAL_FREQUENCIES_WGS]
       .collect()
 
-    studiesFreq should contain theSameElementsAs Seq(
-      STUDY_WITHOUT_TRANSMISSION(study_id = "S1",
+    studyFreqWgs should contain theSameElementsAs Seq(
+      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(study_id = "S1",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
-//        transmission = Set("autosomal_dominant"),
-        zygosity = Set("HET"),
+        //        transmission = Set("autosomal_dominant"),
         study_code = "study_code1"
       ),
-      STUDY_WITHOUT_TRANSMISSION(study_id = "S3",
+      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(study_id = "S3",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
-//        transmission = Set("autosomal_dominant"),
-        zygosity = Set("HET"),
+        //        transmission = Set("autosomal_dominant"),
         study_code = "CAG"
       )
     )
@@ -126,15 +139,30 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     )
   }
 
-  "variants ETL" should "return variants even when only WXS" in {
-    val newOccurrencesDf = occurrencesDf
-      .drop("source")
+  it should "return all variants even when only WXS" in {
+    val onlyWxsDf = occurrencesDf
       .withColumn("source", lit("WXS"))
-    val newData = data.updated(normalized_snv.id, newOccurrencesDf)
+    val updatedData = data.updated(normalized_snv.id, onlyWxsDf)
 
-    val result = variantsETL.transformSingle(newData)
+    val result = variantsETL.transformSingle(updatedData)
+    result.show(false)
 
     result.isEmpty shouldBe false
+
+    result
+      .where($"study_frequencies_wgs".isNotNull)
+      .collect() shouldBe empty
+
+    result
+      .where($"internal_frequencies_wgs".isNotNull)
+      .collect() shouldBe empty
+
+    result
+      .select(explode($"studies") as "studies")
+      .select("studies.*")
+      .as[STUDY]
+      .collect()
+      .length shouldBe 3
   }
 
 }

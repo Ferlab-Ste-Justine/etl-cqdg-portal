@@ -515,6 +515,21 @@
               "type": "keyword",
               "index": false
             },
+            "study_code": {
+              "type": "keyword"
+            },
+            "zygosity": {
+              "type": "keyword"
+            }
+          }
+        },
+        "study_frequencies_wgs": {
+          "type": "nested",
+          "properties": {
+            "study_id": {
+              "type": "keyword",
+              "index": false
+            },
             "total": {
               "properties": {
                 "ac": {
@@ -546,10 +561,8 @@
               }
             },
             "study_code": {
-              "type": "keyword"
-            },
-            "zygosity": {
-              "type": "keyword"
+              "type": "keyword",
+              "index": false
             }
           }
         },

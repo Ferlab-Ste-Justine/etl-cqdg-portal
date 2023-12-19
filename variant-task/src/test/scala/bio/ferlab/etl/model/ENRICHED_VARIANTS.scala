@@ -16,6 +16,7 @@ case class ENRICHED_VARIANTS(`chromosome`: String = "1",
                              `dna_change`: String = "A>T",
                              `assembly_version`: String = "GRCh38",
                              `studies`: Seq[STUDY] = Seq(STUDY()),
+                             `study_frequencies_wgs`: Seq[STUDY_FREQUENCIES_WGS] = Seq(STUDY_FREQUENCIES_WGS()),
                              `internal_frequencies_wgs`: INTERNAL_FREQUENCIES_WGS = INTERNAL_FREQUENCIES_WGS(),
                              `external_frequencies`: EXTERNAL_FREQUENCIES = EXTERNAL_FREQUENCIES(),
                              `rsnumber`: Option[String] = None,
@@ -109,15 +110,16 @@ case class HPO(`hpo_term_id`: Option[String] = None,
                `hpo_term_label`: Option[String] = None)
 
 case class STUDY(`study_id`: String = "S1",
-                 `total`: TOTAL = TOTAL(),
                  `study_code`: String = "study_code1",
-                 `transmission`: Set[String] = Set("autosomal_dominant"),
                  `zygosity`: Set[String] = Set("HET"))
 
-case class STUDY_WITHOUT_TRANSMISSION(`study_id`: String = "S1",
-                                      `total`: TOTAL = TOTAL(),
-                                      `study_code`: String = "study_code1",
-                                      `zygosity`: Set[String] = Set("HET"))
+case class STUDY_FREQUENCIES_WGS(`study_id`: String = "S1",
+                                 `total`: TOTAL = TOTAL(),
+                                 `study_code`: String = "study_code1",
+                                 `transmission`: Set[String] = Set("autosomal_dominant"))
+case class STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(`study_id`: String = "S1",
+                                                      `total`: TOTAL = TOTAL(),
+                                                      `study_code`: String = "study_code1")
 
 case class SPLICEAI(`ds`: Option[Double] = None,
                     `type`: Option[Seq[String]] = None)

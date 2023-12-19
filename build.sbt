@@ -1,6 +1,6 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
-val datalakeSpark3Version = "11.2.2"
+val datalakeSpark3Version = "12.0.1"
 val deltaCoreVersion = "2.1.1"
 val glowVersion = "1.2.1"
 
@@ -8,6 +8,11 @@ val glowVersion = "1.2.1"
 lazy val fhavro_export = project in file("fhavro-export")
 
 val sparkDepsSetting = Seq(
+  resolvers ++= Seq(
+    "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots",
+    "Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/releases"
+  ),
+
   libraryDependencies ++= Seq(
     "bio.ferlab" %% "datalake-spark3" % datalakeSpark3Version,
     "bio.ferlab" %% "datalake-test-utils" % datalakeSpark3Version % Test,
