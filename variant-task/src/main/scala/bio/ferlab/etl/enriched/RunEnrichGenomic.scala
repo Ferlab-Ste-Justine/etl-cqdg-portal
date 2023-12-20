@@ -3,24 +3,31 @@ package bio.ferlab.etl.enriched
 import bio.ferlab.datalake.commons.config.RuntimeETLContext
 import bio.ferlab.datalake.spark3.genomics.enriched.{Consequences, Variants}
 import bio.ferlab.datalake.spark3.genomics.{FirstElement, FrequencySplit, SimpleAggregation, SimpleSplit}
-import mainargs.{ParserForMethods, main}
+import mainargs.{ParserForMethods, arg, main}
 import org.apache.spark.sql.functions._
 
 object RunEnrichGenomic {
 
   @main
-  def snv(rc: RuntimeETLContext): Unit = variants(rc).run()
+  def snv(rc: RuntimeETLContext,
+          @arg(name = "study-id", short = 's', doc = "Study Id") studyId: String,
+          @arg(name = "dataset", short = 'd', doc = "Dataset") dataset: String,
+          @arg(name = "batch", short = 'b', doc = "Batch") batch: String,
+         ): Unit = SNV(rc, studyId, dataset, batch).run()
+
+  @main
+  def variants(rc: RuntimeETLContext): Unit = runVariants(rc).run()
 
   @main
   def consequences(rc: RuntimeETLContext): Unit = Consequences(rc).run()
 
   @main
   def all(rc: RuntimeETLContext): Unit = {
-    snv(rc)
+    variants(rc)
     consequences(rc)
   }
 
-  def variants(rc: RuntimeETLContext): Variants = Variants(
+  def runVariants(rc: RuntimeETLContext): Variants = Variants(
     rc = rc,
     snvDatasetId = "normalized_snv",
     extraAggregations = Seq(collect_set("source") as "sources"),
