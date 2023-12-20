@@ -17,9 +17,9 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
         PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `gender` = "female"),
       ).toDF(),
       "normalized_family_relationship" -> Seq(
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "is_proband"),
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P2", relationship_to_proband = "father"),
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P3", relationship_to_proband = "mother")
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "Proband"),
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P2", relationship_to_proband = "Father"),
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P3", relationship_to_proband = "Mother")
       ).toDF(),
       "normalized_group" -> Seq(
         GROUP(internal_family_id = "FAMO1", family_members = Seq("P1", "P2", "P3")),
