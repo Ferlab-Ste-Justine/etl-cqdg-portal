@@ -112,6 +112,17 @@ object ConfigurationGenerator extends App {
         repartition = Some(RepartitionByRange(Seq("chromosome", "start"), Some(100)))
       ),
       DatasetConf(
+        id = "enriched_snv",
+        storageid = storage,
+        path = s"/enriched/snv",
+        format = DELTA,
+        loadtype = OverWritePartition,
+        table = Some(TableConf("database", "enriched_snv")),
+        partitionby = List("study_id", "dataset", "batch", "has_alt", "chromosome"),
+        writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("overwriteSchema" -> "true"),
+        repartition = Some(RepartitionByRange(Seq("chromosome", "start"), Some(100)))
+      ),
+      DatasetConf(
         id = "enriched_specimen",
         storageid = storage,
         path = s"/enriched/specimen",

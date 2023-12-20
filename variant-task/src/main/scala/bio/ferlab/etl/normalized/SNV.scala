@@ -5,7 +5,7 @@ import bio.ferlab.datalake.spark3.etl.v4.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
-import bio.ferlab.etl.Constants.columns.{GENES_SYMBOL, TRANSMISSION_MODE}
+import bio.ferlab.etl.Constants.columns.GENES_SYMBOL
 import bio.ferlab.etl.normalized.SNV._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -41,19 +41,9 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
       .withColumnRenamed("is_affected", "affected_status")
 
     val occurrences = selectOccurrences(vcf, releaseId, dataset, batch)
-
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
-      // Parental origin + transmission computation were removed for performance
-
-      //      .withRelativesGenotype(Seq("gq", "dp", "info_qd", "filter", "ad_ref", "ad_alt", "ad_total", "ad_ratio", "calls", "affected_status", "zygosity"),
-      //        participantIdColumn = col("participant_id"),
-      //        familyIdColumn = col("family_id")
-      //      )
-      //      .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      //      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
       .withSource(data(normalized_task.id))
-    //      .withCompoundHeterozygous(patientIdColumnName = "participant.participant_id") //TODO
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset' and batch='$batch' ")
