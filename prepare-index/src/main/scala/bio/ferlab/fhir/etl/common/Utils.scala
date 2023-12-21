@@ -311,7 +311,7 @@ object Utils {
 
       val isProbandDf = familyRelationshipDf
         .select("submitter_participant_id", "relationship_to_proband")
-        .withColumn("is_a_proband", when(col("relationship_to_proband") === "Is the proband", lit(true)).otherwise(lit(false)))
+        .withColumn("is_a_proband", when(col("relationship_to_proband") === "Proband", lit(true)).otherwise(lit(false)))
         .drop("relationship_to_proband")
 
       val familyWithGroup = wholeFamilyDf

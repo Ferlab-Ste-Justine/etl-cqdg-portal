@@ -39,9 +39,9 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     ).toDF()
 
     val inputFamilyRelationship = Seq(
-      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL1", `category` = "category", `submitter_participant_id` = "P1", `focus_participant_id` = "P2", `relationship_to_proband` = "father"),
-      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL2", `category` = "category", `submitter_participant_id` = "P2", `focus_participant_id` = "P2", `relationship_to_proband` = "Is the proband"),
-      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL3", `category` = "category", `submitter_participant_id` = "P3", `focus_participant_id` = "P2", `relationship_to_proband` = "mother"),
+      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL1", `category` = "category", `submitter_participant_id` = "P1", `focus_participant_id` = "P2", `relationship_to_proband` = "Father"),
+      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL2", `category` = "category", `submitter_participant_id` = "P2", `focus_participant_id` = "P2", `relationship_to_proband` = "Proband"),
+      FAMILY_RELATIONSHIP(`internal_family_relationship_id` = "FAM_REL3", `category` = "category", `submitter_participant_id` = "P3", `focus_participant_id` = "P2", `relationship_to_proband` = "Mother"),
     ).toDF()
 
     val output = inputPatients.addFamily(inputFamilies, inputFamilyRelationship)
@@ -59,11 +59,11 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       FAMILY_RELATIONSHIP_WITH_FAMILY(
         `participant_id` = "P2",
         `submitter_participant_id` = "S_P2",
-        `relationship_to_proband` = "Is the proband"),
+        `relationship_to_proband` = "Proband"),
       FAMILY_RELATIONSHIP_WITH_FAMILY(
         `participant_id` = "P3",
         `submitter_participant_id` = "S_P3",
-        `relationship_to_proband` = "mother"),
+        `relationship_to_proband` = "Mother"),
     )
   }
 
