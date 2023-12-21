@@ -17,9 +17,9 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
         PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `gender` = "female"),
       ).toDF(),
       "normalized_family_relationship" -> Seq(
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "Proband"),
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P2", relationship_to_proband = "Father"),
-        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMO1", focus_participant_id = "P1", submitter_participant_id = "P3", relationship_to_proband = "Mother")
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMRO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "Proband"),
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMRO1", focus_participant_id = "P1", submitter_participant_id = "P2", relationship_to_proband = "Father"),
+        FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMRO1", focus_participant_id = "P1", submitter_participant_id = "P3", relationship_to_proband = "Mother")
       ).toDF(),
       "normalized_group" -> Seq(
         GROUP(internal_family_id = "FAMO1", family_members = Seq("P1", "P2", "P3")),
@@ -54,8 +54,14 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
 
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_1") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_1", `age_biospecimen_collection` = "Young", `submitter_biospecimen_id` = "BS_1",
-        `participant_id` = "P1", `participant_fhir_id` = "P1", `submitter_participant_id` = "P1_internal", `gender` = "male", `is_affected` = Some(true),
-        `sample_id` = "SAMPLE1", `fhir_sample_id` = "FHIR_SAMPLE1")
+        `participant_id` = "P1",
+        `participant_fhir_id` = "P1",
+        `submitter_participant_id` = "P1_internal",
+        `gender` = "male", `is_affected` = Some(true),
+        `sample_id` = "SAMPLE1", `fhir_sample_id` = "FHIR_SAMPLE1",
+        is_a_proband = Some(true),
+        `mother_id` = Some("P3"), `father_id` = Some("P2")
+      )
     )
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_2") shouldBe Some(SPECIMEN_ENRICHED(
       `age_biospecimen_collection` = "Young", `is_affected` = Some(false)

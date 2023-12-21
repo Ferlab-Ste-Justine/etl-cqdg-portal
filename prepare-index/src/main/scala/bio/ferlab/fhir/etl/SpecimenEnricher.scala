@@ -1,17 +1,17 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf, RuntimeETLContext}
+import bio.ferlab.datalake.commons.config.{DatasetConf, RuntimeETLContext}
 import bio.ferlab.datalake.spark3.etl.v4.SingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.Utils._
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 
 import java.time.LocalDateTime
 
 /**
  * This step enrich specimen in order to join with occurrences and variant tables.
+ *
  * @param studyIds
  * @param configuration
  */
@@ -25,11 +25,6 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
   private val study: DatasetConf = conf.getDataset("normalized_research_study")
   private val disease: DatasetConf = conf.getDataset("normalized_diagnosis")
   private val disease_status: DatasetConf = conf.getDataset("normalized_disease_status")
-
-  val extractParent: String => UserDefinedFunction = (parent: String) =>
-    udf(
-      (arr: Seq[(String, String)])
-      => arr.find(e => e._2 == parent).map(e=> e._1))
 
   override def extract(lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): Map[String, DataFrame] = {
     Seq(patient, specimen, group, family_relationship, sample_registration, study, disease, disease_status)
@@ -50,20 +45,23 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
 
     val studyShort = data(study.id).select("fhir_id", "study_code").withColumnRenamed("fhir_id", "study_id")
 
-    val parents = data(family_relationship.id)
-      .groupBy("study_id", "internal_family_relationship_id")
-      .agg(collect_list(struct( "submitter_participant_id", "relationship_to_proband")) as "groupedFam")
-      .withColumn("father_id",  extractParent("Father")(col("groupedFam")))
-      .withColumn("mother_id",  extractParent("Mother")(col("groupedFam")))
-      .withColumn("expFamily", explode(col("groupedFam")))
-      .withColumn("subject", col("expFamily.submitter_participant_id"))
-      .withColumnRenamed("internal_family_relationship_id", "family_id")
-      .select("subject","mother_id", "father_id", "family_id")
 
     val patientDf = participantWithFam
+      .withColumn("parent_ids", aggregate(
+          col("family_relationships"),
+          struct(lit(null).cast("string") as "father_id", lit(null).cast("string") as "mother_id"),
+          (acc, relation) => when(relation("relationship_to_proband") === "Father", struct(relation("participant_id") as "father_id", acc("mother_id") as "mother_id"))
+                             .when(relation("relationship_to_proband") === "Mother", struct(acc("father_id") as "father_id", relation("participant_id") as "mother_id"))
+                             .otherwise(acc)
+        )
+      )
+      .withColumn("father_id", when(col("is_a_proband"), col("parent_ids.father_id")).otherwise(lit(null)))
+      .withColumn("mother_id", when(col("is_a_proband"), col("parent_ids.mother_id")).otherwise(lit(null)))
+      .drop("parent_ids")
       .withColumnRenamed("participant_id", "subject")
       .withColumnRenamed("fhir_id", "participant_fhir_id")
-      .select("subject", "gender", "vital_status", "ethnicity", "is_a_proband", "is_affected", "participant_fhir_id", "submitter_participant_id")
+      .select("subject", "gender", "vital_status", "ethnicity", "is_a_proband", "is_affected", "participant_fhir_id",
+        "submitter_participant_id", "family_id", "father_id", "mother_id")
 
     data(specimen.id)
       .join(patientDf, Seq("subject"))
@@ -71,7 +69,6 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
       .withColumnRenamed("fhir_id", "biospecimen_id")
       .withColumnRenamed("sample_id", "fhir_sample_id")
       .withColumnRenamed("submitter_sample_id", "sample_id")
-      .join(parents, Seq("subject"), "left_outer")
       .withColumnRenamed("subject", "participant_id")
       .join(studyShort, Seq("study_id"))
   }
