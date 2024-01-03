@@ -94,12 +94,13 @@ object Utils {
       df
         .join(diagnosis, col("fhir_id") === col("cqdg_participant_id"), "left_outer")
         .join(mondoWithAncestors, Seq("cqdg_participant_id"), "left_outer")
+        .drop("cqdg_participant_id")
+        .join(phenotypes, col("fhir_id") === col("cqdg_participant_id"), "left_outer")
         .join(observedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(nonObservedPhenotypes, Seq("cqdg_participant_id"), "left_outer")
-        .join(phenotypes, Seq("cqdg_participant_id"), "left_outer")
         .join(observedPhenotypesWithAncestors, Seq("cqdg_participant_id"), "left_outer")
-        .withColumnRenamed("fhir_id", "participant_id")
         .drop("cqdg_participant_id")
+        .withColumnRenamed("fhir_id", "participant_id")
     }
 
     def addCauseOfDeath(causeOfDeath: DataFrame): DataFrame = {
@@ -139,15 +140,12 @@ object Utils {
         .drop("subject")
     }
 
-    def addGroup(group: DataFrame): DataFrame = {
-      val explodedGroupDf = group
-        .withColumn("family_member", explode(col("family_members")))
-        .drop("study_id", "release_id")
-
-      df
-        .join(explodedGroupDf, col("family_member") === col("submitter_participant_id"), "left_outer")
-        .select("internal_family_id", "submitter_family_id", "submitter_participant_id", "focus_participant_id", "relationship_to_proband", "family_type")
-    }
+    def fieldCount(field: String, countField: String): DataFrame = df.withColumn("files_exp", explode(col("files")))
+      .na.drop(Seq(s"files_exp.$field"))
+      .groupBy("study_id", s"files_exp.$field")
+      .agg(size(collect_set(col("subject"))) as "participant_count")
+      .groupBy("study_id")
+      .agg(collect_list(struct(col(field), col("participant_count"))) as countField)
 
     def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
       val biospecimenGrouped = biospecimensDf.addSamplesGroupedToBiospecimen(sampleRegistrationDF)

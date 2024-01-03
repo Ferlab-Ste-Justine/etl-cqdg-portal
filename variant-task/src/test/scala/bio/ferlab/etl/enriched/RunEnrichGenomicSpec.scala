@@ -145,7 +145,6 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     val updatedData = data.updated(normalized_snv.id, onlyWxsDf)
 
     val result = variantsETL.transformSingle(updatedData)
-    result.show(false)
 
     result.isEmpty shouldBe false
 
