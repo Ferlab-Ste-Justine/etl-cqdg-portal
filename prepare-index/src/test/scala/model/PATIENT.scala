@@ -46,18 +46,6 @@ case class FAMILY_RELATIONSHIP_NEW (
                            `focus_participant_id`: String = "PRT0000003",
                            `relationship_to_proband`: String = "Mother",
                          )
-
-
-//TODO rename
-case class GROUP_NEW(
-                  `internal_family_id`: String = "12345STU0000001",
-                  `study_id`: String = "STU0000001",
-                  `release_id`: String = "5",
-                  `family_type`: String = "Case-parent trio",
-                  `family_members`: Seq[String] = Seq("PRT0000001", "PRT0000002", "PRT0000003"),
-                  `submitter_family_id`: String = "12345",
-                )
-
 case class PATIENT_OUPUT(
                     `submitter_participant_ids`: String = "PRT0000001",
                     `release_id`: String = "5",

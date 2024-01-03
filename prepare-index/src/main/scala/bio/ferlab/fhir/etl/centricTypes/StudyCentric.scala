@@ -58,32 +58,18 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
         .groupBy("study_id")
         .agg(size(collect_list("sample_id")) as "sample_count")
 
-    val filesExplodedDF = data(normalized_drs_document_reference.id)
-      .withColumn("files_exp", explode(col("files")))
-      .drop("study_id")
+    val participantsWithFiles = data(normalized_patient.id)
+      .withColumnRenamed("fhir_id", "subject")
+      .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
 
-    val participantsWithFilesDF = data(normalized_patient.id)
-      .withColumnRenamed("fhir_id", "participant_id")
-      .join(filesExplodedDF, Seq("participant_id"), "left_outer")
+    val dataTypesCount = participantsWithFiles
+      .fieldCount("data_type", "data_types")
 
-    val dataTypesCount = participantsWithFilesDF
-      .na.drop(Seq("data_type"))
-      .groupBy("study_id", "data_type")
-      .agg(size(collect_set(col("participant_id"))) as "participant_count")
-      .groupBy("study_id")
-      .agg(collect_list(struct(col("data_type"), col("participant_count"))) as "data_types")
-
-    val dataCategoryCount = participantsWithFilesDF
-      .na.drop(Seq("data_category"))
-      .groupBy("study_id", "data_category")
-      .agg(size(collect_set(col("participant_id"))) as "participant_count")
-      .groupBy("study_id")
-      .agg(collect_list(struct(col("data_category"), col("participant_count"))) as "data_categories")
+    val dataCategoryCount = participantsWithFiles
+      .fieldCount("data_category", "data_categories")
 
     val participantCount =
-      data(normalized_patient.id)
-        .withColumnRenamed("fhir_id", "subject")
-        .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
+      participantsWithFiles
         .groupBy("study_id")
         .agg(size(collect_set("subject")) as "participant_count")
 
@@ -105,6 +91,10 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
         )
 
     val familyCount = data(normalized_group.id)
+      .withColumn("subject", explode(col("family_members")))
+      .join(participantsWithFiles, Seq("study_id", "subject"), "inner")
+      .groupBy("study_id", "internal_family_id", "submitter_family_id")
+      .agg(collect_set(col("subject")) as "family_members")
       .where(size(col("family_members")).gt(1))
       .groupBy("study_id")
       .agg(size(collect_set(col("internal_family_id"))) as "family_count")

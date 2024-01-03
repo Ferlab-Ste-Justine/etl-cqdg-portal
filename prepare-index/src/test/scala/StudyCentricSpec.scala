@@ -16,11 +16,16 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val patient1: PATIENT_INPUT =  PATIENT_INPUT(`fhir_id` = "PRT0000001")
   val patient2: PATIENT_INPUT =  PATIENT_INPUT( `fhir_id` = "PRT0000002", `age_at_recruitment` = "Young", `submitter_participant_id` = "35849419216")
   val patient3: PATIENT_INPUT =  PATIENT_INPUT( `fhir_id` = "PRT0000003", `age_at_recruitment` = "Young", `ethnicity` = "aboriginal" ,`submitter_participant_id` = "35849430470")
+  val patient4: PATIENT_INPUT =  PATIENT_INPUT(`fhir_id` = "PRT0000004", `submitter_participant_id` = "Excluded1")
+  val patient5: PATIENT_INPUT =  PATIENT_INPUT( `fhir_id` = "PRT0000005", `submitter_participant_id` = "Excluded2")
+  val patient6: PATIENT_INPUT =  PATIENT_INPUT( `fhir_id` = "PRT0000006", `submitter_participant_id` = "Excluded3")
 
   val family1: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW()
   val family2: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000002FR", `submitter_participant_id` = "PRT0000002", `relationship_to_proband` = "Father")
-  val family3: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000003FR", `submitter_participant_id` = "PRT0000003", `relationship_to_proband` = "Is the proband")
-
+  val family3: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "FAM0000003FR", `submitter_participant_id` = "PRT0000003", `relationship_to_proband` = "Proband")
+  val family4: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "Excluded1", `submitter_participant_id` = "PRT0000004", `relationship_to_proband` = "Mother")
+  val family5: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "Excluded2", `submitter_participant_id` = "PRT0000005", `relationship_to_proband` = "Father")
+  val family6: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "Excluded3", `submitter_participant_id` = "PRT0000006", `relationship_to_proband` = "Proband")
 
   val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = "BIO1" , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM")), `dataset` = Some("dataset1"))
   val document7: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "7", `data_type` = "ALIR", `biospecimen_reference` = "BIO1", `relates_to` = Some("1") , `files` = Seq(FILE(`file_name` = "file1.crai", `file_format` = "CRAI")), `dataset` = Some("dataset1"))
@@ -47,6 +52,9 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val sample3: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE3", `parent` = "BIO1", `subject` = "PRT0000001")
   val sample4: SAMPLE_INPUT = SAMPLE_INPUT(`fhir_id` = "SAMPLE4", `parent` = "BIO1", `subject` = "PRT0000001")
 
+  val group1: GROUP = GROUP(`internal_family_id` = "12345STU0000001", `family_members` = Seq("PRT0000001", "PRT0000002", "PRT0000003"), `submitter_family_id` = "12345", `study_id` = "STU0000001")
+  val group2: GROUP = GROUP(`internal_family_id` = "Group1Excluded", `family_members` = Seq("PRT0000004", "PRT0000005", "PRT0000006"), `submitter_family_id` = "Excluded1")
+
   val studyDataset: Seq[DATASET_INPUT] = Seq(DATASET_INPUT(`name` = "dataset1", `description` = None), DATASET_INPUT(`name` = "dataset2", `description` = Some("desc")))
 
 
@@ -56,7 +64,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
       "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6, document7).toDF(),
       "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
-      "normalized_group" -> Seq(GROUP_NEW()).toDF(),
+      "normalized_group" -> Seq(group1, group2).toDF(),
       "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
       "normalized_task" -> Seq(TASK()).toDF(),
       "normalized_phenotype" -> Seq(phenotype1, phenotype2, phenotype3).toDF(),
@@ -76,6 +84,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
       `sample_count` = 4,
       `file_count` = 6,
+      `family_count` = 1,
       `data_categories` = Seq(("Genomics","2")),
       `datasets` = Seq(
         // Dataset file_count should be 5 as CRAI files should be excluded

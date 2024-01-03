@@ -4,7 +4,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.{col, first, struct}
+import org.apache.spark.sql.functions.{col, struct}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
