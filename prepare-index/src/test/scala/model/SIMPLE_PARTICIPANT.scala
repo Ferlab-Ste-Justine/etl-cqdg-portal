@@ -20,7 +20,6 @@ case class SIMPLE_PARTICIPANT(
                                `mondo_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                `mondo`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
                                `observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
-                               `non_observed_phenotype_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                `phenotypes_tagged`: Seq[PHENOTYPE_TAGGED_WITH_OBSERVED] = Seq.empty,
                                `observed_phenotypes`: Seq[PHENOTYPE_ENRICHED] = Seq.empty,
                                `family_relationships`: Seq[FAMILY_RELATIONSHIP_WITH_FAMILY] = Nil,

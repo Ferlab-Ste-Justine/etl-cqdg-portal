@@ -1,6 +1,6 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.OntologyUtils.{getDiagnosis, getTaggedPhenotypes}
-import model.{DIAGNOSIS, DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS, PHENOTYPE_TAGGED_WITH_OBSERVED}
+import model.{DIAGNOSIS_INPUT, PHENOTYPE, PHENOTYPE_HPO_CODE, PHENOTYPE_TAGGED, PHENOTYPE_TAGGED_WITH_ANCESTORS, PHENOTYPE_TAGGED_WITH_OBSERVED}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -20,27 +20,20 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 
-    val (t1, t2, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (_, t2, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
-    //observed phenotypes tagged
-    val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+    //phenotypes tagged
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect().head
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text"),
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Old"), `source_text` = "text"),
-      ))
-
-    //observed phenotypes tagged
-    val notTaggedPhenotypes = t2.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
-
-    notTaggedPhenotypes shouldBe
-      ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "3", `parents` = Seq("A Name (HP:A)"), `name` = "C Name (HP:C)", `age_at_event` = Some("Super Old"), `source_text` = "text"),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text", `is_observed` = Some(true)),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Old"), `source_text` = "text", `is_observed` = Some(true)),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "3", `parents` = Seq("A Name (HP:A)"), `name` = "C Name (HP:C)", `age_at_event` = Some("Super Old"), `source_text` = "text", `is_observed` = Some(false)),
       ))
 
     //observed phenotypes with ancestors
-    val taggedPhenotypesWithAncestors = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
+    val taggedPhenotypesWithAncestors = t2.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
 
     taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
       Seq(
@@ -58,20 +51,20 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
 
-    val (t1, _, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (_, t2, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
     //observed phenotypes tagged
-    val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect().head
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Young"), `source_text` = "text"),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = Some("Young"), `source_text` = "text", `is_observed` = Some(true)),
         // HP:D (obsolete) should be changed to HP:G (alternate)
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = None, `source_text` = "text"),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = None, `source_text` = "text", `is_observed` = Some(true)),
       ))
 
     //observed phenotypes with ancestors
-    val taggedPhenotypesWithAncestors = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
+    val taggedPhenotypesWithAncestors = t2.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
 
     taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
       Seq(
@@ -89,19 +82,19 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2).toDF()
 
-    val (t1, _, t3, _) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val (_, t2, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
 
     //observed phenotypes tagged
-    val taggedPhenotypes = t1.as[(String, Seq[PHENOTYPE_TAGGED])].collect().head
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect().head
 
     taggedPhenotypes shouldBe
       ("1", Seq(
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text"),
-        PHENOTYPE_TAGGED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = None, `source_text` = "text"),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "1", `is_leaf` = true, `name` = "G Name (HP:G)", `parents` = Seq("B Name (HP:B)"), `age_at_event` = Some("Young"), `source_text` = "text", `is_observed` = Some(true)),
+        PHENOTYPE_TAGGED_WITH_OBSERVED(`internal_phenotype_id` = "2", `is_leaf` = true, `name` = "E Name (HP:E)", `parents` = Seq("B Name (HP:B)", "C Name (HP:C)"), `age_at_event` = None, `source_text` = "text", `is_observed` = Some(true)),
       ))
 
     //observed phenotypes with ancestors
-    val taggedPhenotypesWithAncestors = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
+    val taggedPhenotypesWithAncestors = t2.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head
 
     taggedPhenotypesWithAncestors._2 should contain theSameElementsAs
       Seq(
@@ -166,8 +159,8 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
 
     val phenotypes = Seq(phenotype1, phenotype2, phenotype3).toDF()
 
-    val (_, _, _, t4) = getTaggedPhenotypes(phenotypes, hpo_terms)
-    val taggedPhenotypes = t4.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect()
+    val (_, _, t3) = getTaggedPhenotypes(phenotypes, hpo_terms)
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect()
 
     taggedPhenotypes.flatMap(e => e._2.map(p => (p.`internal_phenotype_id`, p.`is_observed`)))
 

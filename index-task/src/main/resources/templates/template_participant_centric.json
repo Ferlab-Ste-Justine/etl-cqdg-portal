@@ -206,32 +206,6 @@
             }
           }
         },
-        "non_observed_phenotype_tagged": {
-          "type": "nested",
-          "properties": {
-            "internal_phenotype_id": {
-              "type": "keyword"
-            },
-            "name": {
-              "type": "keyword"
-            },
-            "source_text": {
-              "type": "keyword"
-            },
-            "parents": {
-              "type": "keyword"
-            },
-            "is_leaf": {
-              "type": "boolean"
-            },
-            "is_tagged": {
-              "type": "boolean"
-            },
-            "age_at_event": {
-              "type": "keyword"
-            }
-          }
-        },
         "phenotypes_tagged": {
           "type": "nested",
           "properties": {
