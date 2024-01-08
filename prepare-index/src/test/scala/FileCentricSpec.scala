@@ -42,7 +42,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       ).toDF(),
     )
 
-    val output = new FileCentric("5", List("STU0000001"))(conf).transform(data)
+    val output = new FileCentric(List("STU0000001"))(conf).transform(data)
     output.keys should contain("es_index_file_centric")
 
     val file_centric = output("es_index_file_centric").as[FILE_CENTRIC].collect()

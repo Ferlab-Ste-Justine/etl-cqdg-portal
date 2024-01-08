@@ -9,7 +9,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit configuration: Configuration) extends ETL {
+class SimpleParticipant(studyIds: List[String])(implicit configuration: Configuration) extends ETL {
 
   override val mainDestination: DatasetConf = conf.getDataset("simple_participant")
   val normalized_patient: DatasetConf = conf.getDataset("normalized_patient")
@@ -31,8 +31,7 @@ class SimpleParticipant(releaseId: String, studyIds: List[String])(implicit conf
     (Seq(
       normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death,
       normalized_group, normalized_family_relationship, normalized_researchstudy)
-      .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
-        .where(col("study_id").isin(studyIds: _*))
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,

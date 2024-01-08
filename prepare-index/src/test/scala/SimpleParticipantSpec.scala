@@ -42,7 +42,7 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
       "icd_terms" -> read(getClass.getResource("/icd_terms.json").toString, "Json", Map(), None, None)
     )
 
-    val output = new SimpleParticipant("re_000001", List("SD_Z6MWD3H0"))(conf).transform(data)
+    val output = new SimpleParticipant(List("SD_Z6MWD3H0"))(conf).transform(data)
 
     output.keys should contain("simple_participant")
 

@@ -73,7 +73,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       ).toDF(),
     )
 
-    val output = new BiospecimenCentric("5", List("STU0000001"))(conf).transform(data)
+    val output = new BiospecimenCentric(List("STU0000001"))(conf).transform(data)
 
     output.keys should contain("es_index_biospecimen_centric")
 

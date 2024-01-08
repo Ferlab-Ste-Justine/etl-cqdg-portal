@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions.{col, transform => sparkTransform, _}
 
 import java.time.LocalDateTime
 
-class StudyCentric(releaseId: String, studyIds: List[String])(implicit configuration: Configuration) extends ETL {
+class StudyCentric(studyIds: List[String])(implicit configuration: Configuration) extends ETL {
 
   override val mainDestination: DatasetConf = conf.getDataset("es_index_study_centric")
   val normalized_researchstudy: DatasetConf = conf.getDataset("normalized_research_study")
@@ -29,9 +29,7 @@ class StudyCentric(releaseId: String, studyIds: List[String])(implicit configura
       normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
       normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen,
       normalized_sample_registration)
-      .map(ds => ds.id -> ds.read.where(col("release_id") === releaseId)
-        .where(col("study_id").isin(studyIds: _*))
-      ).toMap
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))).toMap
 
   }
 
