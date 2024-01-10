@@ -110,7 +110,7 @@ object SNV {
 
   def getSNV(inputDF: DataFrame): DataFrame = {
     val inputDfExpGenotypes = inputDF
-      .filter(array_contains(col("INFO_FILTERS"), "PASS")) // Remove low quality variants
+      .filter(col("INFO_FILTERS").isNull || array_contains(col("INFO_FILTERS"), "PASS")) // Remove low quality variants
       .withColumn("annotation", firstCsq)
       .withColumn("hgvsg", hgvsg)
       .withColumn("variant_class", variant_class)
