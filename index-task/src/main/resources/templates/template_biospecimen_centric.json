@@ -6,6 +6,9 @@
   "template": {
     "settings": {
       "number_of_shards": 5,
+      "index": {
+        "max_result_window" : 12000
+      },
       "analysis": {
         "normalizer": {
           "custom_normalizer": {
