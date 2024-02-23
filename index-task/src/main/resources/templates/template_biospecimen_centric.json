@@ -81,7 +81,7 @@
             "participant_2_id": {
               "type": "keyword"
             },
-            "gender": {
+            "sex": {
               "type": "keyword"
             },
             "vital_status": {

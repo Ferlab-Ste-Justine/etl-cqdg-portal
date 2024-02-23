@@ -60,7 +60,7 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
       .drop("parent_ids")
       .withColumnRenamed("participant_id", "subject")
       .withColumnRenamed("fhir_id", "participant_fhir_id")
-      .select("subject", "gender", "vital_status", "ethnicity", "is_a_proband", "is_affected", "participant_fhir_id",
+      .select("subject", "sex", "vital_status", "ethnicity", "is_a_proband", "is_affected", "participant_fhir_id",
         "submitter_participant_id", "family_id", "father_id", "mother_id")
 
     data(specimen.id)

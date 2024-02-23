@@ -26,7 +26,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, dataset: String, batch: S
         familyIdColumn = col("family_id")
       )
       .withParentalOrigin("parental_origin", col("calls"), col("father_calls"), col("mother_calls"))
-      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "gender")
+      .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "sex")
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset' and batch='$batch' ")

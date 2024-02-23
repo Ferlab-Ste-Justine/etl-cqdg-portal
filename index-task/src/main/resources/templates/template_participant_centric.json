@@ -29,7 +29,7 @@
           "type": "keyword",
           "normalizer" : "custom_normalizer"
         },
-        "gender": {
+        "sex": {
           "type": "keyword"
         },
         "vital_status": {
