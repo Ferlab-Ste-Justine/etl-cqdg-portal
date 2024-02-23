@@ -94,7 +94,7 @@
                 "participant_2_id": {
                   "type": "keyword"
                 },
-                "gender": {
+                "sex": {
                   "type": "keyword"
                 },
                 "age_at_recruitment": {
@@ -338,7 +338,7 @@
             "release_id": {
               "type": "keyword"
             },
-            "gender": {
+            "sex": {
               "type": "keyword"
             },
             "vital_status": {

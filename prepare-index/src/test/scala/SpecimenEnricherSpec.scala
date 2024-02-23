@@ -13,8 +13,8 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     val data: Map[String, DataFrame] = Map(
       "normalized_patient" -> Seq(
         PATIENT_INPUT(fhir_id = "P1", `submitter_participant_id` = "P1_internal"),
-        PATIENT_INPUT(fhir_id = "P2", `submitter_participant_id` = "P2_internal", `gender` = "female"),
-        PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `gender` = "female"),
+        PATIENT_INPUT(fhir_id = "P2", `submitter_participant_id` = "P2_internal", `sex` = "female"),
+        PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `sex` = "female"),
       ).toDF(),
       "normalized_family_relationship" -> Seq(
         FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMRO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "Proband"),
@@ -57,7 +57,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
         `participant_id` = "P1",
         `participant_fhir_id` = "P1",
         `submitter_participant_id` = "P1_internal",
-        `gender` = "male", `is_affected` = Some(true),
+        `sex` = "male", `is_affected` = Some(true),
         `sample_id` = "SAMPLE1", `fhir_sample_id` = "FHIR_SAMPLE1",
         is_a_proband = Some(true),
         `mother_id` = Some("P3"), `father_id` = Some("P2")

@@ -21,9 +21,10 @@ object Transformations {
           .otherwise(lit("Unknown"))
       )
       .withColumn("age_of_death", ageFromExtension(col("extension"), AGE_OF_DEATH_S_D))
+      .withColumnRenamed("gender", "sex")
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
-    Drop("identifier", "extension", "meta")
+    Drop("identifier", "extension", "meta", "gender")
   )
 
   val taskMappings: List[Transformation] = List(

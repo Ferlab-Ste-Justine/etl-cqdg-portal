@@ -3,7 +3,7 @@ package model
 case class PARTICIPANT_WITH_BIOSPECIMEN(
                                          `participant_id`: String = "PRT0486300",
                                          `participant_2_id`: String = "PRT0486300",
-                                         `gender`: String = "female",
+                                         `sex`: String = "female",
                                          `age_at_recruitment`: String = "Young",
                                          `ethnicity`: String = "European",
                                          `submitter_participant_id`: String = "35849428444",

@@ -37,7 +37,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
 
     val vcf = getSNV(data("raw_vcf"))
-    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "gender", "mother_id", "father_id", "study_id", "study_code")
+    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "sex", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
     val occurrences = selectOccurrences(vcf, releaseId, dataset, batch)

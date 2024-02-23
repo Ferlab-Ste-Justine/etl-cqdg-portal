@@ -32,7 +32,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         SIMPLE_PARTICIPANT(
           `participant_id` = "P2",
           `participant_2_id` = "P2",
-          `gender` = "female"
+          `sex` = "female"
         )
       ).toDF(),
       "normalized_task" -> Seq(TASK(`fhir_id` = "SXP0029366", `_for` = "P1", `alir` = "12", `ssup` = "11")).toDF(),
@@ -72,7 +72,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
             `participant_id` = "P1",
             `participant_2_id` = "P1",
-            `gender` = "male",
+            `sex` = "male",
             `biospecimens` = Set(
               BIOSPECIMEN(
                 `biospecimen_id` = "B1",
@@ -114,7 +114,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
           `participant_id` = "P1",
           `participant_2_id` = "P1",
-          `gender` = "male",
+          `sex` = "male",
           `biospecimens` = Set(
             BIOSPECIMEN(
               `biospecimen_id` = "B1",
