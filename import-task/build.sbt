@@ -5,7 +5,7 @@ val version = "1.0"
 val awssdkVersion = "2.16.66"
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-avro" % "2.4.2",
+  "org.apache.spark" %% "spark-avro" % "3.4.2",
   "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.38.8" % Test,
   "software.amazon.awssdk" % "s3" % awssdkVersion % Test,
 )

@@ -1,0 +1,44 @@
+name: Publish SHA
+
+on:
+  push:
+    branches:
+      - master
+
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        required: false
+        description: 'Publish SHA'
+
+jobs:
+  build:
+    name: Publish SHA
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v11
+      - name: Build Assembly
+        run: sbt clean assembly
+      - name: Publish etl-cqdg-portal Image using commit sha and timestamp
+        id: publish-etl-cqdg-portal-image
+        uses: Ferlab-Ste-Justine/action-push-image@v2
+        with:
+          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+          image: ferlabcrsj/etl-cqdg-portal
+          tag_format: "{sha}-{timestamp}"
+      - name: Publish fhavro-export Image using commit sha and timestamp
+        id: publish-fhavro-export-image
+        uses: Ferlab-Ste-Justine/action-push-image@v2
+        with:
+          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+          image: ferlabcrsj/fhavro-export
+          tag_format: "{sha}-{timestamp}"
+          location: fhavro-export
+          dockerfile: fhavro-export/Dockerfile
