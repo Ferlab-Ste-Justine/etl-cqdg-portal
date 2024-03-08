@@ -91,7 +91,7 @@ jobs:
           asset_name: variant-task.jar
           asset_content_type: application/java-archive
       - name: Publish Image using commit sha and timestamp
-        id: publish-fharo-image
+        id: publish-fhavro-image
         uses: Ferlab-Ste-Justine/action-push-image@v2
         with:
           username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
