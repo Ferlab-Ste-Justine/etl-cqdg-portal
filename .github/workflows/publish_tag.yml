@@ -97,6 +97,6 @@ jobs:
           username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
           password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
           image: ferlabcrsj/fhavro-export
-          tag_format: "{sha}-{timestamp}"
+          tag_format: "{semver}"
           location: fhavro-export
           dockerfile: fhavro-export/Dockerfile
