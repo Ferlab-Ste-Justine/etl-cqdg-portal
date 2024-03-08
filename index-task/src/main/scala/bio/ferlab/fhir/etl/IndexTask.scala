@@ -68,6 +68,7 @@ object IndexTask extends App {
     .getOrCreate()
 
   spark.sparkContext.setLogLevel("ERROR")
+  Thread.sleep(3600 * 1000)
 
   val templatePath = s"${conf.storages.find(_.id == "storage").get.path}/templates/template_$jobType.json"
 
