@@ -1,2 +1,3 @@
 *
 !**/target/*/*.jar
+!index-task/pod_templates/pod-template-es-cert.yml
