@@ -29,32 +29,32 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
 
   val occurrencesDf: DataFrame = Seq(
     // At least 10 participants so participant_ids should be shown except the WXS source
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0001", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0002", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0003", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0004", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0005", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0006", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0007", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0008", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0009", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0010", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0011", study_id = "S1", study_code = "study_code1", `source` = "WXS", `zygosity` = "HOM"),
+    NORMALIZED_SNV(`participant_id` = "PA0001", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0002", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0003", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0004", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0005", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0006", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0007", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0008", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0009", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0010", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0011", study_id = "S1", study_code = "study_code1", `source` = "WXS", `zygosity` = "HOM"),
 
     // WXS occurrence should be added to the source and studies lists
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0012", study_id = "S2", `study_code` = "study_code2", `source` = "WXS", `zygosity` = "HOM", `calls` = List(0, 0)),
+    NORMALIZED_SNV(`participant_id` = "PA0012", study_id = "S2", `study_code` = "study_code2", `source` = "WXS", `zygosity` = "HOM", `calls` = List(0, 0)),
 
     // Study is CAG so participant_ids won't be included in frequencies
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0013", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0014", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0015", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0016", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0017", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0018", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0019", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0020", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0021", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN(`participant_id` = "PA0022", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0013", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0014", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0015", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0016", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0017", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0018", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0019", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0020", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0021", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0022", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
   ).toDF
   val genomesDf: DataFrame = Seq(NormalizedOneKGenomes()).toDF
   val topmed_bravoDf: DataFrame = Seq(NormalizedTopmed()).toDF

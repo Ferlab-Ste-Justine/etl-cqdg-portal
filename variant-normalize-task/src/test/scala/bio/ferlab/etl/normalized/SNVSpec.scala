@@ -1,17 +1,14 @@
 package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
-import bio.ferlab.datalake.testutils.TestETLContext
-import bio.ferlab.etl.{WithSparkSession, WithTestConfig}
-import bio.ferlab.etl.model.{GENOTYPES, NORMALIZED_SNV, NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN, NORMALIZED_TASK, SPECIMEN_ENRICHED, VCF_SNV_INPUT}
+import bio.ferlab.datalake.testutils.{TestETLContext, WithSparkSession}
+import bio.ferlab.etl.normalized.model.{GENOTYPES, NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN, NORMALIZED_TASK, SPECIMEN_ENRICHED, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithTestConfig {
-
   import spark.implicits._
-
   val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   val specimenEnriched: DatasetConf = conf.getDataset("enriched_specimen")
   val normalized_task: DatasetConf = conf.getDataset("normalized_task")

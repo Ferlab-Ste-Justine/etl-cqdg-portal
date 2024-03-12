@@ -2,14 +2,11 @@ package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
-import bio.ferlab.etl.WithTestConfig
-import bio.ferlab.etl.model.{GENOTYPES, NormalizedConsequences, VCF_SNV_INPUT}
+import bio.ferlab.etl.normalized.model.{GENOTYPES, NORMALIZED_CONSEQUENCES, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
 
 class ConsequencesSpec extends SparkSpec with WithTestConfig {
-
   import spark.implicits._
-
   val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
 
   val data: Map[String, DataFrame] = Map(
@@ -28,10 +25,10 @@ class ConsequencesSpec extends SparkSpec with WithTestConfig {
   it should "generate normalized consequences from input VCF" in {
     val results = Consequences(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", "annotated_vcf", None).transform(data)
 
-    val result = results("normalized_consequences").as[NormalizedConsequences].collect()
+    val result = results("normalized_consequences").as[NORMALIZED_CONSEQUENCES].collect()
 
     result.filter(r => r.`chromosome` == "2") shouldBe empty // Low quality variant
-    result should contain theSameElementsAs Seq(NormalizedConsequences())
+    result should contain theSameElementsAs Seq(NORMALIZED_CONSEQUENCES())
   }
 }
 

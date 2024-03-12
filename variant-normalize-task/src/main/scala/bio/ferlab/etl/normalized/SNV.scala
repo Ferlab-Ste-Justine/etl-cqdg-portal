@@ -5,14 +5,14 @@ import bio.ferlab.datalake.spark3.etl.v4.SimpleSingleETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
-import bio.ferlab.etl.Constants.columns.GENES_SYMBOL
 import bio.ferlab.etl.normalized.SNV._
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{array_contains, array_distinct, broadcast, col, explode, lit, struct}
 
 import java.time.LocalDateTime
 
 case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner: String, dataset: String, batch: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
@@ -51,6 +51,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
 }
 
 object SNV {
+  private final val GENES_SYMBOL = "genes_symbol"
   implicit class DataFrameOps(df: DataFrame) {
     def withSource(task: DataFrame)(implicit spark: SparkSession): DataFrame = {
       import spark.implicits._
