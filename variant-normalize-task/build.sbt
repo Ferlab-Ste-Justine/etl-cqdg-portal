@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-hive" % sparkVersion % Provided,
   "org.apache.hadoop" % "hadoop-aws" % "3.3.6" % Provided,
   "io.delta" %% "delta-core" % deltaCoreVersion,
-  "io.projectglow" %% "glow-spark3" % glowVersion % Provided exclude ("org.apache.hadoop", "hadoop-client") ,
+  "io.projectglow" %% "glow-spark3" % glowVersion exclude ("org.apache.hadoop", "hadoop-client") ,
   "org.scalatest" %% "scalatest" % "3.2.9" % Test,
 )
 
