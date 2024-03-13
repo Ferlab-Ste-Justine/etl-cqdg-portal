@@ -6,8 +6,8 @@ import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 import bio.ferlab.datalake.spark3.implicits.GenomicImplicits.columns._
 import bio.ferlab.etl.normalized.SNV._
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.{array_contains, array_distinct, broadcast, col, explode, lit, struct}
 
 import java.time.LocalDateTime
 

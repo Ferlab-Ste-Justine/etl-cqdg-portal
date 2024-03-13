@@ -2,13 +2,13 @@ package bio.ferlab.etl.normalized
 
 import bio.ferlab.datalake.commons.config.DatasetConf
 import bio.ferlab.datalake.testutils.{SparkSpec, TestETLContext}
-import bio.ferlab.etl.normalized.model.{GENOTYPES, NORMALIZED_CONSEQUENCES, VCF_SNV_INPUT}
+import bio.ferlab.etl.WithTestConfig
+import bio.ferlab.etl.model.{GENOTYPES, NORMALIZED_CONSEQUENCES, VCF_SNV_INPUT}
 import org.apache.spark.sql.DataFrame
 
 class ConsequencesSpec extends SparkSpec with WithTestConfig {
-  import spark.implicits._
   val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
-
+  import spark.implicits._
   val data: Map[String, DataFrame] = Map(
     raw_variant_calling.id -> Seq(
       VCF_SNV_INPUT(`contigName` = "chr1", `INFO_FILTERS` = Seq("PASS"),
