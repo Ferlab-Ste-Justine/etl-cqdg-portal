@@ -35,12 +35,10 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
   }
 
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
-
-    val vcf = getSNV(data("raw_vcf"))
     val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "sex", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
-    val occurrences = selectOccurrences(vcf, releaseId, dataset, batch)
+    val occurrences = selectOccurrences(data("raw_vcf"), releaseId, dataset, batch)
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
       .withSource(data(normalized_task.id))
@@ -64,7 +62,36 @@ object SNV {
   }
 
   private def selectOccurrences(inputDF: DataFrame, releaseId: String, dataset: String, batch:String): DataFrame = {
-    val occurrences = inputDF
+    val inputDfExpGenotypes = inputDF
+      .filter(col("INFO_FILTERS").isNull || array_contains(col("INFO_FILTERS"), "PASS")) // Remove low quality variants
+      .withColumn("annotation", firstCsq)
+      .withColumn("hgvsg", hgvsg)
+      .withColumn("variant_class", variant_class)
+      .withColumn(GENES_SYMBOL, array_distinct(csq("symbol")))
+      .drop("annotation", "INFO_CSQ")
+      .withColumn("genotype", explode(col("genotypes")))
+      .drop("genotypes")
+
+    inputDfExpGenotypes
+      .withColumn(
+        "genotype",
+        struct(
+          col("genotype.sampleId"),
+          col("genotype.conditionalQuality"),
+          col("genotype.SB"),
+          col("genotype.alleleDepths"),
+          col("genotype.phased"),
+          col("genotype.calls"),
+          col("genotype.MIN_DP"),
+          col("genotype.phredLikelihoods"),
+          col("genotype.depth"),
+          optional_info(inputDfExpGenotypes, "genotype.RGQ", "RGQ", "int"),
+          optional_info(inputDfExpGenotypes, "genotype.PGT", "PGT", "string"),
+
+        )
+      )
+
+    val occurrences = inputDfExpGenotypes
       .select(
         chromosome,
         start,
@@ -88,14 +115,24 @@ object SNV {
         ac as "info_ac",
         an as "info_an",
         af as "info_af",
-        optional_info(inputDF,"INFO_SOR","info_sor", "float"),
-        optional_info(inputDF,"INFO_ReadPosRankSum","info_read_pos_rank_sum", "float"),
-        optional_info(inputDF,"INFO_FS","info_fs", "float"),
-        optional_info(inputDF,"INFO_DP","info_dp", "int"),
-        optional_info(inputDF,"INFO_MQ","info_mq", "float"),
-        optional_info(inputDF,"INFO_QD", "info_qd", "float"),
         col("INFO_END") as "info_end",
+        optional_info(inputDF,"INFO_BaseQRankSum","info_baseq_rank_sum", "float"),
+        optional_info(inputDF,"INFO_ExcessHet","info_excess_het", "float"),
+        optional_info(inputDF,"INFO_FS","info_fs", "float"),
+        optional_info(inputDF,"INFO_DS","info_ds", "boolean"),
+        optional_info(inputDF,"INFO_FractionInformativeReads","info_fraction_informative_reads", "float"),
+        optional_info(inputDF,"INFO_InbreedingCoeff","info_inbreed_coeff", "float"),
+        optional_info(inputDF,"INFO_MLEAC","info_mleac", "array<int>"),
+        optional_info(inputDF,"INFO_MLEAF","info_mleaf", "array<float>"),
+        optional_info(inputDF,"INFO_MQ","info_mq", "float"),
         optional_info(inputDF,"INFO_MQRankSum", "info_m_qrank_sum", "float"),
+        optional_info(inputDF,"INFO_QD", "info_qd", "float"),
+        optional_info(inputDF,"INFO_R2_5P_bias", "info_r2_5p_bias", "float"),
+        optional_info(inputDF,"INFO_ReadPosRankSum","info_read_pos_rank_sum", "float"),
+        optional_info(inputDF,"INFO_SOR","info_sor", "float"),
+        optional_info(inputDF,"INFO_VQSLOD","info_vqslod", "float"),
+        optional_info(inputDF,"INFO_culprit","info_culprit", "string"),
+        optional_info(inputDF,"INFO_DP","info_dp", "int"),
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "float"),
         lit(releaseId) as "release_id",
         lit(dataset) as "dataset",
@@ -105,46 +142,6 @@ object SNV {
       .drop("annotation")
       .withColumn("zygosity", zygosity(col("calls")))
     occurrences
-  }
-
-  def getSNV(inputDF: DataFrame): DataFrame = {
-    val inputDfExpGenotypes = inputDF
-      .filter(col("INFO_FILTERS").isNull || array_contains(col("INFO_FILTERS"), "PASS")) // Remove low quality variants
-      .withColumn("annotation", firstCsq)
-      .withColumn("hgvsg", hgvsg)
-      .withColumn("variant_class", variant_class)
-      .withColumn(GENES_SYMBOL, array_distinct(csq("symbol")))
-      .drop("annotation", "INFO_CSQ")
-      .withColumn("INFO_DS", lit(null).cast("boolean"))
-      .withColumn("INFO_HaplotypeScore", lit(null).cast("double"))
-      .withColumn("genotype", explode(col("genotypes")))
-      .drop("genotypes")
-
-    inputDfExpGenotypes
-      .withColumn(
-        "genotype",
-        struct(
-          col("genotype.sampleId"),
-          col("genotype.conditionalQuality"),
-          //          col("genotype.SQ"),
-          //          col("genotype.PRI"),
-          //          col("genotype.posteriorProbabilities"),
-          col("genotype.SB"),
-          col("genotype.alleleDepths"),
-          //          col("genotype.ICNT"),
-          //          col("genotype.AF"),
-          col("genotype.phased"),
-          col("genotype.calls"),
-          col("genotype.MIN_DP"),
-          col("genotype.phredLikelihoods"),
-          col("genotype.depth"),
-          optional_info(inputDfExpGenotypes, "genotype.RGQ", "RGQ", "int"),
-          optional_info(inputDfExpGenotypes, "genotype.PGT", "PGT", "string"),
-          //          col("genotype.SPL"),
-          //          col("genotype.PS"),
-          //          col("genotype.MB"), //TODO confirm is ok
-        )
-      )
   }
 
 }
