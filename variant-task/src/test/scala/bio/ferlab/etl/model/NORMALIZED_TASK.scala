@@ -27,6 +27,5 @@ case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000003",
                            `gcnv`: String = "FIL0000008",
                            `gsv`: String = "FIL0000009",
                            `ssup`: String = "FIL0000010",
-                           `study_id`: String = "STU0000001",
-                           `release_id`: Int = 1)
+                           `study_id`: String = "STU0000001")
 

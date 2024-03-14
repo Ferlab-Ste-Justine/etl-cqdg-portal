@@ -142,7 +142,7 @@ object OntologyUtils {
           .otherwise(col("diagnosis_ICD_code"))
       )
       .drop("ancestors", "id", "is_leaf", "name", "parents")
-      .groupBy("subject", "study_id", "release_id")
+      .groupBy("subject", "study_id")
       .agg(collect_list(struct(
         col("fhir_id"),
         col("diagnosis_source_text"),
@@ -156,7 +156,7 @@ object OntologyUtils {
       .join(taggedMondoTerms, Seq("subject"), "left_outer")
       .withColumnRenamed("fhir_id", "internal_diagnosis_id")
       .withColumnRenamed("subject", "cqdg_participant_id")
-      .drop("study_id", "release_id"),
+      .drop("study_id"),
       mondoWithAncestors.drop("study_id"))
   }
 }

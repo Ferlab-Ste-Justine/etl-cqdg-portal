@@ -133,7 +133,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       .select("file")
           .select("file.file_id", "file.relates_to")
 
-    result.as[(String, String)].collect() shouldBe Seq(("FHIR_ID_1", "FHIR_ID_2"), ("FHIR_ID_4", "FHIR_ID_3"))
+    result.as[(String, String)].collect() should contain theSameElementsAs Seq(("FHIR_ID_1", "FHIR_ID_2"), ("FHIR_ID_4", "FHIR_ID_3"))
   }
 
   "addParticipantWithBiospecimen" should "only return files with participant" in {

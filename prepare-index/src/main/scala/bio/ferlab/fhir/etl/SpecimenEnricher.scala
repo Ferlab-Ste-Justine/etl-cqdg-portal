@@ -36,7 +36,7 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
   override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
     val participantWithFam = data(patient.id)
       .withColumn("participant_id", col("fhir_id"))
-      .join(data(disease_status.id).drop("fhir_id", "study_id", "release_id"), col("participant_id") === col("subject"), "left_outer")
+      .join(data(disease_status.id).drop("fhir_id", "study_id"), col("participant_id") === col("subject"), "left_outer")
       .withColumn("is_affected",
         when(col("disease_status").isNotNull and col("disease_status") === "yes", true).otherwise(false)
       )

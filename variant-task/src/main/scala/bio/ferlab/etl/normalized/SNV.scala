@@ -12,7 +12,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner: String, dataset: String, batch: String, releaseId: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(rc: RuntimeETLContext, studyId: String, owner: String, dataset: String, batch: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
 
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
@@ -24,13 +24,13 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
 
     Map(
       "raw_vcf" -> vcf(raw_variant_calling.location
-        .replace("{{STUDY_CODE}}", s"$studyCode")
+        .replace("{{STUDY_ID}}", s"$studyId")
         .replace("{{DATASET}}", s"$dataset")
         .replace("{{BATCH}}", s"$batch")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
         .where(col("contigName").isin(validContigNames: _*)),
       enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyId),
-      normalized_task.id -> normalized_task.read.where(col("study_id") === studyId && col("release_id") === releaseId),
+      normalized_task.id -> normalized_task.read.where(col("study_id") === studyId),
     )
 
   }
@@ -39,7 +39,7 @@ case class SNV(rc: RuntimeETLContext, studyId: String, studyCode: String, owner:
     val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "sex", "mother_id", "father_id", "study_id", "study_code")
       .withColumnRenamed("is_affected", "affected_status")
 
-    val occurrences = selectOccurrences(data("raw_vcf"), releaseId, dataset, batch)
+    val occurrences = selectOccurrences(data("raw_vcf"), dataset, batch)
     occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
       .withSource(data(normalized_task.id))
@@ -63,7 +63,7 @@ object SNV {
     }
   }
 
-  private def selectOccurrences(inputDF: DataFrame, releaseId: String, dataset: String, batch: String): DataFrame = {
+  private def selectOccurrences(inputDF: DataFrame, dataset: String, batch: String): DataFrame = {
     val inputDfExpGenotypes = inputDF
       .filter(col("INFO_FILTERS").isNull || array_contains(col("INFO_FILTERS"), "PASS")) // Remove low quality variants
       .withColumn("annotation", firstCsq)
@@ -135,7 +135,6 @@ object SNV {
         optional_info(inputDF, "INFO_culprit", "info_culprit", "string"),
         optional_info(inputDF, "INFO_DP", "info_dp", "int"),
         optional_info(inputDF, "INFO_HaplotypeScore", "info_haplotype_score", "double"),
-        lit(releaseId) as "release_id",
         lit(dataset) as "dataset",
         lit(batch) as "batch"
       )

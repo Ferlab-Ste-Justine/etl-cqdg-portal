@@ -7,7 +7,7 @@ package models
 
 
 
-case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "STU0000001",
+case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "CAG",
                                      `keyword`: Seq[String] = Seq("genomics", "chronic conditions", "population-based cohort", "survey data"),
                                      `description`: String = "CARTaGENE is a public research platform of the CHU Sainte-Justine created to accelerate health research. CARTaGENE consists of both biological samples and health data from 43,000 Québec residents aged between 40 to 69 years.",
                                      `contact`: CONTACT = CONTACT(),
@@ -19,10 +19,9 @@ case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "STU0000001",
                                      `access_requirements`: Seq[ACCESS_REQUIREMENTS] = Seq(ACCESS_REQUIREMENTS(), ACCESS_REQUIREMENTS(`code` = "DUO:0000021"), ACCESS_REQUIREMENTS(`code` = "DUO:0000025"), ACCESS_REQUIREMENTS(`code` = "DUO:0000026"), ACCESS_REQUIREMENTS(`code` = "DUO:0000027"), ACCESS_REQUIREMENTS(`code` = "DUO:0000029")),
                                      `population`: String = "Adult",
                                      `study_version`: String = "1",
-                                     `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "ds_name 2", `description`= "description 2")),
-                                     `study_id`: String = "STU0000001",
-                                     `security` : String = "R",
-                                     `release_id`: String = "1")
+                                     `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "ds_name_2", `description`= "description 2")),
+                                     `study_id`: String = "CAG",
+                                     `security` : String = "R")
 
 case class CONTACT(`type`: String = "url",
                    `value`: String = "https://sdas.cartagene.qc.ca")
@@ -33,5 +32,5 @@ case class ACCESS_LIMITATIONS(`code`: String = "DUO:0000005",
 case class ACCESS_REQUIREMENTS(`code`: String = "DUO:0000019",
                                `display`: Option[String] = None)
 
-case class DATA_SETS(`name`: String = "ds_name 1",
+case class DATA_SETS(`name`: String = "ds_name_1",
                      `description`: String = "description 1")

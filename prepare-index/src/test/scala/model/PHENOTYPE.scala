@@ -2,7 +2,6 @@ package model
 
 case class PHENOTYPE(
                       `study_id`: String = "STU0000001",
-                      `release_id`: String = "5",
                       `fhir_id`: String = "PHE0000001",
                       `phenotype_source_text`: String = null,
                       `age_at_phenotype`: Option[String] = None ,

@@ -7,7 +7,7 @@ package models
 
 
 
-case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000003",
+case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000001",
                            `owner`: String = "CQDG",
                            `bio_informatic_analysis`: Option[String] = None,
                            `labAliquotID`: String = "1000004041-A10",
@@ -25,11 +25,10 @@ case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000003",
                            `workflow_version`: String = "3.9.3",
                            `genome_build`: String = "GRCh38",
                            `_for`: String = "PRT0000002",
-                           `alir`: String = "FIL0000007",
-                           `snv`: String = "FIL0000016",
-                           `gcnv`: String = "FIL0000008",
-                           `gsv`: String = "FIL0000009",
-                           `ssup`: String = "FIL0000010",
-                           `study_id`: String = "STU0000001",
-                           `release_id`: String = "1")
+                           `alir`: String = "FIL0000101",
+                           `snv`: String = "FIL0000103",
+                           `gcnv`: String = "FIL0000105",
+                           `gsv`: String = "FIL0000106",
+                           `ssup`: String = "FIL0000107",
+                           `study_id`: String = "CAG")
 

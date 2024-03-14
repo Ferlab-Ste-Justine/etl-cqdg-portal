@@ -322,9 +322,6 @@
             "study_id": {
               "type": "keyword"
             },
-            "release_id": {
-              "type": "keyword"
-            },
             "study": {
               "properties": {
                 "study_code": {
@@ -450,9 +447,6 @@
           "type": "keyword"
         },
         "study_code": {
-          "type": "keyword"
-        },
-        "release_id": {
           "type": "keyword"
         },
         "sample_id": {

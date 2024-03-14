@@ -5,7 +5,7 @@ The Fhavro Export task exports data from a [FHIR](https://hapifhir.io/) server, 
 The format of the file(s) saved on Amazon S3 should be as followed:
 
 ```
-raw/fhir/<resource-name>/study_id=<study-id>/release_id=<release-id>/<schema-name>.avro
+raw/fhir/<resource-name>/study_id=<study-id>/<schema-name>.avro
 ```
 
 Where:

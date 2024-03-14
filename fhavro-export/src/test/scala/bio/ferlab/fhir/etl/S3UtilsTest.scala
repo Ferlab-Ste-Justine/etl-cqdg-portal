@@ -43,12 +43,12 @@ class S3UtilsTest extends AnyFlatSpec with MinioServerSuite with Matchers {
 
   "buildKey" should "build a formatted key based on a request" in {
     val fhirRequest = FhirRequest("Patient", "kfdrc-patient", None, None, None, None, None)
-    S3Utils.buildKey(fhirRequest, "re_001", "SD_ABC") shouldBe s"fhir/patient/study_id=SD_ABC/release_id=re_001/kfdrc-patient.avro"
+    S3Utils.buildKey(fhirRequest, "SD_ABC") shouldBe s"fhir/patient/study_id=SD_ABC/kfdrc-patient.avro"
   }
 
   it should "build a formatted key based on a request entity-type" in {
     val fhirRequest = FhirRequest("Patient", "kfdrc-patient", None, None, Some("this_is_patient"), None, None)
-    S3Utils.buildKey(fhirRequest, "re_001", "SD_ABC") shouldBe s"fhir/this_is_patient/study_id=SD_ABC/release_id=re_001/kfdrc-patient.avro"
+    S3Utils.buildKey(fhirRequest, "SD_ABC") shouldBe s"fhir/this_is_patient/study_id=SD_ABC/kfdrc-patient.avro"
   }
 
 }

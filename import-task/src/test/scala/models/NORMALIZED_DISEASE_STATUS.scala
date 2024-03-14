@@ -10,6 +10,5 @@ package models
 case class NORMALIZED_DISEASE_STATUS(`fhir_id`: String = "FAM0000001DS",
                                      `subject`: String = "PRT0000001",
                                      `disease_status`: String = "Unknown",
-                                     `study_id`: String = "STU0000001",
-                                     `release_id`: String = "1")
+                                     `study_id`: String = "CAG")
 

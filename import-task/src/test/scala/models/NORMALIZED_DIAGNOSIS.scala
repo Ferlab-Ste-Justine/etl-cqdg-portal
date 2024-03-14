@@ -13,5 +13,4 @@ case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000001",
                                 `diagnosis_mondo_code`: String = "MONDO:0004980",
                                 `diagnosis_ICD_code`: String = "L20.9",
                                 `age_at_diagnosis`: String = "HP:0003577",
-                                `study_id`: String = "STU0000001",
-                                `release_id`: String = "1")
+                                `study_id`: String = "CAG")

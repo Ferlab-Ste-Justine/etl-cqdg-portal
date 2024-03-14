@@ -157,9 +157,6 @@
         "study_id" : {
           "type" : "keyword",
           "normalizer" : "custom_normalizer"
-        },
-        "release_id" : {
-          "type" : "keyword"
         }
       }
     }

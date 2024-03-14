@@ -341,9 +341,6 @@
             "study_id": {
               "type": "keyword"
             },
-            "release_id": {
-              "type": "keyword"
-            },
             "file_id": {
               "type": "keyword"
             },
@@ -481,9 +478,6 @@
               }
             }
           }
-        },
-        "release_id": {
-          "type": "keyword"
         },
         "study_code": {
           "type": "keyword"

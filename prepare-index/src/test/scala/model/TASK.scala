@@ -3,7 +3,6 @@ package model
 case class TASK(
                  `fhir_id`: String = "SXP0000001",
                  `study_id`: String = "STU0000001",
-                 `release_id`: String = "5",
                  `_for`: String = "PRT0000001",
                  `owner`: String = "CQDG",
                  `is_paired_end`: Boolean = true,

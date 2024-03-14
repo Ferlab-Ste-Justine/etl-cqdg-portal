@@ -10,6 +10,5 @@ package models
 case class NORMALIZED_TUMOR_NORMAL_DESIGNATION(`fhir_id`: String = "BIO0000001",
                                                `subject`: String = "PRT0000001",
                                                `tumor_normal_designation`: String = "Not applicable",
-                                               `study_id`: String = "STU0000001",
-                                               `release_id`: String = "1")
+                                               `study_id`: String = "CAG")
 

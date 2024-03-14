@@ -315,9 +315,6 @@
                 },
                 "study_id": {
                   "type": "keyword"
-                },
-                "release_id": {
-                  "type": "keyword"
                 }
               }
             }
@@ -333,9 +330,6 @@
               "type": "keyword"
             },
             "study_id": {
-              "type": "keyword"
-            },
-            "release_id": {
               "type": "keyword"
             },
             "sex": {
@@ -719,9 +713,6 @@
           "type": "keyword"
         },
         "study_id" : {
-          "type": "keyword"
-        },
-        "release_id" : {
           "type": "keyword"
         }
       }
