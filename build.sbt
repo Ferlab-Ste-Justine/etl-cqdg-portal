@@ -1,9 +1,8 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
-val sparkVersion = "3.4.2"
+val sparkVersion = "3.5.1"
 val datalakeSpark3Version = "13.0.0"
-val deltaCoreVersion = "2.4.0"
-val glowVersion = "1.2.1"
+val deltaCoreVersion = "3.1.0"
 
 
 lazy val fhavro_export = project in file("fhavro-export")
@@ -20,7 +19,7 @@ val sparkDepsSetting = Seq(
     "org.apache.spark" %% "spark-sql" % sparkVersion % Provided,
     "org.apache.spark" %% "spark-hive" % sparkVersion % Provided,
     "org.apache.hadoop" % "hadoop-aws" % "3.3.6" % Provided,
-    "io.delta" %% "delta-core" % deltaCoreVersion % Provided,
+    "io.delta" %% "delta-spark" % deltaCoreVersion % Provided,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test,
   )
 )

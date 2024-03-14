@@ -1,4 +1,4 @@
-FROM apache/spark:3.4.2
+FROM apache/spark:3.5.1
 
 COPY index-task/pod_templates/pod-template-es-cert.yml /app/pod-template-es-cert.yml
 
