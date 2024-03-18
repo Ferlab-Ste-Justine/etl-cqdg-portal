@@ -10,7 +10,7 @@ object Transformations {
 
   val patientMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "release_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
+      .select("fhir_id", "study_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
       .withColumn("age_at_recruitment", ageFromExtension(col("extension"), AGE_AT_RECRUITMENT_S_D))
       .withColumn("ethnicity",
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
@@ -29,7 +29,7 @@ object Transformations {
 
   val taskMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "release_id", "output", "code", "for", "owner", "extension")
+      .select("fhir_id", "study_id", "output", "code", "for", "owner", "extension")
       .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("display"))
       .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT_S_D)(0))
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
@@ -61,7 +61,7 @@ object Transformations {
 
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
-      .select("fhir_id", "extension", "identifier", "subject", "study_id", "release_id", "type", "meta", "parent")
+      .select("fhir_id", "extension", "identifier", "subject", "study_id", "type", "meta", "parent")
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
@@ -75,7 +75,7 @@ object Transformations {
 
   val sampleRegistrationMappings: List[Transformation] = List(
     Custom { _
-      .select("identifier", "type", "subject", "parent", "study_id", "release_id", "fhir_id")
+      .select("identifier", "type", "subject", "parent", "study_id", "fhir_id")
       .where(size(col("parent")) > 0)
       .withColumn("sample_type",
         transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
@@ -88,7 +88,7 @@ object Transformations {
 
   val observationCauseOfDeathMappings: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "subject")
+      .select("study_id", "fhir_id", "code", "subject")
       .filter(array_contains(col("code")("coding")("system"),"https://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death"))
       .withColumn("submitter_participant_ids", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("cause_of_death", col("code")("coding")("code")(0))
@@ -98,7 +98,7 @@ object Transformations {
 
   val observationDiseaseStatus: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "subject", "valueCodeableConcept")
+      .select("study_id", "fhir_id", "code", "subject", "valueCodeableConcept")
       .filter(array_contains(col("code")("coding")("code"),"Disease Status"))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("disease_status", col("valueCodeableConcept")("coding")("code")(0))
@@ -108,7 +108,7 @@ object Transformations {
 
   val observationTumorNormalDesignation: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "subject", "valueCodeableConcept")
+      .select("study_id", "fhir_id", "code", "subject", "valueCodeableConcept")
       .filter(array_contains(col("code")("coding")("code"),"Tumor Normal Designation"))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("tumor_normal_designation", col("valueCodeableConcept")("coding")("code")(0))
@@ -118,7 +118,7 @@ object Transformations {
 
   val observationFamilyRelationshipMappings: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
+      .select("study_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
       .withColumnRenamed("fhir_id", "internal_family_relationship_id")
       .where(col("code")("coding")(0)("code") === "Family Relationship")
       .withColumn("submitter_participant_id",  regexp_extract(col("subject")("reference"), patientExtract, 1))
@@ -131,7 +131,7 @@ object Transformations {
 
   val conditionDiagnosisMappings: List[Transformation] = List(
     Custom(_
-      .select("identifier", "code", "subject", "study_id", "release_id", "fhir_id", "extension")
+      .select("identifier", "code", "subject", "study_id", "fhir_id", "extension")
       .withColumn("diagnosis_source_text", col("code")("text"))
       .withColumn("diagnosis_mondo_code",
         firstNonNull(filter(col("code")("coding"), col => col("system").equalTo(SYSTEM_MONDO))("code")))
@@ -145,7 +145,7 @@ object Transformations {
 
   val observationPhenotypeMappings: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
+      .select("study_id", "fhir_id", "code", "valueCodeableConcept", "subject", "interpretation", "extension")
       .where(col("code")("coding")(0)("code") === "Phenotype")
       .withColumn("age_at_phenotype", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
       .withColumn("phenotype_source_text", col("code")("text"))
@@ -161,7 +161,7 @@ object Transformations {
 
   val researchstudyMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "keyword", "release_id", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier")
+      .select("fhir_id", "keyword", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier")
       .withColumn("keyword", extractKeywords(col("keyword")))
       .withColumn(
         "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
@@ -192,7 +192,7 @@ object Transformations {
 
   val documentreferenceMappings: List[Transformation] = List(
     Custom { input =>
-      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "release_id", "fhir_id", "meta", "relatesTo")
+      val columns = Array("id", "type", "category", "subject", "content", "context", "study_id", "fhir_id", "meta", "relatesTo")
       val df = input
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
@@ -231,7 +231,7 @@ object Transformations {
 
   val groupMappings: List[Transformation] = List(
     Custom(_
-      .select("study_id", "release_id", "fhir_id", "code", "member", "identifier")
+      .select("study_id", "fhir_id", "code", "member", "identifier")
       .withColumnRenamed("fhir_id", "internal_family_id")
       .withColumn("family_type", firstNonNull(transform(col("code")("coding"), col => col("code"))))
       .withColumn("family_members", transform(col("member"), col => regexp_extract(col("entity")("reference"), patientExtract, 1)))

@@ -3,7 +3,6 @@ package model
 case class BIOSPECIMEN_CENTRIC(
                                 `biospecimen_id`: String = "BIO0031886",
                                 `study_id`: String = "STU0000001",
-                                `release_id`: String = "5",
                                 `security`: String = "R",
                                 `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
                                 `age_biospecimen_collection`: String = "Young",

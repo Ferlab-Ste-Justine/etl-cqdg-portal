@@ -32,13 +32,13 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
       ).toDF(),
       specimenEnriched.id -> specimenEnrichedDf,
       normalized_task.id -> Seq(
-        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S1", `experimental_strategy` = "WGS"),
-        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S2", `experimental_strategy` = "WGS"),
-        NORMALIZED_TASK(`study_id` = "STU0000001", `release_id` = 1, `ldm_sample_id` = "S3", `experimental_strategy` = "WXS"),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S1", `experimental_strategy` = "WGS"),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S2", `experimental_strategy` = "WGS"),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S3", `experimental_strategy` = "WXS"),
       ).toDF()
     )
 
-    val results = SNV(TestETLContext(), "STU0000001", "STU0000001", "owner", "dataset_default", "annotated_vcf", releaseId = "1", None).transform(dataFomVCFFile)
+    val results = SNV(TestETLContext(), "STU0000001", "owner", "dataset_default", "annotated_vcf", None).transform(dataFomVCFFile)
 
     val result = results("normalized_snv").as[NORMALIZED_SNV_WITHOUT_PARENTAL_ORIGIN].collect()
 

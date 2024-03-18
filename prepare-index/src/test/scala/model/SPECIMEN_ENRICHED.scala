@@ -7,7 +7,6 @@ package model
 case class SPECIMEN_ENRICHED(`study_id`: String = "STU0000001",
                              `participant_id`: String = "P2",
                              `biospecimen_id`: String = "FHIR_BS_2",
-                             `release_id`: String = "5",
                              `security`: String = "R",
                              `submitter_participant_id`: String = "P2_internal",
                              `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",

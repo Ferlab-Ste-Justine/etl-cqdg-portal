@@ -12,8 +12,7 @@ case class NORMALIZED_SAMPLE_REGISTRATION(`subject`: String = "PRT0000001",
                                           `fhir_id`: String = "SAM0000001",
                                           `sample_type`: SAMPLE_TYPE = SAMPLE_TYPE(),
                                           `submitter_sample_id`: String = "S03411",
-                                          `study_id`: String = "STU0000001",
-                                          `release_id`: String = "1")
+                                          `study_id`: String = "CAG")
 
 case class SAMPLE_TYPE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
                        `code`: String = "DNA",

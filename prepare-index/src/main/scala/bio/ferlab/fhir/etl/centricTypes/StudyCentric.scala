@@ -41,7 +41,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
 
     val samplesCount =
       data(normalized_patient.id)
-        .select("fhir_id", "study_id", "release_id")
+        .select("fhir_id", "study_id")
         .withColumnRenamed("fhir_id", "participant_id")
         .addFilesWithBiospecimen(
           data(normalized_drs_document_reference.id),
@@ -51,7 +51,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
         )
         .withColumn("file_exp", explode(col("files")))
         .withColumn("bio_exp", explode(col("file_exp.biospecimens")))
-        .select("study_id", "release_id", "bio_exp.sample_id")
+        .select("study_id", "bio_exp.sample_id")
         .distinct().filter(col("sample_id").isNotNull)
         .groupBy("study_id")
         .agg(size(collect_list("sample_id")) as "sample_count")
@@ -76,7 +76,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
     val fileCount =
       data(normalized_drs_document_reference.id)
         .addAssociatedDocumentRef()
-        .join(participantsRenamed, Seq("participant_id", "study_id", "release_id"), "inner")
+        .join(participantsRenamed, Seq("participant_id", "study_id"), "inner")
         .groupBy("study_id")
         .agg(
           size(collect_set(

@@ -2,7 +2,6 @@ package model
 
 case class GROUP(
                   study_id: String = "Study_1",
-                  release_id: String = "5",
                   internal_family_id: String = "1",
                   family_type: String = "trio",
                   family_members: Seq[String] = Seq("P1", "P2", "P3"),

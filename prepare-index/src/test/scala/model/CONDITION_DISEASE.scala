@@ -8,7 +8,6 @@ case class AGE_AT_EVENT(
 
 case class DISEASE_STATUS(
                          `study_id`: String = "STU0000001",
-                         `release_id`: String = "5",
                          `fhir_id`: String = "D_STATUS_ID",
                          `subject`: String = "SUBJECT",
                          `disease_status`: String = "DS",

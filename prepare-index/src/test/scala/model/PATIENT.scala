@@ -3,7 +3,6 @@ package model
 case class PATIENT(
                     `study_id`: String = "STU0000001",
                     `participant_id`: String = "PRT0483534",
-                    `release_id`: String = "5",
                     `fhir_id`: String = "PRT0483534",
                     `sex`: String = "male",
                     `deceasedBoolean`: Boolean = false,
@@ -16,7 +15,6 @@ case class PATIENT(
 
 case class PATIENT_INPUT(
                     `study_id`: String = "STU0000001",
-                    `release_id`: String = "5",
                     `fhir_id`: String = "PRT0483534",
                     `sex`: String = "male",
                     `vital_status`: String = "Unknown",
@@ -31,7 +29,6 @@ case class PATIENT_INPUT(
 case class CAUSE_OF_DEATH(
                            `fhir_id`: String = "PRT0000003",
                            `study_id`: String = "STU0000001",
-                           `release_id`: String = "5",
                            `submitter_participant_ids`: String = "PRT0000003",
                            `cause_of_death`: String = "Pie eating",
                          )
@@ -39,7 +36,6 @@ case class CAUSE_OF_DEATH(
 //TODO RENAME
 case class FAMILY_RELATIONSHIP_NEW (
                            `study_id`: String = "STU0000001",
-                           `release_id`: String = "5",
                            `internal_family_relationship_id`: String = "FAM0000001FR",
                            `category`: String = "SOCIALHISTORY",
                            `submitter_participant_id`: String = "PRT0000001",
@@ -48,7 +44,6 @@ case class FAMILY_RELATIONSHIP_NEW (
                          )
 case class PATIENT_OUPUT(
                     `submitter_participant_ids`: String = "PRT0000001",
-                    `release_id`: String = "5",
                     `sex`: String = "female",
                     `vital_status`: String = "Unknown",
                     `age_at_recruitment`: String = "215574198069",

@@ -54,7 +54,7 @@ object Utils {
         .withColumn("sample_2_id", col("sample_id")) //doubling sample_id portal use
         .withColumnRenamed("parent", "fhir_id")
 
-      df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id", "release_id"), "left_outer")
+      df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id"), "left_outer")
         .withColumn("biospecimen_tissue_source",
           when(col("biospecimen_tissue_source")("display").isNotNull,
             concat_ws(" ", col("biospecimen_tissue_source")("display"), concat(lit("("), col("biospecimen_tissue_source")("code"), lit(")"))))
@@ -63,14 +63,14 @@ object Utils {
     }
 
     def addBiospecimen(biospecimenDf: DataFrame): DataFrame = {
-      val groupColumns = Seq("subject", "study_id", "release_id")
+      val groupColumns = Seq("subject", "study_id")
 
       val biospecimenGrouped = biospecimenDf
         .groupBy(groupColumns.head, groupColumns.tail: _*)
         .agg(collect_list(struct(biospecimenDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "biospecimens")
         .withColumnRenamed("subject", "participant_id")
 
-      df.join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")
+      df.join(biospecimenGrouped, Seq("participant_id", "study_id"), "left_outer")
     }
 
     def addParticipants(participantDf: DataFrame): DataFrame = {
@@ -104,7 +104,7 @@ object Utils {
 
     def addCauseOfDeath(causeOfDeath: DataFrame): DataFrame = {
       val cleanCauseOfDeath = causeOfDeath
-        .drop("study_id","release_id", "fhir_id")
+        .drop("study_id", "fhir_id")
 
       df
         .join(cleanCauseOfDeath, col("submitter_participant_ids") === col("fhir_id"), "left_outer")
@@ -117,7 +117,7 @@ object Utils {
         .withColumnRenamed("fhir_id", "analysis_id")
         .withColumn("type_of_sequencing", when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads")))
         .withColumn("run_date", split(col("run_date"), "\\.")(0))
-        .drop("study_id", "release_id", "is_paired_end")
+        .drop("study_id", "is_paired_end")
 
       val seqExperimentByFile = sequencingExperimentClean
         .withColumn("all_files", filter(array(col("alir"), col("snv"), col("gcnv"), col("gsv"), col("ssup")), a => a.isNotNull))
@@ -131,7 +131,7 @@ object Utils {
 
     def addDiseaseStatus(diseaseStatus: DataFrame): DataFrame = {
       val cleanDiseaseStatus = diseaseStatus
-        .drop("study_id","release_id", "fhir_id")
+        .drop("study_id", "fhir_id")
         .withColumnRenamed("disease_status", "is_affected")
 
       df
@@ -156,15 +156,15 @@ object Utils {
         .withColumn("file_2_id", col("file_id")) //Duplicate for UI use
 
       val filesWithBiospecimen = filesWithSeqExp
-        .join(biospecimenGrouped, Seq("participant_id", "study_id", "release_id"), "left_outer")
+        .join(biospecimenGrouped, Seq("participant_id", "study_id"), "left_outer")
 
       val filesGroupedPerParticipant = filesWithBiospecimen
-        .groupBy("participant_id",  "study_id", "release_id")
+        .groupBy("participant_id",  "study_id")
         .agg(collect_list(struct(
-          filesWithBiospecimen.columns.filterNot(Seq("participant_id",  "study_id", "release_id").contains).map(col): _*
+          filesWithBiospecimen.columns.filterNot(Seq("participant_id",  "study_id").contains).map(col): _*
         )) as "files")
 
-      df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id", "release_id"), "inner")
+      df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id"), "inner")
     }
 
     def addAssociatedDocumentRef(): DataFrame = {
@@ -202,11 +202,11 @@ object Utils {
       biospecimenWithSample
         .withColumn("biospecimen",
           struct(
-            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id", "release_id").contains).map(col): _*)
+            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id").contains).map(col): _*)
         )
         .withColumnRenamed("subject", "participant_id")
-        .select("participant_id", "study_id", "release_id", "biospecimen")
-        .groupBy("participant_id", "study_id", "release_id")
+        .select("participant_id", "study_id", "biospecimen")
+        .groupBy("participant_id", "study_id")
         .agg(collect_list("biospecimen") as "biospecimens")
     }
 
@@ -219,17 +219,17 @@ object Utils {
         .withColumn("file_2_id", col("file_id"))
 
       val filesWithSeqExpGrouped = filesWithSeqExp
-        .groupBy("subject", "study_id", "release_id")
-        .agg(collect_list(struct(filesWithSeqExp.columns.filterNot(Seq("subject", "study_id", "release_id").contains) map col: _*)) as "files")
+        .groupBy("subject", "study_id")
+        .agg(collect_list(struct(filesWithSeqExp.columns.filterNot(Seq("subject", "study_id").contains) map col: _*)) as "files")
 
-      df.join(filesWithSeqExpGrouped, Seq("subject", "study_id", "release_id"), "inner")
+      df.join(filesWithSeqExpGrouped, Seq("subject", "study_id"), "inner")
     }
 
     def addDataSetToStudy(filesDf: DataFrame, participants: DataFrame, tasks: DataFrame): DataFrame = {
       val filesWithTaskAndParticipants = filesDf
         .addSequencingExperiment(tasks)
         .addAssociatedDocumentRef()
-        .join(participants, Seq("participant_id", "study_id", "release_id"), "inner")
+        .join(participants, Seq("participant_id", "study_id"), "inner")
         .groupBy("study_id", "dataset")
         .agg(
           collect_set("data_type") as "data_types",
@@ -296,7 +296,7 @@ object Utils {
     def addFamily(familyDf: DataFrame, familyRelationshipDf: DataFrame): DataFrame = {
       val explodedFamilyDF = familyDf
         .withColumn("family_members_exp", explode(col("family_members")))
-        .drop("study_id", "release_id")
+        .drop("study_id")
 
       val wholeFamilyDf = familyRelationshipDf
         .join(explodedFamilyDF, col("family_members_exp") === col("submitter_participant_id"), "left_outer")
@@ -313,7 +313,7 @@ object Utils {
 
       val familyWithGroup = wholeFamilyDf
         .join(participantIsAffectedDf, Seq("participant_id"), "left_outer")
-        .groupBy("study_id", "release_id", "family_id", "submitter_family_id")
+        .groupBy("study_id", "family_id", "submitter_family_id")
         .agg(collect_list(struct(
           col("participant_id"),
           col("submitter_participant_id"),
@@ -328,7 +328,7 @@ object Utils {
         )
         .withColumn("family_members_exp", explode(col("family_members")))
         .join(isProbandDf, col("submitter_participant_id") === col("family_members_exp"))
-        .drop("submitter_participant_id", "family_members", "study_id", "release_id", "family_id", "submitter_family_id")
+        .drop("submitter_participant_id", "family_members", "study_id", "family_id", "submitter_family_id")
 
       val participantFamilyRelDf =
         wholeFamilyDf

@@ -15,7 +15,6 @@ case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000001",
                               `submitter_participant_id`: String = "35849409716",
                               `vital_status`: String = "Alive",
                               `age_of_death`: String = "HP:0003593",
-                              `study_id`: String = "STU0000001",
-                              `security`: String = "R",
-                              `release_id`: String = "1")
+                              `study_id`: String = "CAG",
+                              `security`: String = "R")
 

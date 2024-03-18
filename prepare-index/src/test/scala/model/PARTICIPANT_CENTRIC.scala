@@ -4,7 +4,6 @@ package model
 case class PARTICIPANT_CENTRIC(
                                 `participant_id`: String = "PRT0494378",
                                 `study_id`: String = "STU0000001",
-                                `release_id`: String = "5",
                                 `sex`: String = "male",
                                 `vital_status`: Option[String] = None,
                                 `age_at_recruitment`: String = "Young",

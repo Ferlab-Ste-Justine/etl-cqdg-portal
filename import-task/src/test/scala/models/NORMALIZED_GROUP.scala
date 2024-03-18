@@ -11,6 +11,5 @@ case class NORMALIZED_GROUP(`internal_family_id`: String = "FM00000001",
                             `family_type`: String = "Case-parent trio",
                             `family_members`: Seq[String] = Seq("PRT0000001", "PRT0000002", "PRT0000003"),
                             `submitter_family_id`: String = "12345",
-                            `study_id`: String = "STU0000001",
-                            `release_id`: String = "1")
+                            `study_id`: String = "CAG")
 

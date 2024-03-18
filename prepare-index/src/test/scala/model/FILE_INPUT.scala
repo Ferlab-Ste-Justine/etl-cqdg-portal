@@ -2,7 +2,6 @@ package model
 
 case class FILE_INPUT(
                        `study_id`: String = "STU0000001",
-                       `release_id`: String = "5",
                        `fhir_id`: String = "FIL0081238",
                        `participant_id`: String = "PRT0503531",
                        `biospecimen_reference`: String = "SAM0234037",

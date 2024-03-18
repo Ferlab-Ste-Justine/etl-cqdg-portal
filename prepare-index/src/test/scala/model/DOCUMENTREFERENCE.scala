@@ -2,7 +2,6 @@ package model
 
 case class DOCUMENTREFERENCE(
                               `study_id`: String = "STU0000001",
-                              `release_id`: String = "5",
                               `fhir_id`: String = "5",
                               `participant_id`: String = "PRT0000001",
                               `biospecimen_reference`: String = "SAM0000001",

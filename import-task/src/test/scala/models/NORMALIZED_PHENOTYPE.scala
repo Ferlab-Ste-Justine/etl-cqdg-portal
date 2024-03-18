@@ -13,8 +13,7 @@ case class NORMALIZED_PHENOTYPE(`fhir_id`: String = "PHE0000002",
                                 `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
                                 `cqdg_participant_id`: String = "PRT0000002",
                                 `phenotype_observed`: String = "POS",
-                                `study_id`: String = "STU0000001",
-                                `release_id`: String = "1")
+                                `study_id`: String = "CAG")
 
 case class PHENOTYPE_HPO_CODE(`system`: String = "http://purl.obolibrary.org/obo/hp.owl",
                               `code`: String = "HP:0000822")

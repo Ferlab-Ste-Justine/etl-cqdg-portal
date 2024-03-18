@@ -12,11 +12,10 @@ case class ETLConfiguration(`es-config`: Map[String, String], datalake: Datalake
 class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
 
 
-  val study = "STU0000001"
-  val release = "1"
+  val study = "CAG"
 
   private def addObjectToBucket(objects: Seq[(String, String)]): Unit = {
-    objects.foreach({ case (path, fileName) => transferFromResource(s"fhir/$path/study_id=$study/release_id=$release", s"$fileName.avro")})
+    objects.foreach({ case (path, fileName) => transferFromResource(s"fhir/$path/study_id=$study", s"$fileName.avro")})
   }
 
   implicit val spark: SparkSession = SparkSession.builder()
@@ -60,8 +59,8 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
     val jobs = FhavroToNormalizedMappings
-      .mappings(release)
-      .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, release, List(study)) }
+      .mappings()
+      .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, List(study)) }
 
 //    jobs.foreach(_.run().foreach(e => {
 //      ClassGenerator
@@ -92,8 +91,8 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     normalizedBiospecimen.filter(_.`fhir_id` == "BIO0000001").head shouldEqual NORMALIZED_BIOSPECIMEN()
     normalizedSampleRegistration.filter(_.`subject` == "PRT0000001").head shouldEqual NORMALIZED_SAMPLE_REGISTRATION()
     normalizedResearchStudy.head shouldEqual NORMALIZED_RESEARCH_STUDY()
-    normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000019").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
+    normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000207").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
     group.filter(_.`internal_family_id` == "FM00000001").head shouldEqual NORMALIZED_GROUP()
-    task.filter(_.`fhir_id` == "SXP0000003").head shouldEqual NORMALIZED_TASK()
+    task.filter(_.`fhir_id` == "SXP0000001").head shouldEqual NORMALIZED_TASK()
   }
 }

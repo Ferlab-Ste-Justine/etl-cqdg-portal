@@ -7,15 +7,15 @@ object ImportTask extends SparkApp {
 
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
-  val Array(_, _, releaseId, studyIds) = args
+  val Array(_, _, studyIds) = args
 
   val studyList = studyIds.split(",").toList
 
   implicit val (conf, _, spark) = init()
 
   val jobs = FhavroToNormalizedMappings
-    .mappings(releaseId)
-    .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, releaseId, studyList) }
+    .mappings()
+    .map { case (src, dst, transformations) => new ImportRawToNormalizedETL(src, dst, transformations, studyList) }
 
   jobs.foreach(_.run())
 }

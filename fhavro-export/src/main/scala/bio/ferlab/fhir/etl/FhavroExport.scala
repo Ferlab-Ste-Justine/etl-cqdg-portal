@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.S3Client
 object FhavroExport extends App {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
-  val Array(releaseId, studyIds, env) = args
+  val Array(studyIds, env) = args
 
   val studyList = studyIds.split(",").toList
 
@@ -21,7 +21,7 @@ object FhavroExport extends App {
           implicit val s3Client: S3Client = buildS3Client(configuration)
           implicit val fhirClient: GenericClient = buildFhirClient(configuration)
 
-          val fhavroExporter = new FhavroExporter(configuration.awsConfig.bucketName, releaseId, studyId)
+          val fhavroExporter = new FhavroExporter(configuration.awsConfig.bucketName, studyId)
 
           configuration.fhirConfig.resources.foreach { fhirRequest =>
             val resources = fhavroExporter.requestExportFor(fhirRequest)

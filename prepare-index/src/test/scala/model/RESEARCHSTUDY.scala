@@ -3,7 +3,6 @@ package model
 case class RESEARCHSTUDY(
                           `fhir_id`: String = "STU0000001",
                           `keyword`: Seq[String] = Seq("genomics", "chronic conditions", "population-based cohort", "survey data"),
-                          `release_id`: String = "5",
                           `study_id`: String = "STU0000001",
                           `description`: String = "CARTaGENE",
                           `study_code`: String = "cag",

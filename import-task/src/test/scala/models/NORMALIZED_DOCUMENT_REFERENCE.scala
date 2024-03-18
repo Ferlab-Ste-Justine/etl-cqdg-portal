@@ -7,20 +7,19 @@ package models
 
 
 
-case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000019",
+case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000207",
                                          `participant_id`: String = "PRT0000003",
                                          `biospecimen_reference`: String = "SAM0000003",
                                          `data_type`: String = "Sequencing-data-supplement",
                                          `data_category`: String = "Genomics",
-                                         `dataset`: String = "ds_name 1",
+                                         `dataset`: String = "ds_name_1",
                                          `files`: Seq[FILES] = Seq(FILES()),
-                                         `study_id`: String = "STU0000001",
+                                         `study_id`: String = "CAG",
                                          `relates_to`: Option[String] = None,
-                                         `security`: String = "R",
-                                         `release_id`: String = "1")
+                                         `security`: String = "R")
 
 case class FILES(`file_name`: String = "mpsMetrics_S03344.tar.gz",
                  `file_format`: String = "TGZ",
                  `file_size`: Float = 8.0f,
-                 `ferload_url`: String = "http://flerloadurl/03fe6239ff7db8a5706103d3f0dd08441004ed5b",
+                 `ferload_url`: String = "s3://run_4055/CAG/dataset_ds_name_1/1623/mpsMetrics_S03344.tar.gz",
                  `file_hash`: Option[String] = None)
