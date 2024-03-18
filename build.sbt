@@ -1,7 +1,7 @@
 import sbtassembly.AssemblyPlugin.autoImport.assembly
 
 val sparkVersion = "3.5.1"
-val datalakeSpark3Version = "13.0.0"
+val datalakeSpark3Version = "14.0.0"
 val deltaCoreVersion = "3.1.0"
 
 
@@ -18,9 +18,9 @@ val sparkDepsSetting = Seq(
     "bio.ferlab" %% "datalake-test-utils" % datalakeSpark3Version % Test,
     "org.apache.spark" %% "spark-sql" % sparkVersion % Provided,
     "org.apache.spark" %% "spark-hive" % sparkVersion % Provided,
-    "org.apache.hadoop" % "hadoop-aws" % "3.3.6" % Provided,
+    "org.apache.hadoop" % "hadoop-aws" % "3.3.4" % Provided,
     "io.delta" %% "delta-spark" % deltaCoreVersion % Provided,
-    "org.scalatest" %% "scalatest" % "3.2.9" % Test,
+    "org.scalatest" %% "scalatest" % "3.2.17" % Test,
   )
 )
 val commonSettings = Seq(
