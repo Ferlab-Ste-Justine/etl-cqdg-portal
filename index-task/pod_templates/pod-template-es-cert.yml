@@ -25,4 +25,4 @@ spec:
     - name: es-ca-cert
       secret:
         secretName: opensearch-ca-certificate
-        defaultMode: 0555
+        defaultMode: 365
