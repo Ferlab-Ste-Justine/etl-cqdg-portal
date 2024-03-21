@@ -10,7 +10,8 @@ import scala.util.matching.Regex
 object FhavroToNormalizedMappings {
   val pattern: Regex = "raw_([A-Za-z0-9-_]+)".r
 
-  val idFromUrlRegex = "^http[s]?:\\/\\/.*\\/([a-zA-z0-9]*)\\/_history"
+  // using id regex from: https://fhir-ru.github.io/datatypes.html
+  val idFromUrlRegex = "^http[s]?:\\/\\/.*\\/([A-Za-z0-9\\-\\.]{1,64})\\/_history"
 
   def defaultTransformations(): List[Transformation] = {
     List(Custom(_
