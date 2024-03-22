@@ -3764,12 +3764,12 @@
                       "default":null
                     },
                     {
-                      "name":"valueDateTime",
+                      "name":"valueDate",
                       "type":[
                         "null",
                         {
                           "type":"long",
-                          "logicalType":"timestamp-micros"
+                          "logicalType":"date"
                         }
                       ],
                       "default":null

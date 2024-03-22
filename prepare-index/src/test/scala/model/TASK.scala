@@ -10,7 +10,7 @@ case class TASK(
                  `labAliquotID`: String = "nanuq_sample_id",
                  `run_name`: String = "runNameExample",
                  `run_alias`: String = "runAliasExample",
-                 `run_date`: String = null,
+                 `run_date`: String = "2007-04-14",
                  `capture_kit`: String = "RocheKapaHyperExome",
                  `platform`: String = "Illumina",
                  `experimental_strategy`: String = "WXS",
