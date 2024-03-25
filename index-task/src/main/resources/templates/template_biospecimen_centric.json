@@ -401,7 +401,7 @@
                 },
                 "run_date" : {
                   "type": "date",
-                  "format": "yyyy-MM-dd HH:mm:ss"
+                  "format": "yyyy-MM-dd"
                 },
                 "capture_kit" : {
                   "type": "keyword"
