@@ -39,7 +39,7 @@ object Transformations {
       .withColumn("read_length", split(filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"), ",")(0))
       .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
       .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
-      .withColumn("run_date", date_from_unix_date(filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDate")))
+      .withColumn("run_date", date_from_unix_date(filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDate")).cast("string"))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
       .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
       .withColumn("experimental_strategy", filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code"))
