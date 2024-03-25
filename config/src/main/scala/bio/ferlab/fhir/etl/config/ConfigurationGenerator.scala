@@ -92,7 +92,7 @@ object ConfigurationGenerator extends App {
       DatasetConf(
         id = "raw_vcf",
         storageid = storage_vcf,
-        path = "/{{OWNER}}/{{STUDY_ID}}/{{DATASET}}/{{BATCH}}/variants.*.vep.vcf.gz",
+        path = "/{{OWNER}}/{{STUDY_CODE}}/{{DATASET}}/{{BATCH}}/variants.*.vep.vcf.gz",
         format = VCF,
         loadtype = Read,
         partitionby = List("chromosome"),

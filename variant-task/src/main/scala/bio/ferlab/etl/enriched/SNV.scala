@@ -10,13 +10,13 @@ import bio.ferlab.datalake.spark3.implicits.GenomicImplicits._
 
 import java.time.LocalDateTime
 
-case class SNV(rc: RuntimeETLContext, studyId: String, dataset: String, batch: String) extends SimpleSingleETL(rc) {
+case class SNV(rc: RuntimeETLContext, studyCode: String, dataset: String, batch: String) extends SimpleSingleETL(rc) {
 
   override val mainDestination: DatasetConf = conf.getDataset("enriched_snv")
   private val normalized_snv: DatasetConf = conf.getDataset("normalized_snv")
 
   override def extract(lastRunValue: LocalDateTime, currentRunValue: LocalDateTime): Map[String, DataFrame] = Map(
-    normalized_snv.id -> normalized_snv.read.where(s"study_id = '$studyId' and dataset='$dataset' and batch='$batch' ")
+    normalized_snv.id -> normalized_snv.read.where(s"study_id = '$studyCode' and dataset='$dataset' and batch='$batch' ")
   )
 
   override def transformSingle(data: Map[String, DataFrame], lastRunValue: LocalDateTime, currentRunValue: LocalDateTime): DataFrame = {
@@ -29,5 +29,5 @@ case class SNV(rc: RuntimeETLContext, studyId: String, dataset: String, batch: S
       .withGenotypeTransmission(TRANSMISSION_MODE, `gender_name` = "sex")
   }
 
-  override def replaceWhere: Option[String] = Some(s"study_id = '$studyId' and dataset='$dataset' and batch='$batch' ")
+  override def replaceWhere: Option[String] = Some(s"study_id = '$studyCode' and dataset='$dataset' and batch='$batch' ")
 }
