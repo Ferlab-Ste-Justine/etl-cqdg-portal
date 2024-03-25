@@ -10,10 +10,10 @@ object RunEnrichGenomic {
 
   @main
   def snv(rc: RuntimeETLContext,
-          @arg(name = "study-id", short = 's', doc = "Study Id") studyId: String,
+          @arg(name = "study-code", short = 's', doc = "Study Code") studyCode: String,
           @arg(name = "dataset", short = 'd', doc = "Dataset") dataset: String,
           @arg(name = "batch", short = 'b', doc = "Batch") batch: String,
-         ): Unit = SNV(rc, studyId, dataset, batch).run()
+         ): Unit = SNV(rc, studyCode, dataset, batch).run()
 
   @main
   def variants(rc: RuntimeETLContext): Unit = runVariants(rc).run()

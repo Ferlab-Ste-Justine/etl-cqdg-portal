@@ -9,7 +9,7 @@ import org.apache.spark.sql.functions.{array_contains, col, lit}
 
 import java.time.LocalDateTime
 
-case class Consequences(rc: RuntimeETLContext, studyId: String, owner: String, dataset: String, batch: String, referenceGenomePath: Option[String]) extends BaseConsequences(rc: RuntimeETLContext, annotationsColumn = csq, groupByLocus = true) {
+case class Consequences(rc: RuntimeETLContext, studyCode: String, owner: String, dataset: String, batch: String, referenceGenomePath: Option[String]) extends BaseConsequences(rc: RuntimeETLContext, annotationsColumn = csq, groupByLocus = true) {
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_consequences")
 
@@ -17,7 +17,7 @@ case class Consequences(rc: RuntimeETLContext, studyId: String, owner: String, d
                        currentRunDateTime: LocalDateTime = LocalDateTime.now()): Map[String, DataFrame] = {
     Map(
       raw_vcf -> vcf(raw_variant_calling.location
-        .replace("{{STUDY_CODE}}", s"$studyId")
+        .replace("{{STUDY_CODE}}", s"$studyCode")
         .replace("{{DATASET}}", s"$dataset")
         .replace("{{BATCH}}", s"$batch")
         .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
@@ -30,6 +30,6 @@ case class Consequences(rc: RuntimeETLContext, studyId: String, owner: String, d
     val filteredVcf = data(raw_vcf).filter(array_contains(col("INFO_FILTERS"), "PASS"))
 
     super.transformSingle(data + (raw_vcf -> filteredVcf), lastRunDateTime, currentRunDateTime)
-      .withColumn("study_id", lit(studyId))
+      .withColumn("study_id", lit(studyCode))
   }
 }
