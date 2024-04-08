@@ -90,7 +90,7 @@ jobs:
           asset_path: variant-task/target/scala-2.12/variant-task.jar
           asset_name: variant-task.jar
           asset_content_type: application/java-archive
-      - name: Publish Image using commit sha and timestamp
+      - name: Publish Image Fhavro Export
         id: publish-fhavro-image
         uses: Ferlab-Ste-Justine/action-push-image@v2
         with:
@@ -100,3 +100,11 @@ jobs:
           tag_format: "{semver}"
           location: fhavro-export
           dockerfile: fhavro-export/Dockerfile
+      - name: Publish Image ETL Portal
+        id: publish-etl-cqdg-portal-image
+        uses: Ferlab-Ste-Justine/action-push-image@v2
+        with:
+          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+          image: ferlabcrsj/etl-cqdg-portal
+          tag_format: "{semver}"
