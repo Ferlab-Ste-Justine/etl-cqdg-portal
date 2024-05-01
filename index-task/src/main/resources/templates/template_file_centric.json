@@ -590,6 +590,9 @@
             "family_type": {
               "type": "keyword"
             },
+            "relationship_to_proband": {
+              "type": "keyword"
+            },
             "submitter_family_id": {
               "type": "keyword"
             },
