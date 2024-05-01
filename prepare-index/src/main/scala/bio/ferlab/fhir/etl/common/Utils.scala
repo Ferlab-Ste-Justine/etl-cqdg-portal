@@ -168,29 +168,70 @@ object Utils {
     }
 
     def addAssociatedDocumentRef(): DataFrame = {
-      val refFileFormat = Seq("CRAI", "TBI")
-
       val filesExp = df.withColumn("files_exp", explode(col("files")))
+
+      ///-----------------
+      val desiredDocumentCols = Seq("fhir_id", "biospecimen_reference", "data_type", "data_category", "relates_to") //from "files_exp"
+      val desiredStudyCols = Seq("name") //from "files_exp"
+      val desiredSequencingExperimentCols = Seq("bio_informatic_analysis", "experimental_strategy")
+      val desiredParticipantsCols = Seq("participant_id", "submitter_participant_id")
+      val desiredBiospecimensCols = Seq("biospecimen_id", "sample_id", "submitter_biospecimen_id", "submitter_sample_id")
+      val desiredfFamilyRelationshipCols = Seq("family_id", "family_type")
+
+      val filesParticipantExp = filesExp
+        .select((desiredDocumentCols ++ Seq("participants", "study", "sequencing_experiment", "files_exp.*")).map(col): _*)
+        .withColumn("study", struct(desiredStudyCols.map(n => s"study.$n").map(col): _*))
+        .withColumn("sequencing_experiment", struct(desiredSequencingExperimentCols.map(n => s"sequencing_experiment.$n").map(col): _*))
+        .withColumn("participant", explode(col("participants")))
+
+     val filesBiospecimenExp =  filesParticipantExp
+        .withColumn("family_relationship",
+          filter(col("participant.family_relationships"), col => col("participant_id") === filesParticipantExp.col("participant")("participant_id"))(0)
+        )
+        .withColumn("biospecimen", explode(col("participant.biospecimens")))
+        .withColumn("biospecimen", struct(desiredBiospecimensCols.map(n => s"biospecimen.$n").map(col): _*))
+        .withColumn("participant", struct((desiredParticipantsCols.map(n => s"participant.$n") ++ desiredfFamilyRelationshipCols.map(n => s"family_relationship.$n")).map(col): _*))
+        .drop(col("participants"), col("family_relationship"))
+
+      val filesBiospecimenGrouped = filesBiospecimenExp
+        .groupBy(filesBiospecimenExp.columns.filterNot(Seq("biospecimen").contains).map(col): _*)
+        .agg(collect_list(col("biospecimen")) as "biospecimens")
+
+      val filesParticipantGrouped = filesBiospecimenGrouped
+        .groupBy(filesBiospecimenGrouped.columns.filterNot(Seq("participant").contains).map(col): _*)
+        .agg(collect_list(col("participant")) as "participants")
+
+      val relatedDocSeqExperiment = filesParticipantGrouped
+        .filter(!col("relates_to").isNotNull)
+        .select("fhir_id", "sequencing_experiment")
+        .withColumnRenamed("fhir_id", "relates_to")
+
+      val relatedDocWithSeqExperiment = filesParticipantGrouped
+        .filter(col("relates_to").isNotNull)
+        .drop("sequencing_experiment")
+        .join(relatedDocSeqExperiment, Seq("relates_to"), "inner")
+
+      /// ---------------------------
 
       val fileColumns =  filesExp.select("files_exp.*").columns
 
-      val filesParent = filesExp.filter(!col("files_exp.file_format").isin(refFileFormat: _*)).drop("relates_to")
+      //Filter out files like CRAI and TBI
+      val filesParent = filesExp.filter(!col("relates_to").isNotNull).drop("relates_to")
 
-      val filesRef = filesExp
-        .filter(col("files_exp.file_format").isin(refFileFormat: _*))
-        .select("fhir_id", "relates_to")
-        .withColumnRenamed("relates_to", "parent_fhir_id")
-        .withColumnRenamed("fhir_id", "relates_to")
-        .withColumnRenamed("parent_fhir_id", "fhir_id")
+      //CRAI and TBI files
+      val filesRef = relatedDocWithSeqExperiment
+        .withColumn("related_file", struct(relatedDocWithSeqExperiment.columns.filterNot(Seq("relates_to").contains).map(col): _*))
+        .select("related_file", "relates_to")
+        .withColumnRenamed("relates_to", "fhir_id")
+        .withColumnRenamed("related_file", "relates_to")
 
-      val filesWithRef = filesParent
+
+      val rr = filesParent
         .join(filesRef, Seq("fhir_id"), "left_outer")
 
-        .drop("files")
-
-      val fileWithRefColumns = filesWithRef.columns.filterNot(_.equals("files_exp"))
-
-      filesWithRef.select((fileWithRefColumns ++ fileColumns.map(c => s"files_exp.$c")).map(col): _*)
+      rr.show(false)
+      rr.printSchema()
+      rr
     }
 
 

@@ -7,7 +7,7 @@ case class FILE_CENTRIC(
                          biospecimen_reference: String = "SAM0247817",
                          data_type: String = "Germline Structural Variant",
                          dataset: Option[String] = Some("Dataset1"),
-                         `relates_to`: Option[String] = None,
+                         `relates_to`: Option[RELATES_TO] = None,
                          data_category: String = "Genomics",
                          file_name: String = "NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz",
                          file_format: String = "VCF",
@@ -22,4 +22,36 @@ case class FILE_CENTRIC(
 case class FILE_FACET_IDS(
                            file_fhir_id_1: String = "337786",
                            file_fhir_id_2: String = "337786"
+                         )
+
+case class STUDY_REL(
+                      name: String = "CARTaGENE"
+                         )
+
+case class BIOSPECIMEN_REL(
+                            biospecimen_id: String = "BIO0041635",
+                            sample_id: String = "sam1",
+                            submitter_biospecimen_id: String = "cag_sp_20832",
+                            submitter_sample_id: String = "S03411"
+                    )
+
+case class PARTICIPANT_REL(
+                            participant_id: String = "P1",
+                            submitter_participant_id: String = "35849409716",
+                            family_id: String = "FAMO1",
+                            family_type: String = "trio",
+                    )
+
+case class RELATES_TO(
+                          fhir_id: String = "13",
+                          biospecimen_reference: String = "B2",
+                          data_type: String = "SSUP",
+                          data_category: String = "Genomics",
+                          study: STUDY_REL = STUDY_REL(),
+                          file_name: String = "file.2",
+                          file_format: String = "CRAI",
+                          file_size: Long = 56,
+                          ferload_url: String = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
+                          biospecimens: Seq[BIOSPECIMEN_REL] = Nil,
+                          participants: Seq[PARTICIPANT_REL] = Nil,
                          )
