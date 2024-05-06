@@ -30,7 +30,8 @@
           "normalizer" : "custom_normalizer"
         },
         "sex": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "vital_status": {
           "type": "keyword"
@@ -39,10 +40,12 @@
           "type": "keyword"
         },
         "age_at_recruitment": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "ethnicity": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "submitter_participant_id": {
           "type": "keyword"
@@ -66,10 +69,12 @@
               "type": "keyword"
             },
             "biospecimen_tissue_source": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "age_biospecimen_collection": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "submitter_biospecimen_id": {
               "type": "keyword"
@@ -78,7 +83,8 @@
               "type": "keyword"
             },
             "sample_type": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "submitter_sample_id": {
               "type": "keyword"
@@ -124,7 +130,8 @@
               "type": "boolean"
             },
             "name": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "parents": {
               "type": "keyword"
@@ -153,13 +160,15 @@
               "type": "keyword"
             },
             "source_text": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "parents": {
               "type": "keyword"
             },
             "age_at_event": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             }
           }
         },
@@ -193,7 +202,8 @@
               "type": "keyword"
             },
             "source_text": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "parents": {
               "type": "keyword"
@@ -291,18 +301,21 @@
           "type": "boolean"
         },
         "relationship_to_proband": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "family_id": {
           "type": "keyword"
         },
         "family_type": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "study": {
           "properties": {
             "study_code" : {
-              "type" : "keyword"
+              "type" : "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "name": {
               "type": "keyword"
@@ -351,19 +364,23 @@
               "type": "keyword"
             },
             "data_type": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "dataset": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "data_category": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "file_name": {
               "type": "keyword"
             },
             "file_format": {
-              "type": "keyword"
+              "type": "keyword",
+              "normalizer" : "custom_normalizer"
             },
             "file_size": {
               "type": "keyword"
@@ -446,7 +463,8 @@
                   "type": "keyword"
                 },
                 "experimental_strategy" : {
-                  "type": "keyword"
+                  "type": "keyword",
+                  "normalizer" : "custom_normalizer"
                 },
                 "sequencer_id" : {
                   "type": "keyword"
