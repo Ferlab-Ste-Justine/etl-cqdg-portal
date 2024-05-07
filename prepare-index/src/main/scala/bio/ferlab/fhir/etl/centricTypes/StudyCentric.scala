@@ -75,7 +75,12 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
 
     val fileCount =
       data(normalized_drs_document_reference.id)
-        .addAssociatedDocumentRef()
+//        .addAssociatedDocumentRef()
+        .filter(!col("relates_to").isNotNull).drop("relates_to")
+        .withColumn("files_exp", explode(col("files")))
+        .select("*", "files_exp.*")
+        .drop("files_exp", "files")
+
         .join(participantsRenamed, Seq("participant_id", "study_id"), "inner")
         .groupBy("study_id")
         .agg(

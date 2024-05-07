@@ -29,18 +29,23 @@ case class STUDY_REL(
                          )
 
 case class BIOSPECIMEN_REL(
-                            biospecimen_id: String = "BIO0041635",
+                            biospecimen_id: String = "B1",
                             sample_id: String = "sam1",
                             submitter_biospecimen_id: String = "cag_sp_20832",
-                            submitter_sample_id: String = "S03411"
+                            submitter_sample_id: String = "35849414972"
                     )
 
 case class PARTICIPANT_REL(
                             participant_id: String = "P1",
-                            submitter_participant_id: String = "35849409716",
-                            family_id: String = "FAMO1",
+                            submitter_participant_id: String = "35849428444",
+                            family_id: String = "Family1",
                             family_type: String = "trio",
                     )
+
+case class SEQUENCING_EXPERIMENT_REL(
+                                      bio_informatic_analysis: String = "GGBA",
+                                      experimental_strategy: String = "WXS",
+                          )
 
 case class RELATES_TO(
                           fhir_id: String = "13",
@@ -52,6 +57,7 @@ case class RELATES_TO(
                           file_format: String = "CRAI",
                           file_size: Long = 56,
                           ferload_url: String = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
-                          biospecimens: Seq[BIOSPECIMEN_REL] = Nil,
-                          participants: Seq[PARTICIPANT_REL] = Nil,
+                          biospecimens: Seq[BIOSPECIMEN_REL] = Seq(BIOSPECIMEN_REL()),
+                          participants: Seq[PARTICIPANT_REL] = Seq(PARTICIPANT_REL()),
+                          sequencing_experiment: SEQUENCING_EXPERIMENT_REL = SEQUENCING_EXPERIMENT_REL()
                          )

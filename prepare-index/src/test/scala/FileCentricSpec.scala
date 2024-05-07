@@ -47,9 +47,6 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val output = new FileCentric(List("STU0000001"))(conf).transform(data)
     output.keys should contain("es_index_file_centric")
 
-    output("es_index_file_centric").show(false)
-    output("es_index_file_centric").printSchema()
-
     val file_centric = output("es_index_file_centric").as[FILE_CENTRIC].collect()
 
     output("es_index_file_centric").count() shouldEqual 2 //CRAI files are excluded
@@ -66,12 +63,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
           `biospecimens` = Set(
             BIOSPECIMEN(
-              `biospecimen_id` = "B1",
-            ),
-            BIOSPECIMEN(
               `biospecimen_id` = "B2",
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
+            ),
+            BIOSPECIMEN(
+              `biospecimen_id` = "B1",
             )
           ),
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
@@ -80,12 +77,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
             `sex` = "male",
             `biospecimens` = Set(
               BIOSPECIMEN(
-                `biospecimen_id` = "B1",
-              ),
-              BIOSPECIMEN(
                 `biospecimen_id` = "B2",
                 `sample_id` = "sam2",
                 `sample_2_id` = "sam2",
+              ),
+              BIOSPECIMEN(
+                `biospecimen_id` = "B1",
               )
             )
           )),
@@ -104,7 +101,12 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `file_name` = "file.1",
         `file_format` = "CRAM",
         `file_size` = 56,
-        `relates_to`= Some(RELATES_TO()),
+        `relates_to`= Some(RELATES_TO(
+          biospecimens = Seq(
+            BIOSPECIMEN_REL(biospecimen_id = "B2", sample_id = "sam2"),
+            BIOSPECIMEN_REL()
+          )
+        )),
         `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
         `biospecimens` = Set(
           BIOSPECIMEN(
