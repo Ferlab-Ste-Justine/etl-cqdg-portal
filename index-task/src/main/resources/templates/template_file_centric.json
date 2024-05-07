@@ -82,7 +82,7 @@
               }
             },
             "file_name": {
-              "type": "boolean",
+              "type": "keyword",
               "index": false
             },
             "file_format": {
