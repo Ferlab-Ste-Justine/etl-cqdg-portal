@@ -32,10 +32,10 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
 
     val transformedFile =
       fileDF
-        .addAssociatedDocumentRef()
         .addParticipantWithBiospecimen(data(simple_participant.id), data(normalized_biospecimen.id), data(normalized_sample_registration.id))
         .addStudy(data(es_index_study_centric.id))
         .addSequencingExperiment(data(normalized_sequencing_experiment.id))
+        .addAssociatedDocumentRef()
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("study_code", col("study.study_code"))
         .withColumn("biospecimens", array_distinct(flatten(col("participants.biospecimens"))))

@@ -57,7 +57,99 @@
           "type": "keyword"
         },
         "relates_to": {
-          "type": "keyword"
+          "properties": {
+            "fhir_id": {
+              "type": "keyword"
+            },
+            "biospecimen_reference": {
+              "type": "keyword",
+              "index": false
+            },
+            "data_type": {
+              "type": "keyword",
+              "index": false
+            },
+            "data_category": {
+              "type": "keyword",
+              "index": false
+            },
+            "study": {
+              "properties": {
+                "name": {
+                  "type": "keyword",
+                  "index": false
+                }
+              }
+            },
+            "file_name": {
+              "type": "boolean",
+              "index": false
+            },
+            "file_format": {
+              "type": "keyword",
+              "index": false
+            },
+            "file_size": {
+              "type": "float",
+              "index": false
+            },
+            "ferload_url": {
+              "type": "keyword",
+              "index": false
+            },
+            "biospecimens": {
+              "properties": {
+                "biospecimen_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "sample_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "submitter_biospecimen_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "submitter_sample_id": {
+                  "type": "keyword",
+                  "index": false
+                }
+              }
+            },
+            "participants": {
+              "properties": {
+                "participant_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "submitter_participant_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "family_id": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "family_type": {
+                  "type": "keyword",
+                  "index": false
+                }
+              }
+            },
+            "sequencing_experiment": {
+              "properties": {
+                "bio_informatic_analysis": {
+                  "type": "keyword",
+                  "index": false
+                },
+                "experimental_strategy": {
+                  "type": "keyword",
+                  "index": false
+                }
+              }
+            }
+          }
         },
         "file_hash" : {
           "type": "keyword"
