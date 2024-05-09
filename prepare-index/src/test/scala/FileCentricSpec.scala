@@ -101,12 +101,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `file_name` = "file.1",
         `file_format` = "CRAM",
         `file_size` = 56,
-        `relates_to`= Some(RELATES_TO(
-          biospecimens = Seq(
-            BIOSPECIMEN_REL(biospecimen_id = "B2", sample_id = "sam2"),
-            BIOSPECIMEN_REL()
-          )
-        )),
+        `relates_to`= Some(RELATES_TO()),
         `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
         `biospecimens` = Set(
           BIOSPECIMEN(
