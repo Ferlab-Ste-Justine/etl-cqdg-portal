@@ -174,63 +174,23 @@ object Utils {
       .drop("files_exp", "files")
 
     def addAssociatedDocumentRef(): DataFrame = {
-
-      val desiredDocumentCols = Seq("fhir_id", "biospecimen_reference", "data_type", "data_category", "relates_to") //from "files_exp"
-      val desiredStudyCols = Seq("name")
-      val desiredSequencingExperimentCols = Seq("bio_informatic_analysis", "experimental_strategy")
-      val desiredParticipantsCols = Seq("participant_id", "submitter_participant_id")
-      val desiredBiospecimensCols = Seq("biospecimen_id", "sample_id", "submitter_biospecimen_id", "submitter_sample_id")
-      val desiredFamilyRelationshipCols = Seq("family_id", "family_type")
-
-      val filesExp = df.withColumn("files_exp", explode(col("files")))
-
-      val filesParticipantExp = filesExp
-        .select((desiredDocumentCols ++ Seq("participants", "study", "sequencing_experiment", "files_exp.*")).map(col): _*)
-        .withColumn("study", struct(desiredStudyCols.map(n => s"study.$n").map(col): _*))
-        .withColumn("sequencing_experiment", struct(desiredSequencingExperimentCols.map(n => s"sequencing_experiment.$n").map(col): _*))
-        .withColumn("participant", explode(col("participants")))
-
-     val filesBiospecimenExp =  filesParticipantExp
-        .withColumn("family_relationship",
-          filter(col("participant.family_relationships"), col => col("participant_id") === filesParticipantExp.col("participant")("participant_id"))(0)
-        )
-        .withColumn("biospecimen", explode(col("participant.biospecimens")))
-        .withColumn("biospecimen", struct(desiredBiospecimensCols.map(n => s"biospecimen.$n").map(col): _*))
-        .withColumn("participant", struct((desiredParticipantsCols.map(n => s"participant.$n") ++ desiredFamilyRelationshipCols.map(n => s"family_relationship.$n")).map(col): _*))
-        .drop(col("participants"), col("family_relationship"))
-
-      val filesBiospecimenGrouped = filesBiospecimenExp
-        .groupBy(filesBiospecimenExp.columns.filterNot(Seq("biospecimen").contains).map(col): _*)
-        .agg(collect_list(col("biospecimen")) as "biospecimens")
-
-      val filesParticipantGrouped = filesBiospecimenGrouped
-        .groupBy(filesBiospecimenGrouped.columns.filterNot(Seq("participant").contains).map(col): _*)
-        .agg(collect_list(col("participant")) as "participants")
-
-      val relatedDocSeqExperiment = filesParticipantGrouped
-        .filter(!col("relates_to").isNotNull)
-        .select("fhir_id", "sequencing_experiment")
-        .withColumnRenamed("fhir_id", "relates_to")
-
-      val relatedDocWithSeqExperiment = filesParticipantGrouped
-        .filter(col("relates_to").isNotNull)
-        .drop("sequencing_experiment")
-        .join(relatedDocSeqExperiment, Seq("relates_to"), "inner")
+      val filesExp = df
+        .withColumn("files_exp", explode(col("files")))
+        .withColumnRenamed("fhir_id", "file_id")
 
       //Filter out files like CRAI and TBI
       val filesParent = filesExp.filter(!col("relates_to").isNotNull).drop("relates_to")
 
       //CRAI and TBI files
-      val filesRef = relatedDocWithSeqExperiment
-        .withColumn("related_file", struct(relatedDocWithSeqExperiment.columns.filterNot(Seq("relates_to").contains).map(col): _*))
+      val filesRef = filesExp
+        .filter(col("relates_to").isNotNull)
+        .withColumn("related_file", struct(Seq("file_id", "files_exp.*").map(col): _*))
         .select("related_file", "relates_to")
-        .withColumnRenamed("relates_to", "fhir_id")
+        .withColumnRenamed("relates_to", "file_id")
         .withColumnRenamed("related_file", "relates_to")
 
-
       val filesWithRef = filesParent
-        .join(filesRef, Seq("fhir_id"), "left_outer")
-
+        .join(filesRef, Seq("file_id"), "left_outer")
 
       val fileColumns =  filesWithRef.select("files_exp.*").columns
 
