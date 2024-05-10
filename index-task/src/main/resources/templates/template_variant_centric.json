@@ -5,7 +5,10 @@
   "priority": 1,
   "template": {
     "settings": {
-      "number_of_shards": 6
+      "number_of_shards": 6,
+      "index": {
+        "max_result_window" : 12000
+      }
     },
     "mappings": {
       "properties": {
