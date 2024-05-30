@@ -1,21 +1,42 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.datalake.spark3.elasticsearch.ElasticSearchClient
-import org.apache.hadoop.shaded.org.apache.http.client.methods.HttpGet
-import org.apache.hadoop.shaded.org.apache.http.util.EntityUtils
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
+import bio.ferlab.fhir.etl.PublishTask.esNodes
+import org.apache.http.client.methods.{HttpGet, HttpPost}
+import org.apache.http.entity.StringEntity
 
 object Publisher {
 
-  def retrievePreviousIndex(alias: String, studyId: String)(implicit esClient: ElasticSearchClient): Option[String] = {
-    val response = esClient.getAliasIndices(alias)
-    response.find(s => s.startsWith(s"${alias}_${studyId.toLowerCase}"))
+  private val patternIndex = """^([a-z0-9_\-.]*)\s+([a-z0-9_\-.]*).*$""".r
+
+  def retrievePreviousIndices(jobs: Seq[String], studies: Seq[String])(implicit esHttpClient: EsHttpClient): Seq[String] = {
+    val httpRequest = new HttpGet(s"$esNodes/_cat/aliases")
+
+    val (body, status) = esHttpClient.executeHttpRequest(httpRequest)
+
+    if(status < 300) {
+      val bodyParsed = body.map( b => {
+        val aliases = b.split("\n").flatMap(s => {
+          val test = patternIndex.findAllIn(s)
+          if(test.hasNext){
+            Some(test.group(1) -> test.group(2))
+          } else None
+        }).toSeq
+
+        aliases
+          .filter{ case(a, i) => jobs.contains(a) & studies.exists(study => i.containsSlice(study)) }.map{ case(_, index) => index }
+      })
+
+      bodyParsed.getOrElse(Nil)
+    } else Nil
   }
 
-  def publish(alias: String,
-              currentIndex: String,
-              previousIndex: Option[String] = None)(implicit esClient: ElasticSearchClient): Unit = {
-    esClient.setAlias(add = List(currentIndex), remove = previousIndex.toList, alias)
+  def updateAlias(alias: String, currentIndex: String, opType: String)(implicit esHttpClient: EsHttpClient): Unit = {
+    val query = s"""{\"actions\":[{\"$opType\":{\"index\":\"$currentIndex\",\"alias\":\"$alias\"}}]}"""
+
+    val httpRequest = new HttpPost(s"$esNodes/_aliases")
+    httpRequest.setEntity(new StringEntity(query))
+    httpRequest.addHeader("Content-Type", "application/json")
+
+    esHttpClient.executeHttpRequest(httpRequest)
   }
 }

@@ -3,8 +3,8 @@ val organization = "bio.ferlab"
 val version = "1.0"
 
 libraryDependencies ++= Seq(
-  "org.json4s" %% "json4s-jackson" % "3.7.0-M5",
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.2",
+  "com.github.pureconfig" %% "pureconfig" % "0.17.6",
+  "org.apache.httpcomponents" % "httpclient" % "4.5.14",
   "org.slf4j" % "slf4j-simple" % "1.7.36"
 )
 

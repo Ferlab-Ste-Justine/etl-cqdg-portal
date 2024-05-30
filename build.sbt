@@ -6,6 +6,7 @@ val deltaCoreVersion = "3.1.0"
 
 
 lazy val fhavro_export = project in file("fhavro-export")
+lazy val publish_task = project in file("publish-task")
 
 val sparkDepsSetting = Seq(
   resolvers ++= Seq(
@@ -55,6 +56,5 @@ lazy val config = (project in file("config")).settings(sparkDepsSetting)
 lazy val import_task = (project in file("import-task")).dependsOn(config).settings(commonSettings ++ sparkDepsSetting)
 lazy val prepare_index = (project in file("prepare-index")).dependsOn(config).settings(commonSettings ++ sparkDepsSetting)
 lazy val index_task = (project in file("index-task")).dependsOn(config).settings(commonSettings ++ sparkDepsSetting)
-lazy val publish_task = (project in file("publish-task")).dependsOn(config).settings(commonSettings ++ sparkDepsSetting)
 lazy val variant_task = (project in file("variant-task")).dependsOn(config).settings(commonSettings ++ sparkDepsSetting)
 
