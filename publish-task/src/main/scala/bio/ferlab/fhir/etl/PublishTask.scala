@@ -16,13 +16,11 @@ object PublishTask extends App {
   val Array(
   esNodes, // http://localhost:9200
   esPort, // 9200
-  env,
-  project,
   release_id, // release id
   study_ids, // study ids separated by ,
   jobTypes, // study_centric or participant_centric or file_centric or biospecimen_centric or all. can be multivalue spearate by ,
   ) = args
-  val serviceConf: ServiceConf = ConfigSource.resources(s"config/$env-$project.conf").loadOrThrow[ServiceConf]
+  val serviceConf: ServiceConf = ConfigSource.resources(s"application.conf").loadOrThrow[ServiceConf]
   private val esConf = serviceConf.esConfig
 
   implicit val esClient: EsHttpClient = new EsHttpClient(esConf)

@@ -108,3 +108,13 @@ jobs:
           password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
           image: ferlabcrsj/etl-cqdg-portal
           tag_format: "{semver}"
+      - name: Publish publish-task Image using commit sha and timestamp
+        id: publish-etl-image
+        uses: Ferlab-Ste-Justine/action-push-image@v2
+        with:
+          username: ${{ secrets.FERLAB_DOCKER_HUB_USER }}
+          password: ${{ secrets.FERLAB_DOCKER_HUB_TOKEN }}
+          image: ferlabcrsj/cqdg-etl-publish
+          tag_format: "{semver}"
+          location: publish-task
+          dockerfile: publish-task/Dockerfile
