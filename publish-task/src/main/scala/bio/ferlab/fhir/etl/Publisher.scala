@@ -1,6 +1,6 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.fhir.etl.PublishTask.esNodes
+import bio.ferlab.fhir.etl.PublishTask.{esNodes, esPort}
 import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.entity.StringEntity
 
@@ -9,7 +9,7 @@ object Publisher {
   private val patternIndex = """^([a-z0-9_\-.]*)\s+([a-z0-9_\-.]*).*$""".r
 
   def retrievePreviousIndices(jobs: Seq[String], studies: Seq[String])(implicit esHttpClient: EsHttpClient): Seq[String] = {
-    val httpRequest = new HttpGet(s"$esNodes/_cat/aliases")
+    val httpRequest = new HttpGet(s"$esNodes:$esPort/_cat/aliases")
 
     val (body, status) = esHttpClient.executeHttpRequest(httpRequest)
 
