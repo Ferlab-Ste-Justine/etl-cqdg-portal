@@ -33,7 +33,7 @@ object Publisher {
   def updateAlias(alias: String, currentIndex: String, opType: String)(implicit esHttpClient: EsHttpClient): Unit = {
     val query = s"""{\"actions\":[{\"$opType\":{\"index\":\"$currentIndex\",\"alias\":\"$alias\"}}]}"""
 
-    val httpRequest = new HttpPost(s"$esNodes/_aliases")
+    val httpRequest = new HttpPost(s"$esNodes:$esPort/_aliases")
     httpRequest.setEntity(new StringEntity(query))
     httpRequest.addHeader("Content-Type", "application/json")
 
