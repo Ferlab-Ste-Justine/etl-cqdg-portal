@@ -29,9 +29,9 @@ object PublishTask extends App {
   private val studyList = study_ids.split(",")
   private val jobs = jobTypes.split(",").toSeq
 
-  Thread.sleep(1000 * 60 * 5)
-
   val oldIndices = retrievePreviousIndices(jobs, studyList)
+
+  println(oldIndices.mkString(","))
 
   private val results = jobs.flatMap { job =>
     studyList.map(studyId => Result(job, studyId, Try {
