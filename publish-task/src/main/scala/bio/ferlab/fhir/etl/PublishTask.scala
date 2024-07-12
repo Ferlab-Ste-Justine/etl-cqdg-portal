@@ -26,12 +26,10 @@ object PublishTask extends App {
   implicit val esClient: EsHttpClient = new EsHttpClient(esConf)
 
 
-  private val studyList = study_ids.split(",")
+  private val studyList = study_ids.split(",").map(_.toLowerCase)
   private val jobs = jobTypes.split(",").toSeq
 
   val oldIndices = retrievePreviousIndices(jobs, studyList)
-
-  println(oldIndices.mkString(","))
 
   private val results = jobs.flatMap { job =>
     studyList.map(studyId => Result(job, studyId, Try {
