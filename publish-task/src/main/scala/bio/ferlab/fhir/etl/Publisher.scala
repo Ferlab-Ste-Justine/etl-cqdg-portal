@@ -1,6 +1,5 @@
 package bio.ferlab.fhir.etl
 
-import bio.ferlab.fhir.etl.PublishTask.{esNodes, esPort}
 import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.entity.StringEntity
 
@@ -46,7 +45,8 @@ object Publisher {
 
   }
 
-  def retrieveIndexesFromRegex(regex: String, fromQuery: String)(implicit esHttpClient: EsHttpClient): Seq[String] = {
+  def retrieveIndexesFromRegex(regex: String, fromQuery: String)(esNodes: String, esPort: String)
+                              (implicit esHttpClient: EsHttpClient): Seq[String] = {
     val httpRequest = new HttpGet(s"$esNodes:$esPort/_cat/$fromQuery?h=index")
 
     val (body, status) = esHttpClient.executeHttpRequest(httpRequest)
@@ -57,7 +57,8 @@ object Publisher {
     } else Nil
   }
 
-  def updateAlias(alias: String, currentIndex: String, opType: String)(implicit esHttpClient: EsHttpClient): Unit = {
+  def updateAlias(alias: String, currentIndex: String, opType: String)(esNodes: String, esPort: String)
+                 (implicit esHttpClient: EsHttpClient): Unit = {
     val query = s"""{\"actions\":[{\"$opType\":{\"index\":\"$currentIndex\",\"alias\":\"$alias\"}}]}"""
     val httpRequest = new HttpPost(s"$esNodes:$esPort/_aliases")
 
