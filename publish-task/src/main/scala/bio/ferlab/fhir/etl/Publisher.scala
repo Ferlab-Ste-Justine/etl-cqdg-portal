@@ -45,7 +45,7 @@ object Publisher {
 
   }
 
-  def retrieveIndexesFromRegex(regex: String, fromQuery: String)(esNodes: String, esPort: String)
+  def retrieveIndexesFromRegex(regex: String, fromQuery: String)(esNodes: String)
                               (implicit esHttpClient: EsHttpClient): Seq[String] = {
     val httpRequest = new HttpGet(s"$esNodes/_cat/$fromQuery?h=index")
 
@@ -57,7 +57,7 @@ object Publisher {
     } else Nil
   }
 
-  def updateAlias(alias: String, currentIndex: String, opType: String)(esNodes: String, esPort: String)
+  def updateAlias(alias: String, currentIndex: String, opType: String)(esNodes: String)
                  (implicit esHttpClient: EsHttpClient): Unit = {
     val query = s"""{\"actions\":[{\"$opType\":{\"index\":\"$currentIndex\",\"alias\":\"$alias\"}}]}"""
     val httpRequest = new HttpPost(s"$esNodes/_aliases")
