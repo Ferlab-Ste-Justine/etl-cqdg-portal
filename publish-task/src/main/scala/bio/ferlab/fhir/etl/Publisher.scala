@@ -47,7 +47,7 @@ object Publisher {
 
   def retrieveIndexesFromRegex(regex: String, fromQuery: String)(esNodes: String, esPort: String)
                               (implicit esHttpClient: EsHttpClient): Seq[String] = {
-    val httpRequest = new HttpGet(s"$esNodes:$esPort/_cat/$fromQuery?h=index")
+    val httpRequest = new HttpGet(s"$esNodes/_cat/$fromQuery?h=index")
 
     val (body, status) = esHttpClient.executeHttpRequest(httpRequest)
 
