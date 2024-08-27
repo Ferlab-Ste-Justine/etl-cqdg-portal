@@ -21,5 +21,8 @@ object RunNormalizedGenomic {
                    @arg(name = "batch", short = 'b', doc = "Batch") batch: String,
                    @arg(name = "reference-genome-path", short = 'g', doc = "Reference Genome Path") referenceGenomePath: Option[String]): Unit = Consequences(rc, studyCode, owner, dataset, batch, referenceGenomePath).run()
 
-  def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
+  def main(args: Array[String]): Unit = {
+    args.foreach(println)
+    ParserForMethods(this).runOrThrow(args, allowPositional = true)
+  }
 }
