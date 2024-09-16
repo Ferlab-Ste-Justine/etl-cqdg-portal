@@ -461,7 +461,8 @@
           "type": "keyword"
         },
         "submitter_sample_id": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         }
       }
     }
