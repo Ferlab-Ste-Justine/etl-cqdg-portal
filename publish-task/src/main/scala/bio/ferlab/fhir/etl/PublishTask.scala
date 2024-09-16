@@ -13,6 +13,7 @@ case class ServiceConf(esConfig: Map[String, String])
 object PublishTask {
   @main
   def publish(
+               @arg(name = "es-port", short = 'p', doc = "Es port") esPort: String,
                @arg(name = "es-nodes", short = 'n', doc = "Es Nodes") esNodes: String,
                @arg(name = "release-id", short = 'r', doc = "Release ID") releaseId: String,
                @arg(name = "job-types", short = 'j', doc = "List of jobs separated by ,") jobTypes: String,
@@ -30,8 +31,8 @@ object PublishTask {
 
     val studyList = study_ids.map(s => s.split(",").map(_.toLowerCase).toSeq)
     val jobs = jobTypes.split(",").toSeq
-    val oldIndices = retrieveIndexesFromRegex(generateRegexCurrentAlias(jobs, studyList), "aliases")(esNodes, "9200")
-    val desiredIndices = retrieveIndexesFromRegex(generateRegexDesiredIndex(jobs, releaseId, studyList), "indices")(esNodes, "9200")
+    val oldIndices = retrieveIndexesFromRegex(generateRegexCurrentAlias(jobs, studyList), "aliases")(esNodes, esPort)
+    val desiredIndices = retrieveIndexesFromRegex(generateRegexDesiredIndex(jobs, releaseId, studyList), "indices")(esNodes, esPort)
 
     val results =
       studyList match {
@@ -42,11 +43,11 @@ object PublishTask {
               // only remove if a new index AND a current index exists for this study/job
               if(desiredIndices.exists(e => e.startsWith(s"${job}_$study")) &&
                 oldIndices.exists(e => e.startsWith(s"${job}_$study"))){
-                Publisher.updateAlias(job, s"${job}_$study*", "remove")(esNodes, "9200")
+                Publisher.updateAlias(job, s"${job}_$study*", "remove")(esNodes, esPort)
               }
 
               desiredIndices.find(e => e.startsWith(s"${job}_$study")).map(e => {
-                Publisher.updateAlias(job, e, "add")(esNodes, "9200")
+                Publisher.updateAlias(job, e, "add")(esNodes, esPort)
               })
             })
           })
@@ -58,11 +59,11 @@ object PublishTask {
             Result(job, None, Try {
               // only remove if a new index AND a current index exists for this study/job
               if(desiredIndices.exists(_.startsWith(job)) && oldIndices.exists(_.startsWith(job))){
-                Publisher.updateAlias(job, s"$job*", "remove")(esNodes, "9200")
+                Publisher.updateAlias(job, s"$job*", "remove")(esNodes, esPort)
               }
 
               desiredIndices.filter(e => e.contains(job)).map(e => {
-                Publisher.updateAlias(job, e, "add")(esNodes, "9200")
+                Publisher.updateAlias(job, e, "add")(esNodes, esPort)
               })
             })
           })
