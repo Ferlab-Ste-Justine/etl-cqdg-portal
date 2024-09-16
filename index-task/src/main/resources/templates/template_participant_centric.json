@@ -45,7 +45,8 @@
           "type": "keyword"
         },
         "submitter_participant_id": {
-          "type": "keyword"
+          "type": "keyword",
+          "normalizer" : "custom_normalizer"
         },
         "age_of_death": {
           "type": "keyword"
