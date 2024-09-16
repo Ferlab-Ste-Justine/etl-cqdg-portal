@@ -30,8 +30,8 @@ object PublishTask {
 
     val studyList = study_ids.map(s => s.split(",").map(_.toLowerCase).toSeq)
     val jobs = jobTypes.split(",").toSeq
-    val oldIndices = retrieveIndexesFromRegex(generateRegexCurrentAlias(jobs, studyList), "aliases")(esNodes)
-    val desiredIndices = retrieveIndexesFromRegex(generateRegexDesiredIndex(jobs, releaseId, studyList), "indices")(esNodes)
+    val oldIndices = retrieveIndexesFromRegex(generateRegexCurrentAlias(jobs, studyList), "aliases")(esNodes, "9200")
+    val desiredIndices = retrieveIndexesFromRegex(generateRegexDesiredIndex(jobs, releaseId, studyList), "indices")(esNodes, "9200")
 
     val results =
       studyList match {
@@ -42,11 +42,11 @@ object PublishTask {
               // only remove if a new index AND a current index exists for this study/job
               if(desiredIndices.exists(e => e.startsWith(s"${job}_$study")) &&
                 oldIndices.exists(e => e.startsWith(s"${job}_$study"))){
-                Publisher.updateAlias(job, s"${job}_$study*", "remove")(esNodes)
+                Publisher.updateAlias(job, s"${job}_$study*", "remove")(esNodes, "9200")
               }
 
               desiredIndices.find(e => e.startsWith(s"${job}_$study")).map(e => {
-                Publisher.updateAlias(job, e, "add")(esNodes)
+                Publisher.updateAlias(job, e, "add")(esNodes, "9200")
               })
             })
           })
@@ -58,11 +58,11 @@ object PublishTask {
             Result(job, None, Try {
               // only remove if a new index AND a current index exists for this study/job
               if(desiredIndices.exists(_.startsWith(job)) && oldIndices.exists(_.startsWith(job))){
-                Publisher.updateAlias(job, s"$job*", "remove")(esNodes)
+                Publisher.updateAlias(job, s"$job*", "remove")(esNodes, "9200")
               }
 
               desiredIndices.filter(e => e.contains(job)).map(e => {
-                Publisher.updateAlias(job, e, "add")(esNodes)
+                Publisher.updateAlias(job, e, "add")(esNodes, "9200")
               })
             })
           })
