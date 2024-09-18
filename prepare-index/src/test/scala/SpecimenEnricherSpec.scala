@@ -1,3 +1,4 @@
+import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.fhir.etl.SpecimenEnricher
 import model._
@@ -31,7 +32,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_1", subject = "P1", `submitter_biospecimen_id` = "BS_1"),
         BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_2", subject = "P2", `submitter_biospecimen_id` = "BS_2"),
-        BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_3", subject = "P3", `submitter_biospecimen_id` = "BS_3")
+        BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_3", subject = "P3", `submitter_biospecimen_id` = "BS_3", biospecimen_tissue_source = CODE_SYSTEM(`code` = "Unknown", `display` = null))
       ).toDF(),
       "normalized_research_study" -> Seq(
         RESEARCHSTUDY(`study_code` = "study_code1"),
@@ -43,12 +44,15 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
         DISEASE_STATUS(`fhir_id` = "F1", `subject` = "P1", `disease_status` = "yes"),
         DISEASE_STATUS(`fhir_id` = "F2", `subject` = "P2",  `disease_status` = null),
         DISEASE_STATUS(`fhir_id` = "F3", `subject` = "P3", `disease_status` = "no"),
-      ).toDF()
+      ).toDF(),
+      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None),
     )
 
     val output = SpecimenEnricher(TestETLContext(), Seq("SD_Z6MWD3H0")).transform(data)
 
     val resultDF = output("enriched_specimen")
+
+    resultDF.show(false)
 
     val specimensEnriched = resultDF.as[SPECIMEN_ENRICHED].collect()
 
@@ -68,7 +72,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     ))
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_3") shouldBe Some(
       SPECIMEN_ENRICHED(`biospecimen_id` = "FHIR_BS_3", `age_biospecimen_collection` = "Young", `submitter_biospecimen_id` = "BS_3",
-        `participant_id` = "P3",`participant_fhir_id` = "P3", `submitter_participant_id` = "P3_internal", `is_affected` = Some(false),
+        `biospecimen_tissue_source`= "Unknown", `participant_id` = "P3",`participant_fhir_id` = "P3", `submitter_participant_id` = "P3_internal", `is_affected` = Some(false),
         `sample_id` = null, `sample_type` = null, `fhir_sample_id` = null)
     )
 

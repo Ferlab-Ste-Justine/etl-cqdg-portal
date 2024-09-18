@@ -1,4 +1,5 @@
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
+import bio.ferlab.datalake.spark3.loader.GenericLoader
 import bio.ferlab.fhir.etl.centricTypes.FileCentric
 import model._
 import org.apache.spark.sql.DataFrame
@@ -42,6 +43,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         SAMPLE_INPUT(`subject` = "P1", `parent` = "B1", `fhir_id` = "sam1"),
         SAMPLE_INPUT(`subject` = "P1", `parent` = "B2", `fhir_id` = "sam2"),
       ).toDF(),
+      "ncit_terms" -> GenericLoader.read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None),
     )
 
     val output = new FileCentric(List("STU0000001"))(conf).transform(data)

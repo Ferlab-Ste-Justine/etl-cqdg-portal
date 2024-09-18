@@ -1,4 +1,5 @@
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, DatasetConf, SimpleConfiguration}
+import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.BiospecimenCentric
 import model._
 import org.apache.spark.sql.DataFrame
@@ -71,6 +72,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         SAMPLE_INPUT(`subject` = "P1", `parent` = "B1", `fhir_id` = "sam1"),
         SAMPLE_INPUT(`subject` = "P3", `parent` = "B4", `fhir_id` = "sam2"),
       ).toDF(),
+      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None),
     )
 
     val output = new BiospecimenCentric(List("STU0000001"))(conf).transform(data)
