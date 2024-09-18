@@ -31,6 +31,7 @@ object PrepareIndex extends SparkApp {
       new SimpleParticipant(studyList).run()
       new BiospecimenCentric(studyList).run()
     case "all" =>
+      //TEST
       new StudyCentric(studyList).run()
       new SimpleParticipant(studyList).run()
       new ParticipantCentric(studyList).run()
