@@ -18,6 +18,7 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
   val normalized_biospecimen: DatasetConf = conf.getDataset("normalized_biospecimen")
   val normalized_sample_registration: DatasetConf = conf.getDataset("normalized_sample_registration")
   val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
+  val ncit_terms: DatasetConf = conf.getDataset("ncit_terms")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -35,9 +36,9 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
         .addStudy(data(es_index_study_centric.id))
         .addFilesWithBiospecimen (
           data(normalized_drs_document_reference.id),
-          data(normalized_biospecimen.id),
+          data(normalized_biospecimen.id).joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source"),
           data(normalized_sequencing_experiment.id),
-          data(normalized_sample_registration.id),
+          data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type"),
         )
         .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
         .withColumn("participant_2_id", col("participant_id")) //copy column/ front-end requirements

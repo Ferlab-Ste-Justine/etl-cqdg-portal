@@ -25,6 +25,7 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
   private val study: DatasetConf = conf.getDataset("normalized_research_study")
   private val disease: DatasetConf = conf.getDataset("normalized_diagnosis")
   private val disease_status: DatasetConf = conf.getDataset("normalized_disease_status")
+  private val ncit_terms: DatasetConf = conf.getDataset("ncit_terms")
 
   override def extract(lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): Map[String, DataFrame] = {
     Seq(patient, specimen, group, family_relationship, sample_registration, study, disease, disease_status)
@@ -64,8 +65,9 @@ case class SpecimenEnricher(rc: RuntimeETLContext, studyIds: Seq[String]) extend
         "submitter_participant_id", "family_id", "father_id", "mother_id")
 
     data(specimen.id)
+      .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
       .join(patientDf, Seq("subject"))
-      .addSamplesToBiospecimen(data(sample_registration.id))
+      .addSamplesToBiospecimen(data(sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type"))
       .withColumnRenamed("fhir_id", "biospecimen_id")
       .withColumnRenamed("sample_id", "fhir_sample_id")
       .withColumnRenamed("submitter_sample_id", "sample_id")

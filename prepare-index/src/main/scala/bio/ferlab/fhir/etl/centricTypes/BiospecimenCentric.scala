@@ -19,6 +19,7 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
   val simple_participant: DatasetConf = conf.getDataset("simple_participant")
   val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
   val es_index_file_centric: DatasetConf = conf.getDataset("es_index_file_centric")
+  val ncit_terms: DatasetConf = conf.getDataset("ncit_terms")
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
@@ -34,10 +35,11 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
 
     val transformedBiospecimen =
       biospecimenDF
+        .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
         .addStudy(data(es_index_study_centric.id))
         .addParticipant(data(simple_participant.id))
         .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
-        .addSamplesToBiospecimen(data(normalized_sample_registration.id))
+        .addSamplesToBiospecimen(data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type"))
         .withColumnRenamed("fhir_id", "biospecimen_id")
         .drop("subject")
         .withColumn("study_code", col("study.study_code"))

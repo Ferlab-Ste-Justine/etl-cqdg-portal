@@ -45,21 +45,11 @@ object Utils {
 
     def addSamplesToBiospecimen(samplesDf: DataFrame): DataFrame = {
       val samplesGrouped = samplesDf
-        .withColumn("sample_type",
-          when(col("sample_type")("display").isNotNull,
-            concat_ws(" ", col("sample_type")("display"), concat(lit("("), col("sample_type")("code"), lit(")"))))
-            .otherwise(col("sample_type")("code"))
-        )
         .withColumnRenamed("fhir_id", "sample_id")
         .withColumn("sample_2_id", col("sample_id")) //doubling sample_id portal use
         .withColumnRenamed("parent", "fhir_id")
 
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id"), "left_outer")
-        .withColumn("biospecimen_tissue_source",
-          when(col("biospecimen_tissue_source")("display").isNotNull,
-            concat_ws(" ", col("biospecimen_tissue_source")("display"), concat(lit("("), col("biospecimen_tissue_source")("code"), lit(")"))))
-            .otherwise(col("biospecimen_tissue_source")("code"))
-        )
     }
 
     def addBiospecimen(biospecimenDf: DataFrame): DataFrame = {
@@ -84,6 +74,17 @@ object Utils {
       biospecimenRenamedDf
         .join(participantGroupedDF, Seq("participant_id"), "left_outer")
         .drop(biospecimenRenamedDf.columns.filterNot(_.equals("biospecimen_id")): _*)
+    }
+
+    def joinNcitTerms(ncitTerms: DataFrame, targetCol: String): DataFrame = {
+      val columns = df.columns
+
+      df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
+        .withColumn(targetCol,
+          when(col(targetCol)("display").isNotNull,
+            concat_ws(" ", col(targetCol)("display"), concat(lit("("), col(targetCol)("code"), lit(")"))))
+            .otherwise(col(targetCol)("code"))
+        ).select(columns.map(col): _*)
     }
 
     def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {

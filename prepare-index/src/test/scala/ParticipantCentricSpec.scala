@@ -1,7 +1,9 @@
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
+import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.ParticipantCentric
 import model._
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.functions.col
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import pureconfig.generic.auto._
@@ -35,6 +37,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         SAMPLE_INPUT(fhir_id = "S2", `subject` = "P2", `parent` = "B2")
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
+      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None),
     )
 
     val output = new ParticipantCentric(List("SD_Z6MWD3H0"))(conf).transform(data)
