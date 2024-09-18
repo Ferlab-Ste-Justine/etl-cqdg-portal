@@ -31,6 +31,8 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val patientDF = data(simple_participant.id).drop("study")
 
+    data.keySet.foreach(println)
+
     val transformedParticipant =
       patientDF
         .addStudy(data(es_index_study_centric.id))
