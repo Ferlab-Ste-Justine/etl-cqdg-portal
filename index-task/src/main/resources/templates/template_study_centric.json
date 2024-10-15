@@ -27,7 +27,7 @@
           "type": "keyword",
           "normalizer" : "custom_normalizer"
         },
-        "contact": {
+        "access_authority": {
           "properties": {
             "type": {
               "type": "keyword"
@@ -36,6 +36,48 @@
               "type": "keyword"
             }
           }
+        },
+        "contact_names": {
+          "type": "keyword"
+        },
+        "contact_institutions": {
+          "type": "keyword"
+        },
+        "contact_emails": {
+          "type": "keyword"
+        },
+        "citation_statement": {
+          "type": "keyword"
+        },
+        "selection_criteria": {
+          "type": "keyword"
+        },
+        "funding_sources": {
+          "type": "keyword"
+        },
+        "expected_number_participants": {
+          "type": "integer"
+        },
+        "expected_number_biospecimens": {
+          "type": "integer"
+        },
+        "expected_number_files": {
+          "type": "integer"
+        },
+        "restricted_number_participants": {
+          "type": "integer"
+        },
+        "restricted_number_biospecimens": {
+          "type": "integer"
+        },
+        "restricted_number_files": {
+          "type": "integer"
+        },
+        "study_designs" : {
+          "type" : "keyword"
+        },
+        "data_collection_methods" : {
+          "type" : "keyword"
         },
         "status": {
           "type": "keyword"

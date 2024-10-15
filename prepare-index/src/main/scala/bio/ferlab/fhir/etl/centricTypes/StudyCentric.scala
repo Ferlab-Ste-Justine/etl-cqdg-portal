@@ -64,7 +64,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       .fieldCount("data_type", "data_types")
 
     val dataCategoryCount = participantsWithFiles
-      .fieldCount("data_category", "data_categories")
+      .fieldCount("data_category", "data_categories_from_files")
 
     val participantCount =
       participantsWithFiles
@@ -105,11 +105,14 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
     val studyDatasets = studyDF
       .addDataSetToStudy(data(normalized_drs_document_reference.id), participantsRenamed, data(normalized_sequencing_experiment.id))
 
+    val combinedDataCategories = studyDF.combineDataCategoryFromFilesAndStudy(dataCategoryCount)
+
     val transformedStudyDf = studyDF
       .join(studyDatasets, Seq("study_id"), "left_outer")
       .join(samplesCount, Seq("study_id"), "left_outer")
+      .drop("data_categories")
       .join(dataTypesCount, Seq("study_id"), "left_outer")
-      .join(dataCategoryCount, Seq("study_id"), "left_outer")
+      .join(combinedDataCategories, Seq("study_id"), "left_outer")
       .join(participantCount, Seq("study_id"), "left_outer")
       .join(fileCount, Seq("study_id"), "left_outer")
       .join(familyCount, Seq("study_id"), "left_outer")

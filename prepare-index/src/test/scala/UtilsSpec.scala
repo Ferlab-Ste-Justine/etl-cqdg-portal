@@ -1,8 +1,9 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.Utils._
 import model._
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.{col, explode}
+import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField, StructType}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -164,5 +165,30 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val output = filesDf.addSequencingExperiment(seqExperiment)
 
     output.select("sequencing_experiment.type_of_sequencing").as[String].collect() should contain theSameElementsAs Seq("Paired Reads", "Unpaired Reads")
+  }
+
+  val schema: StructType = StructType(Array(
+    StructField("study_id", StringType,true),
+    StructField("data_categories_from_files", ArrayType(
+      StructType(
+        StructField("data_category", StringType, true) ::
+          StructField("participant_count", IntegerType, false) :: Nil
+      )
+    ),true),
+  ))
+
+  "combineDataCategoryFromFilesAndStudy" should "add DataCategories listed from Study to Data Categories compiled from files" in {
+    val studyDf = Seq(
+      RESEARCHSTUDY(`study_id` = "study1", `data_categories` = Seq("data_category1", "data_category2", "data_category3"))
+    ).toDF()
+
+    val data = Seq(Row("study1", Seq(Row("data_category1", 12), Row("data_category2", 2))))
+
+    val dataCategoriesFromFiles = spark.createDataFrame(spark.sparkContext.parallelize(data), schema)
+
+    val output = studyDf.combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles)
+      .select("data_categories").as[Seq[(String, Option[Int])]].collect().head
+
+    output should contain theSameElementsAs Seq(("data_category1", Some(12)), ("data_category2", Some(2)), ("data_category3", None))
   }
 }

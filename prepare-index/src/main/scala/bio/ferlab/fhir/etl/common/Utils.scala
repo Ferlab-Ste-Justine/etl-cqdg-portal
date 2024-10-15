@@ -8,7 +8,7 @@ object Utils {
 
   implicit class DataFrameOperations(df: DataFrame) {
     def addStudy(studyDf: DataFrame): DataFrame = {
-      val requiredStudyCols = Seq("study_code", "name", "population", "domain", "data_access_codes", "contact")
+      val requiredStudyCols = Seq("study_code", "name", "population", "domain", "data_access_codes", "access_authority")
       val cols = studyDf.columns.filter(requiredStudyCols.contains(_))
 
       val refactorStudyDf = studyDf
@@ -16,6 +16,25 @@ object Utils {
         .drop(studyDf.columns.filterNot(c => c == "study_id"): _*)
 
       df.join(refactorStudyDf, Seq("study_id"), "left_outer")
+    }
+
+    /**
+     * assume df is study, will add data Categories already on the study to the data category found on the files
+     * format have to be [(data_Category_type, count)]>
+     *
+     * @param dataCategoryCount : Data Categories and count based on DocumentReference
+     * */
+    def combineDataCategoryFromFilesAndStudy(dataCategoryCount: DataFrame): DataFrame = {
+      df
+        .select("study_id", "data_categories")
+        .withColumn("data_categories_exp", explode(col("data_categories")))
+        .join(dataCategoryCount, Seq("study_id"), "left_outer")
+        .filter(!array_contains(col("data_categories_from_files")("data_category"), col("data_categories_exp")))
+        .withColumn("data_categories", struct(col("data_categories_exp") as "data_category", lit(null).cast("integer") as "participant_count"))
+        .groupBy("study_id", "data_categories_from_files")
+        .agg(collect_set("data_categories") as "data_categories")
+        .withColumn("data_categories", concat(col("data_categories_from_files"), col("data_categories")))
+        .select("study_id", "data_categories")
     }
 
     def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {

@@ -27,4 +27,12 @@ package object etl {
   val ACCESS_REQUIREMENTS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessRequirements"
   val POPULATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchStudy/population"
   val DATASET_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/dataset"
+  val CONTACT_INSTITUTIONS_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/Contact/ContactInstitution"
+  val CONTACT_TYPE_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/Contact/ContactTypes"
+  val RESTRICTED_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/Restricted"
+  val EXPECTED_CONTENT_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/ResearchStudy/ExpectedContent"
+  val PRINCIPAL_INVESTIGATORS_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/PrincipalInvestigators"
+  val DATA_CATEGORY_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/DataCategoryExtension"
+  val STUDY_DESIGN_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/StudyDesignExtension"
+  val DATA_COLLECTION_METHODS_DS = s"$SYSTEM_URL_CQDG/StructureDefinition/DataCollectionMethodExtension"
 }

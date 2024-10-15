@@ -52,8 +52,6 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
 
     val resultDF = output("enriched_specimen")
 
-    resultDF.show(false)
-
     val specimensEnriched = resultDF.as[SPECIMEN_ENRICHED].collect()
 
     specimensEnriched.find(_.`biospecimen_id` == "FHIR_BS_1") shouldBe Some(

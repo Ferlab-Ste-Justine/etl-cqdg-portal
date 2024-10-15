@@ -202,6 +202,14 @@
               "default": {}
             },
             {
+              "name":"valueBoolean",
+              "type":[
+                "null",
+                "boolean"
+              ],
+              "default":null
+            },
+            {
               "name": "extension",
               "type": {
                 "type": "array",
@@ -226,6 +234,14 @@
                         "string"
                       ],
                       "default":null
+                    },
+                    {
+                      "name": "valueInteger",
+                      "type": [
+                        "null",
+                        "int"
+                      ],
+                      "default": null
                     }
                   ],
                   "default": {}
@@ -705,6 +721,39 @@
               "default":[
 
               ]
+            },
+            {
+              "name": "extension",
+              "type": {
+                "type": "array",
+                "items": {
+                  "type": "record",
+                  "name": "ExtensionContact",
+                  "doc": "An Extension",
+                  "namespace": "bio.ferlab.fhir",
+                  "fields": [
+                    {
+                      "name": "url",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "default": null
+                    },
+                    {
+                      "name":"valueString",
+                      "type":[
+                        "null",
+                        "string"
+                      ],
+                      "default":null
+                    }
+                  ],
+                  "default": {}
+                },
+                "default": []
+              },
+              "default": []
             }
           ],
           "default":{

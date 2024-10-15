@@ -16,5 +16,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
+#        cache: sbt
+    - uses: sbt/setup-sbt@v1
     - name: Run tests
       run: sbt clean test
