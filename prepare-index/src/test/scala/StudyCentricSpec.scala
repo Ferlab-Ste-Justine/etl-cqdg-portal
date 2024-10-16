@@ -84,8 +84,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
       `sample_count` = 4,
       `file_count` = 6,
-      `family_count` = 1,
-      `data_categories` = Seq(("Genomics","2")),
       `datasets` = Seq(
         // Dataset file_count should be 5 as CRAI files should be excluded
         DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV"), `experimental_strategies` = Seq("WXS"), `participant_count` = 1, `file_count` = 5),

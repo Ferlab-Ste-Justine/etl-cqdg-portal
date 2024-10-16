@@ -161,13 +161,39 @@ object Transformations {
   )
 
 
+  private val citationsOf: String => Column = (label: String) => filter(col("relatedArtifact"), c => c("label") === label)("citation")
+
   val researchstudyMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "keyword", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier")
+      .select("fhir_id", "keyword", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier", "relatedArtifact")
       .withColumn("keyword", extractKeywords(col("keyword")))
-      .withColumn(
-        "contact", transform(col("contact"), col => struct(col("telecom")(0)("system") as "type", col("telecom")(0)("value") as "value"))(0)
-      )
+      .withColumn("telecom", firstNonNull(transform(col("contact"), col => col("telecom")(0))))
+      .withColumn("access_authority", struct(col("telecom")("system") as "type", col("telecom")("value")))
+      .withColumn("contact_names", transform(filter(col("contact"), col => col("name").isNotNull), col => col("name")))
+      .withColumn("contact_extensions", flatten(col("contact")("extension")))
+      .withColumn("contact_institutions", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_INSTITUTIONS_SD), col => col("valueString")))
+      .withColumn("contact_emails", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_TYPE_SD), col => col("valueString")))
+      .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url")))
+      .withColumn("citation_statement", citationsOf("CitationStatement")(0))
+      .withColumn("selection_criteria", citationsOf("SelectionCriteria")(0))
+      .withColumn("funding_sources", citationsOf("FundingSource"))
+      .withColumn("expected_items", firstNonNull(filter(col("extension"), col => col("url") === EXPECTED_CONTENT_SD)))
+      .withColumn("expected_number_participants", filter(col("expected_items")("extension"), col => col("url") === "expectedNumberParticipants")(0)("valueInteger"))
+      .withColumn("expected_number_biospecimens", filter(col("expected_items")("extension"), col => col("url") === "expectedNumberBiospecimens")(0)("valueInteger"))
+      .withColumn("expected_number_files", filter(col("expected_items")("extension"), col => col("url") === "expectedNumberFiles")(0)("valueInteger"))
+      .withColumn("restricted_number_participants", filter(col("expected_items")("extension"), col => col("url") === "restrictedNumberParticipants")(0)("valueInteger"))
+      .withColumn("restricted_number_biospecimens", filter(col("expected_items")("extension"), col => col("url") === "restrictedNumberBiospecimens")(0)("valueInteger"))
+      .withColumn("restricted_number_files", filter(col("expected_items")("extension"), col => col("url") === "restrictedNumberFiles")(0)("valueInteger"))
+      .withColumn("principal_investigators", transform(firstNonNull(filter(col("extension"), col => col("url") === PRINCIPAL_INVESTIGATORS_SD))("extension"), col => col("valueString")))
+      .withColumn("data_categories", transform(filter(col("extension"), col => col("url") === DATA_CATEGORY_SD)("valueCoding"), col => when(
+        isnull(col("display")), col("code")
+      ).otherwise(col("display"))))
+      .withColumn("study_designs", transform(filter(col("extension"), col => col("url") === STUDY_DESIGN_SD)("valueCoding"), col => when(
+        isnull(col("display")), col("code")
+      ).otherwise(col("display"))))
+      .withColumn("data_collection_methods", transform(filter(col("extension"), col => col("url") === DATA_COLLECTION_METHODS_DS)("valueCoding"), col => when(
+        isnull(col("display")), col("code")
+      ).otherwise(col("display"))))
       .withColumn("domain", transform(col("category")("coding")(0),  col => when(
         isnull(col("display")), col("code")
       ).otherwise(col("display"))))
@@ -187,9 +213,10 @@ object Transformations {
         filter(col, col => col("url") === "name")(0)("valueString") as "name",
         filter(col, col => col("url") === "description")(0)("valueString") as "description"
       )))
-      .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
+      .withColumn("security", firstNonNull(transform(filter(col("extension"),
+        col => col("url") === RESTRICTED_SD), col => when(lower(col("valueBoolean")) === "true", lit("R")).otherwise(lit("U" )))))
     ),
-    Drop("extension", "category", "meta", "identifier", "data_sets_ext")
+    Drop("extension", "category", "meta", "identifier", "data_sets_ext", "telecom", "contact_extensions", "contact", "relatedArtifact", "expected_items")
   )
 
   val documentreferenceMappings: List[Transformation] = List(
@@ -199,12 +226,18 @@ object Transformations {
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
         .withColumn("biospecimen_reference", regexp_extract(col("context")("related")(0)("reference"), specimenExtract, 1))
-        .withColumn("data_type_filtered",
+        .withColumn("data_type_cs",
            filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)
         )
-        .withColumn("data_type",
-          coalesce(col("data_type_filtered")("display"), col("data_type_filtered")("code")))
-        .withColumn("data_category", filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)("code"))
+        .withColumn("data_type", when(isnull(col("data_type_cs")("display")), col("data_type_cs")("code"))
+          .otherwise(col("data_type_cs")("code"))
+        )
+        .withColumn("data_category_cs",
+              filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)
+        )
+        .withColumn("data_category", when(isnull(col("data_category_cs")("display")), col("data_category_cs")("code"))
+          .otherwise(col("data_category_cs")("code"))
+        )
         .withColumn("content_exp", explode(col("content")))
         .withColumn("file_size", retrieveSize(firstNonNull(filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D))("fileSize")))
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))

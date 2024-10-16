@@ -61,7 +61,7 @@
                 }
               }
             },
-            "contact": {
+            "access_authority": {
               "properties": {
                 "type": {
                   "type": "keyword"
