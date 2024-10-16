@@ -161,6 +161,8 @@ object Transformations {
   )
 
 
+  private val citationsOf: String => Column = (label: String) => filter(col("relatedArtifact"), c => c("label") === label)("citation")
+
   val researchstudyMappings: List[Transformation] = List(
     Custom(_
       .select("fhir_id", "keyword", "study_id", "description", "contact", "category", "status", "title", "extension", "meta", "identifier", "relatedArtifact")
@@ -172,9 +174,9 @@ object Transformations {
       .withColumn("contact_institutions", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_INSTITUTIONS_SD), col => col("valueString")))
       .withColumn("contact_emails", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_TYPE_SD), col => col("valueString")))
       .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url")))
-      .withColumn("citation_statement", transform(filter(col("relatedArtifact"), col => col("label") === "CitationStatement"), col => col("citation")))
-      .withColumn("selection_criteria", transform(filter(col("relatedArtifact"), col => col("label") === "SelectionCriteria"), col => col("citation")))
-      .withColumn("funding_sources", transform(filter(col("relatedArtifact"), col => col("label") === "FundingSource"), col => col("citation")))
+      .withColumn("citation_statement", citationsOf("CitationStatement")(0))
+      .withColumn("selection_criteria", citationsOf("SelectionCriteria")(0))
+      .withColumn("funding_sources", citationsOf("FundingSource"))
       .withColumn("expected_items", firstNonNull(filter(col("extension"), col => col("url") === EXPECTED_CONTENT_SD)))
       .withColumn("expected_number_participants", filter(col("expected_items")("extension"), col => col("url") === "expectedNumberParticipants")(0)("valueInteger"))
       .withColumn("expected_number_biospecimens", filter(col("expected_items")("extension"), col => col("url") === "expectedNumberBiospecimens")(0)("valueInteger"))
