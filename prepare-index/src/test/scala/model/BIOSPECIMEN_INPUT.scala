@@ -4,7 +4,7 @@ case class BIOSPECIMEN_INPUT(
                         `fhir_id`: String = "BIO0036882",
                         `subject`: String = "PRT0504459",
                         `study_id`: String = "STU0000001",
-                        `security`: String = "R",
+                        `security`: String = "U",
                         `biospecimen_tissue_source`: CODE_SYSTEM = CODE_SYSTEM(`code` = "NCIT:C12434", `display` = "Blood"),
                         `age_biospecimen_collection`: String = "Young",
                         `submitter_biospecimen_id`: String = "cag_sp_20832",

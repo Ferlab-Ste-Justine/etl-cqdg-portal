@@ -13,7 +13,7 @@ case class SIMPLE_PARTICIPANT(
                                `cause_of_death`: String = null,
                                `is_affected`: String = null,
                                `study_id`: String = "STU0000001",
-                               `security`: String = "R",
+                               `security`: String = "U",
                                `diagnoses`: Seq[DIAGNOSIS] = Seq.empty,
                                `icd_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
                                `mondo_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,

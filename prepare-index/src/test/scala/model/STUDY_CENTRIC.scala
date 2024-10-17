@@ -35,7 +35,7 @@ case class STUDY_CENTRIC (
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                            `datasets`: Seq[DATASET] = Nil,
-                           `security`: String = "R"
+                           `security`: String = "U"
                          )
 
 case class STUDY_LIGHT (

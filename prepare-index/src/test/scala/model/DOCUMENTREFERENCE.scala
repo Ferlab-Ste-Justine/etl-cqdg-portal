@@ -8,7 +8,7 @@ case class DOCUMENTREFERENCE(
                               `data_type`: String = "SSUP",
                               `relates_to`: Option[String] = None,
                               `data_category`: String = "Genomics",
-                              `security`: String = "R",
+                              `security`: String = "U",
                               `files`: Seq[FILE] = Seq(FILE()),
                               `dataset`: Option[String] = Some("Dataset1"),
                             )

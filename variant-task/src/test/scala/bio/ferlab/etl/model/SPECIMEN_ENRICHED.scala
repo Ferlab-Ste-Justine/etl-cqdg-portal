@@ -7,7 +7,7 @@ package bio.ferlab.etl.model
 case class SPECIMEN_ENRICHED(`study_id`: String = "STU0000001",
                              `participant_id`: String = "P2",
                              `biospecimen_id`: String = "FHIR_BS_2",
-                             `security`: String = "R",
+                             `security`: String = "U",
                              `submitter_participant_id`: String = "P2_internal",
                              `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
                              `age_biospecimen_collection`: AGE_AT = AGE_AT(),

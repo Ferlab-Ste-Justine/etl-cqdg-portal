@@ -6,7 +6,6 @@ case class RESEARCHSTUDY(
                           `study_id`: String = "STU0000001",
                           `description`: String = "CARTaGENE",
                           `study_code`: String = "cag",
-
                           `access_authority`: CONTACT = CONTACT(),
                           `contact_names`: Seq[String] = Seq("contact1", "contact2"),
                           `contact_institutions`: Seq[String] = Seq("contact_institution1", "contact_institution2"),
@@ -23,7 +22,6 @@ case class RESEARCHSTUDY(
                           `data_categories`: Seq[String] = Seq("Genomics", "Proteomics", "Transcriptomics"), //TODO
                           `study_designs`: Seq[String] = Seq("case_only", "registry"),
                           `data_collection_methods`: Seq[String] = Seq("medical_records", "investigator_assessment"),
-
                           `status`: String = "completed",
                           `title`: String = "CARTaGENE",
                           `domain`: Seq[String] = Seq("General health"),
@@ -31,7 +29,7 @@ case class RESEARCHSTUDY(
                           `access_requirements`: Seq[CODE_SYSTEM] = Seq(CODE_SYSTEM(`code` = "DUO:0000021", `display` = "Ethics approval required"), CODE_SYSTEM(`code` = "DUO:0000027", `display` = "Project specific restriction")),
                           `population`: String = "Adult",
                           `study_version`: String = "1",
-                          `security`: String = "R",
+                          `security`: String = "U",
                           `data_sets`: Seq[DATASET_INPUT] = Seq(DATASET_INPUT()),
                         )
 
