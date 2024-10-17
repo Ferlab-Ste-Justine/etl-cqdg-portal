@@ -33,6 +33,9 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
       normalized_group, normalized_family_relationship, normalized_researchstudy)
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
+      normalized_patient.id -> normalized_patient.read
+        .where(col("study_id").isin(studyIds: _*))
+        .where(col("security") =!= "R"),
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,
       icd_terms.id -> icd_terms.read,

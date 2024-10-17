@@ -22,12 +22,15 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
 
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    (Seq(normalized_drs_document_reference, normalized_biospecimen, simple_participant, es_index_study_centric, normalized_sequencing_experiment, normalized_sample_registration)
-      .map(ds => ds.id ->
-        ds.read
+    (Seq(normalized_biospecimen, simple_participant, es_index_study_centric,
+      normalized_sequencing_experiment, normalized_sample_registration)
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))) ++
+      Seq(
+        ncit_terms.id -> ncit_terms.read,
+        normalized_drs_document_reference.id -> normalized_drs_document_reference.read
           .where(col("study_id").isin(studyIds: _*))
           .where(col("security") =!= "R")
-      ) ++ Seq(ncit_terms.id -> ncit_terms.read)).toMap
+      )).toMap
   }
 
   override def transform(data: Map[String, DataFrame],
