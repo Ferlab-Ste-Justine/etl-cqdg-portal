@@ -29,12 +29,12 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     (Seq(
-      normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death,
+      normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death,
       normalized_group, normalized_family_relationship, normalized_researchstudy)
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
-//      normalized_patient.id -> normalized_patient.read
-//        .where(col("study_id").isin(studyIds: _*))
+      normalized_patient.id -> normalized_patient.read
+        .where(col("study_id").isin(studyIds: _*)),
 //        .where(col("security") =!= "R"),
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,
