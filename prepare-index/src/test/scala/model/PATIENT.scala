@@ -21,7 +21,7 @@ case class PATIENT_INPUT(
                     `age_at_recruitment`: String = "Young",
                     `ethnicity`: String = "European",
                     `submitter_participant_id`: String = "35849427674",
-                    `security`: String = "R",
+                    `security`: String = "U",
                     `age_of_death`: String = "Old",
                   )
 
