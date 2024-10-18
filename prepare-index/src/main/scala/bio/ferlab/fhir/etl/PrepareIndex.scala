@@ -2,6 +2,7 @@ package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.spark3.SparkApp
 import bio.ferlab.fhir.etl.centricTypes.{BiospecimenCentric, FileCentric, ParticipantCentric, SimpleParticipant, StudyCentric}
+import org.apache.spark.sql.functions.col
 
 object PrepareIndex extends SparkApp {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
@@ -14,28 +15,30 @@ object PrepareIndex extends SparkApp {
 
   val studyList = studyIds.split(",").toList
 
+  val studyCentric = new StudyCentric(studyList).run()
+
+
+  val filteredStudies =
+    studyCentric("es_index_study_centric")
+      .where(col("study_id") =!= "R")
+      .select("study_id").collect().map(r => r.getString(0)).toList
+
+  filteredStudies.foreach(println)
+
+  new SimpleParticipant(filteredStudies).run()
+
+
   jobName match {
     case "study_centric" =>
-      new SimpleParticipant(studyList).run()
-      new StudyCentric(studyList).run()
     case "participant_centric" =>
-      new StudyCentric(studyList).run()
-      new SimpleParticipant(studyList).run()
-      new ParticipantCentric(studyList).run()
+      new ParticipantCentric(filteredStudies).run()
     case "file_centric" =>
-      new StudyCentric(studyList).run()
-      new SimpleParticipant(studyList).run()
-      new FileCentric(studyList).run()
+      new FileCentric(filteredStudies).run()
     case "biospecimen_centric" =>
-      new StudyCentric(studyList).run()
-      new SimpleParticipant(studyList).run()
-      new BiospecimenCentric(studyList).run()
+      new BiospecimenCentric(filteredStudies).run()
     case "all" =>
-      //TEST
-      new StudyCentric(studyList).run()
-      new SimpleParticipant(studyList).run()
-      new ParticipantCentric(studyList).run()
-      new FileCentric(studyList).run()
-      new BiospecimenCentric(studyList).run()
+      new ParticipantCentric(filteredStudies).run()
+      new FileCentric(filteredStudies).run()
+      new BiospecimenCentric(filteredStudies).run()
   }
 }
