@@ -20,7 +20,7 @@ object PrepareIndex extends SparkApp {
 
   val filteredStudies =
     studyCentric("es_index_study_centric")
-      .where(col("study_id") =!= "R")
+      .where(col("security") =!= "R")
       .select("study_id").collect().map(r => r.getString(0)).toList
 
   filteredStudies.foreach(println)
