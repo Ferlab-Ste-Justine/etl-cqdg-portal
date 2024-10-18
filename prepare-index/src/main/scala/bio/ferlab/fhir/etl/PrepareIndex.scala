@@ -18,12 +18,11 @@ object PrepareIndex extends SparkApp {
   val studyCentric = new StudyCentric(studyList).run()
 
 
+  //Remove studies that are restricted
   val filteredStudies =
     studyCentric("es_index_study_centric")
       .where(col("security") =!= "R")
       .select("study_id").collect().map(r => r.getString(0)).toList
-
-  filteredStudies.foreach(println)
 
   new SimpleParticipant(filteredStudies).run()
 

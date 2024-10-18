@@ -235,7 +235,7 @@ object Transformations {
         .withColumn("data_category_cs",
               filter(col("category")(0)("coding"), col => col("system") === DOCUMENT_DATA_CATEGORY)(0)
         )
-        .withColumn("data_category", when(isnull(col("data_category_cs")("display")), col("data_category_cs")("code"))
+        .withColumn("data_category", when(isnull(col("data_category_cs")("display")), col("data_category_cs")("display"))
           .otherwise(col("data_category_cs")("code"))
         )
         .withColumn("content_exp", explode(col("content")))
