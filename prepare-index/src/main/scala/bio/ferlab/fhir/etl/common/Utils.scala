@@ -18,6 +18,12 @@ object Utils {
       df.join(refactorStudyDf, Seq("study_id"), "left_outer")
     }
 
+    def filterRestricted(): DataFrame = {
+      if(df.columns.contains("security")) {
+        df.where(col("security") =!= "R")
+      } else df
+    }
+
     /**
      * assume df is study, will add data Categories already on the study to the data category found on the files
      * format have to be [(data_Category_type, count)]>

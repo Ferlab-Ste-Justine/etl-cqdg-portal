@@ -29,7 +29,7 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
         ncit_terms.id -> ncit_terms.read,
         normalized_drs_document_reference.id -> normalized_drs_document_reference.read
           .where(col("study_id").isin(studyIds: _*))
-          .where(col("security") =!= "R")
+          .filterRestricted()
       )).toMap
   }
 

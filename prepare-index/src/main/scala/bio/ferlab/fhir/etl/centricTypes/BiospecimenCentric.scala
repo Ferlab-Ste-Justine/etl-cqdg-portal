@@ -32,7 +32,7 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
         ncit_terms.id -> ncit_terms.read,
         normalized_biospecimen.id -> normalized_biospecimen.read
           .where(col("study_id").isin(studyIds: _*))
-          .where(col("security") =!= "R")
+          .filterRestricted()
       )).toMap
   }
 
