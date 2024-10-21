@@ -31,15 +31,20 @@ object Utils {
      * @param dataCategoryCount : Data Categories and count based on DocumentReference
      * */
     def combineDataCategoryFromFilesAndStudy(dataCategoryCount: DataFrame): DataFrame = {
-      df
+
+      val deltaDataCategory = df
         .select("study_id", "data_categories")
         .withColumn("data_categories_exp", explode(col("data_categories")))
         .join(dataCategoryCount, Seq("study_id"), "left_outer")
         .filter(!array_contains(col("data_categories_from_files")("data_category"), col("data_categories_exp")))
         .withColumn("data_categories", struct(col("data_categories_exp") as "data_category", lit(null).cast("integer") as "participant_count"))
-        .groupBy("study_id", "data_categories_from_files")
+        .groupBy("study_id")
         .agg(collect_set("data_categories") as "data_categories")
-        .withColumn("data_categories", concat(col("data_categories_from_files"), col("data_categories")))
+
+      dataCategoryCount.join(deltaDataCategory, Seq("study_id"), "left")
+        .withColumn("data_categories",
+          when(isnull(col("data_categories")), col("data_categories_from_files"))
+          .otherwise(concat(col("data_categories_from_files"), col("data_categories"))))
         .select("study_id", "data_categories")
     }
 

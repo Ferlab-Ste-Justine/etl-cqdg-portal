@@ -178,17 +178,34 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   ))
 
   "combineDataCategoryFromFilesAndStudy" should "add DataCategories listed from Study to Data Categories compiled from files" in {
-    val studyDf = Seq(
+    // Extra Data categories from files
+    val study1Df = Seq(
       RESEARCHSTUDY(`study_id` = "study1", `data_categories` = Seq("data_category1", "data_category2", "data_category3"))
     ).toDF()
 
-    val data = Seq(Row("study1", Seq(Row("data_category1", 12), Row("data_category2", 2))))
+    val data1 = Seq(Row("study1", Seq(Row("data_category1", 12), Row("data_category2", 2))))
 
-    val dataCategoriesFromFiles = spark.createDataFrame(spark.sparkContext.parallelize(data), schema)
+    val dataCategoriesFromFiles1 = spark.createDataFrame(spark.sparkContext.parallelize(data1), schema)
 
-    val output = studyDf.combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles)
+    val output1 = study1Df.combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles1)
       .select("data_categories").as[Seq[(String, Option[Int])]].collect().head
 
-    output should contain theSameElementsAs Seq(("data_category1", Some(12)), ("data_category2", Some(2)), ("data_category3", None))
+    output1 should contain theSameElementsAs Seq(("data_category1", Some(12)), ("data_category2", Some(2)), ("data_category3", None))
+
+    // No extra Data categories from files
+    val study2Df = Seq(
+      RESEARCHSTUDY(`study_id` = "study1", `data_categories` = Seq("data_category2"))
+    ).toDF()
+
+    val data2 = Seq(Row("study1", Seq(Row("data_category2", 12))))
+
+    val dataCategoriesFromFiles2 = spark.createDataFrame(spark.sparkContext.parallelize(data2), schema)
+
+    val output2 = study2Df.combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles2)
+      .select("data_categories").as[Seq[(String, Option[Int])]].collect().head
+
+    output2 should contain theSameElementsAs Seq(("data_category2", Some(12)))
   }
 }
+
+
