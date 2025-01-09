@@ -31,7 +31,7 @@ case class STUDY_CENTRIC (
                            `status`: String = "completed",
                            `family_count`: Int = 1,
                            `sample_count`: Int = 1,
-                           `experimental_strategies`: Seq[(String, String)] = Seq(("WXS", "5")),
+                           `experimental_strategies`: Seq[(String, String)] = Seq(("WXS", "6")),
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                            `datasets`: Seq[DATASET] = Nil,

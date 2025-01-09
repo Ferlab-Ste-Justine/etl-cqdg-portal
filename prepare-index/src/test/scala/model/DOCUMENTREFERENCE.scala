@@ -4,7 +4,7 @@ case class DOCUMENTREFERENCE(
                               `study_id`: String = "STU0000001",
                               `fhir_id`: String = "5",
                               `participant_id`: String = "PRT0000001",
-                              `biospecimen_reference`: String = "SAM0000001",
+                              `biospecimen_reference`: Seq[String] = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
                               `data_type`: String = "SSUP",
                               `relates_to`: Option[String] = None,
                               `data_category`: String = "Genomics",

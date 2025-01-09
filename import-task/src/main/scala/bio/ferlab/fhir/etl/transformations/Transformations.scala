@@ -51,14 +51,9 @@ object Transformations {
       .withColumn("genome_build", filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code"))
       .withColumn("_for", regexp_extract(col("for")("reference"), patientExtract, 1))
       .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
-      .withColumn("clean_output", transform(col("output"), col => struct(col("type")("coding")(0) as "code", col("valueReference") as "value")))
-      .withColumn("alir", filter(col("clean_output"), col => col("code")("code") === "Aligned-reads")(0)("value")("reference"))
-      .withColumn("snv", filter(col("clean_output"), col => col("code")("code") === "SNV")(0)("value")("reference"))
-      .withColumn("gcnv", filter(col("clean_output"), col => col("code")("code") === "Germline-CNV")(0)("value")("reference"))
-      .withColumn("gsv", filter(col("clean_output"), col => col("code")("code") === "Germline-structural-variant")(0)("value")("reference"))
-      .withColumn("ssup", filter(col("clean_output"), col => col("code")("code") === "Sequencing-data-supplement")(0)("value")("reference"))
+      .withColumn("analysis_files", transform(col("output"), col => struct(col("type")("coding")(0)("code") as "data_type", col("valueReference")("reference") as "file_id")))
     ),
-    Drop("seq_exp", "extension", "workflow", "code", "output", "clean_output", "for")
+    Drop("seq_exp", "extension", "workflow", "code", "output", "for")
   )
 
   val biospecimenMappings: List[Transformation] = List(
@@ -225,7 +220,7 @@ object Transformations {
       val df = input
         .select(columns.head, columns.tail: _*)
         .withColumn("participant_id", regexp_extract(col("subject")("reference"), patientExtract, 1))
-        .withColumn("biospecimen_reference", regexp_extract(col("context")("related")(0)("reference"), specimenExtract, 1))
+        .withColumn("biospecimen_reference", transform(col("context")("related"), col => regexp_extract(col("reference"), specimenExtract, 1)))
         .withColumn("data_type_cs",
            filter(col("type")("coding"), col => col("system") === DOCUMENT_DATA_TYPE)(0)
         )

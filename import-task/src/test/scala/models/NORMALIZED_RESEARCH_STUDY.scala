@@ -34,7 +34,7 @@ case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "CAG",
                                      `data_categories`: Seq[String] = Seq("genomics", "proteomics"),
                                      `study_designs`: Seq[String] = Seq("case_only", "registry"),
                                      `data_collection_methods`: Seq[String] = Seq("medical_records", "investigator_assessment"),
-                                     `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "ds_name_2", `description`= "description 2")),
+                                     `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "d2", `description`= "description 2")),
                                      `study_id`: String = "CAG",
                                      `security` : String = "R")
 
@@ -47,5 +47,5 @@ case class ACCESS_LIMITATIONS(`code`: String = "DUO:0000005",
 case class ACCESS_REQUIREMENTS(`code`: String = "DUO:0000019",
                                `display`: Option[String] = None)
 
-case class DATA_SETS(`name`: String = "ds_name_1",
+case class DATA_SETS(`name`: String = "d1",
                      `description`: String = "description 1")

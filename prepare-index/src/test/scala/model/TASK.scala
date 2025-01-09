@@ -18,11 +18,17 @@ case class TASK(
                  `workflow_name`: String = "Dragen",
                  `workflow_version`: String = "1.1.0",
                  `genome_build`: String = "GRCh38",
-                 `alir`: String = "1",
-                 `snv`: String = "2",
-                 `gcnv`: String = "3",
-                 `gsv`: String = "4",
-                 `ssup`: String = "5",
+                 `analysis_files`: Seq[ANALYSIS_FILE] = Seq(
+                   ANALYSIS_FILE("Annotated-SNV", "12"),
+                   ANALYSIS_FILE("Aligned-reads", "1"),
+                   ANALYSIS_FILE("SNV", "2"),
+                   ANALYSIS_FILE("Germline-CNV", "3"),
+                   ANALYSIS_FILE("Germline-structural-variant", "4"),
+                   ANALYSIS_FILE("Sequencing-data-supplement", "5"),
+                 ),
                )
 
-
+case class ANALYSIS_FILE(
+                          data_type: String,
+                          file_id: String,
+                        )

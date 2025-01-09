@@ -4,7 +4,7 @@ case class FILE_CENTRIC(
                          file_id: String = "FIL0086557",
                          study_id: String = "STU0000001",
                          `security`: String = "U",
-                         biospecimen_reference: String = "SAM0247817",
+                         biospecimen_reference: Seq[String] = Seq("SAM0247817"),
                          data_type: String = "Germline Structural Variant",
                          dataset: Option[String] = Some("Dataset1"),
                          `relates_to`: Option[RELATES_TO] = None,
