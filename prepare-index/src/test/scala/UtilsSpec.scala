@@ -157,8 +157,12 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     ).toDF()
 
     val seqExperiment = Seq(
-      SEQUENCING_EXPERIMENT_INPUT(`alir` = "F1"),
-      SEQUENCING_EXPERIMENT_INPUT(`snv` = "F2", `is_paired_end` = false),
+      SEQUENCING_EXPERIMENT_INPUT(`analysis_files` = Seq(
+        ANALYSIS_FILE("Aligned-reads", "F1"),
+      )),
+      SEQUENCING_EXPERIMENT_INPUT(`analysis_files` = Seq(
+        ANALYSIS_FILE("snv", "F2"),
+      ), `is_paired_end` = false),
     ).toDF()
 
 

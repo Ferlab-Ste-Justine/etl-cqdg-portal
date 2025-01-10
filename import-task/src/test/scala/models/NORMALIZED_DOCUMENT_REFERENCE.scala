@@ -7,19 +7,19 @@ package models
 
 
 
-case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000207",
+case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000212",
                                          `participant_id`: String = "PRT0000003",
-                                         `biospecimen_reference`: String = "SAM0000003",
-                                         `data_type`: String = "Sequencing-data-supplement",
+                                         `biospecimen_reference`: Seq[String] = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
+                                         `data_type`: String = "Annotated-SNV",
                                          `data_category`: String = "genomics",
-                                         `dataset`: String = "ds_name_1",
+                                         `dataset`: String = "d1",
                                          `files`: Seq[FILES] = Seq(FILES()),
                                          `study_id`: String = "CAG",
                                          `relates_to`: Option[String] = None,
                                          `security`: String = "R")
 
-case class FILES(`file_name`: String = "FIL0000207.mpsMetrics_S03344.tar.gz",
-                 `file_format`: String = "TGZ",
+case class FILES(`file_name`: String = "FIL0000212.variants_12345.snv.vep.vcf.gz",
+                 `file_format`: String = "VCF",
                  `file_size`: Float = 8.0f,
-                 `ferload_url`: String = "s3://cqdg-dev-file-import/run_432/CAG/dataset_ds_name_1/1623/mpsMetrics_S03344.tar.gz",
+                 `ferload_url`: String = "s3://cqdg-dev-file-import/studies/CAG/study_version_1/vcf_annotated/variants_12345.snv.vep.vcf.gz",
                  `file_hash`: Option[String] = None)

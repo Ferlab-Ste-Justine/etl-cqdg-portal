@@ -424,20 +424,13 @@
                 "genome_build" : {
                   "type": "keyword"
                 },
-                "alir" : {
-                  "type": "keyword"
-                },
-                "snv" : {
-                  "type": "keyword"
-                },
-                "gcnv" : {
-                  "type": "keyword"
-                },
-                "gsv" : {
-                  "type": "keyword"
-                },
-                "ssup" : {
-                  "type": "keyword"
+                "analysis_files" : {
+                  "data_type" : {
+                    "type": "keyword"
+                  },
+                  "file_id" : {
+                    "type": "keyword"
+                  }
                 }
               }
             }

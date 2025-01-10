@@ -59,7 +59,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `file_format` = Some("TGZ"),
             `file_size` = Some(56.0),
             `ferload_url` = Some("http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a"),
-            `biospecimen_reference` = Some("SAM0000001"),
+            `biospecimen_reference` = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
             `data_type` = Some("SSUP"),
             `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(

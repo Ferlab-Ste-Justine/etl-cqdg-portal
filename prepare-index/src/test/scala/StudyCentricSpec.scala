@@ -27,12 +27,13 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val family5: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "Excluded2", `submitter_participant_id` = "PRT0000005", `relationship_to_proband` = "Father")
   val family6: FAMILY_RELATIONSHIP_NEW = FAMILY_RELATIONSHIP_NEW(`internal_family_relationship_id` = "Excluded3", `submitter_participant_id` = "PRT0000006", `relationship_to_proband` = "Proband")
 
-  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = "BIO1" , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM")), `dataset` = Some("dataset1"))
-  val document7: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "7", `data_type` = "ALIR", `biospecimen_reference` = "BIO1", `relates_to` = Some("1") , `files` = Seq(FILE(`file_name` = "file1.crai", `file_format` = "CRAI")), `dataset` = Some("dataset1"))
+  val document1: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "1", `data_type` = "ALIR", `biospecimen_reference` = Seq("BIO1") , `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM")), `dataset` = Some("dataset1"))
+  val document7: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "7", `data_type` = "ALIR", `biospecimen_reference` = Seq("BIO1"), `relates_to` = Some("1") , `files` = Seq(FILE(`file_name` = "file1.crai", `file_format` = "CRAI")), `dataset` = Some("dataset1"))
   val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `dataset` = Some("dataset1"))
-  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `biospecimen_reference` = "BIO1", `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
+  val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "2", `data_type` = "SNV", `biospecimen_reference` = Seq("BIO1"), `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
   val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "4", `data_type` = "GSV", `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
   val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "3", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")), `dataset` = Some("dataset1"))
+  val document12: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "12", `data_type` = "Annotated-SNV", `files` = Seq(FILE(`file_name` = "file12.vep", `file_format` = "VCF")), `dataset` = Some("dataset1"))
   val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`fhir_id` = "6", `participant_id` = "PRT0000002", `data_type` = "GCNV", `files` = Seq(FILE(`file_name` = "file6.vcf", `file_format` = "VCF")), `dataset` = Some("dataset2"))
 
   val diagnosis1: DIAGNOSIS_INPUT =DIAGNOSIS_INPUT()
@@ -62,7 +63,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val data: Map[String, DataFrame] = Map(
       "normalized_research_study" -> Seq(RESEARCHSTUDY(`data_sets` = studyDataset)).toDF(),
       "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
-      "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6, document7).toDF(),
+      "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6, document12, document7).toDF(),
       "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
       "normalized_group" -> Seq(group1, group2).toDF(),
       "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
@@ -81,12 +82,12 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val studyCentricOutput = STUDY_CENTRIC(
       `participant_count` = 2, // PRT0000001, PRT0000002
-      `data_types` = Seq(("SSUP","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
+      `data_types` = Seq(("SSUP","1"),("Annotated-SNV","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
       `sample_count` = 4,
-      `file_count` = 6,
+      `file_count` = 7,
       `datasets` = Seq(
-        // Dataset file_count should be 5 as CRAI files should be excluded
-        DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV"), `experimental_strategies` = Seq("WXS"), `participant_count` = 1, `file_count` = 5),
+        // Dataset file_count should be 6 as CRAI files should be excluded
+        DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"), `experimental_strategies` = Seq("WXS"), `participant_count` = 1, `file_count` = 6),
         DATASET(`name` = "dataset2", `description` = Some("desc"), `data_types` = Seq("GCNV"), `experimental_strategies` = Nil, `participant_count` = 1, `file_count` = 1)
       )
     )

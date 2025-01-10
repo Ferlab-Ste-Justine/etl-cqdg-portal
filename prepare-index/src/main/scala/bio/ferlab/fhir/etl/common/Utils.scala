@@ -151,11 +151,11 @@ object Utils {
         .drop("study_id", "is_paired_end")
 
       val seqExperimentByFile = sequencingExperimentClean
-        .withColumn("all_files", filter(array(col("alir"), col("snv"), col("gcnv"), col("gsv"), col("ssup")), a => a.isNotNull))
-        .withColumn("all_files_exp", explode(col("all_files")))
+        .withColumn("all_files_exp", explode(col("analysis_files")))
         .groupBy("all_files_exp")
         .agg(collect_list(struct(sequencingExperimentClean.columns.filterNot(Seq("participant_id", "all_files", "all_files_exp").contains).map(e => col(e)): _*))(0) as "sequencing_experiment")
-        .withColumnRenamed("all_files_exp", "fhir_id")
+        .withColumn("fhir_id", col("all_files_exp")("file_id"))
+        .drop("all_files_exp")
 
       df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
     }
@@ -305,8 +305,6 @@ object Utils {
     }
 
     def expStrategiesCountPerStudy(taskDf: DataFrame, filesDf: DataFrame): DataFrame = {
-      val filesCols = Seq("alir", "snv", "gcnv", "gsv", "ssup")
-
       val cleanFilesDF = filesDf
         .select("study_id", "fhir_id", "files")
         .withColumn("file", explode(col("files")))
@@ -314,10 +312,8 @@ object Utils {
         .drop("files")
 
       val cleanTask = taskDf
-        .groupBy(taskDf.columns.filter(cn => !filesCols.contains(cn)).map(col): _*)
-        .agg(first(array(filesCols.map(col): _*)) as "files")
-        .withColumn("pivot", explode(col("files")))
-        .drop("files")
+        .withColumn("pivot", explode(col("analysis_files")))
+        .withColumn("pivot", col("pivot")("file_id"))
 
       val experimentalStrategiesCount = cleanTask
         .join(cleanFilesDF, Seq("pivot", "study_id"), "inner")
