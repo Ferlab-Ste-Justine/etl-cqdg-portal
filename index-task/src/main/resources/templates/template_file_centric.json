@@ -716,11 +716,13 @@
               "type": "keyword"
             },
             "analysis_files" : {
-              "data_type" : {
-                "type": "keyword"
-              },
-              "file_id" : {
-                "type": "keyword"
+              "properties": {
+                "data_type": {
+                  "type": "keyword"
+                },
+                "file_id": {
+                  "type": "keyword"
+                }
               }
             }
           }
