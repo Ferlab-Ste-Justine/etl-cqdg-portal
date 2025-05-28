@@ -12,7 +12,7 @@ case class ETLConfiguration(`es-config`: Map[String, String], datalake: Datalake
 class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
 
 
-  val study = "CAG"
+  val study = "study1"
 
   private def addObjectToBucket(objects: Seq[(String, String)]): Unit = {
     objects.foreach({ case (path, fileName) => transferFromResource(s"fhir/$path/study_id=$study", s"$fileName.avro")})
@@ -91,7 +91,7 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     normalizedBiospecimen.filter(_.`fhir_id` == "BIO0000001").head shouldEqual NORMALIZED_BIOSPECIMEN()
     normalizedSampleRegistration.filter(_.`subject` == "PRT0000001").head shouldEqual NORMALIZED_SAMPLE_REGISTRATION()
     normalizedResearchStudy.head shouldEqual NORMALIZED_RESEARCH_STUDY()
-    normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000212").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
+    normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000101").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
     group.filter(_.`internal_family_id` == "FM00000001").head shouldEqual NORMALIZED_GROUP()
     task.filter(_.`fhir_id` == "SXP0000001").head shouldEqual NORMALIZED_TASK()
   }

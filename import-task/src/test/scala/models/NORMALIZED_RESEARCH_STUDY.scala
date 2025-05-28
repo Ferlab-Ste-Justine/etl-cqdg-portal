@@ -7,44 +7,46 @@ package models
 
 
 
-case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "CAG",
-                                     `keyword`: Seq[String] = Seq("genomics", "chronic conditions", "population-based cohort", "survey data"),
-                                     `description`: String = "CARTaGENE is a public research platform of the CHU Sainte-Justine created to accelerate health research. CARTaGENE consists of both biological samples and health data from 43,000 Québec residents aged between 40 to 69 years.",
+case class NORMALIZED_RESEARCH_STUDY(`fhir_id`: String = "study1",
+                                     `keyword`: Seq[String] = Seq("epilepsy", "developmental disorder", "family trios"),
+                                     `description`: String = "Case-parent trio study on developmental and epileptic encephalopaties (DEE)",
                                      `access_authority`: ACCESS_AUTHORITY = ACCESS_AUTHORITY(),
-                                     `contact_names`: Seq[String] = Seq("contact1", "contact2"),
-                                     `contact_institutions`: Seq[String] = Seq("contact_institution1", "contact_institution2"),
-                                     `contact_emails`: Seq[String] = Seq("contact_eamil1@toto.com", "contact_eamil2@toto.com"),
-                                     `citation_statement`: String = "some_citation_statement",
-                                     `selection_criteria`: String = "some_selection_criteria",
+                                     `contact_names`: Seq[String] = Seq("James Gordon 2", "Lois Lane 2"),
+                                     `contact_institutions`: Seq[String] = Seq("Metropolis University", "Gotham University"),
+                                     `contact_emails`: Seq[String] = Seq("jgordon2@gpd.com", "llane@mpd.com"),
+                                     `principal_investigators`: Seq[String] = Seq("Batman2", "Superman2"),
+                                     `citation_statement`: String = null,
+                                     `selection_criteria`: String = "Children with a diagnosis of intractable seizures",
                                      `funding_sources`: Seq[String] = Seq("funding_source1", "funding_source2"),
                                      `status`: String = "completed",
-                                     `title`: String = "CARTaGENE",
-                                     `domain`: Seq[String] = Seq("general-health"),
-                                     `study_code`: String = "CAG",
+                                     `title`: String = "Developmental and epileptic encephalopathies",
+                                     `website`: String = "http://study2.com",
+                                     `domain`: Seq[String] = Seq("neurodevelopmental-conditions"),
+                                     `study_code`: String = "STUDY1",
                                      `access_limitations`: Seq[ACCESS_LIMITATIONS] = Seq(ACCESS_LIMITATIONS()),
-                                     `access_requirements`: Seq[ACCESS_REQUIREMENTS] = Seq(ACCESS_REQUIREMENTS(), ACCESS_REQUIREMENTS(`code` = "DUO:0000021"), ACCESS_REQUIREMENTS(`code` = "DUO:0000025"), ACCESS_REQUIREMENTS(`code` = "DUO:0000026"), ACCESS_REQUIREMENTS(`code` = "DUO:0000027"), ACCESS_REQUIREMENTS(`code` = "DUO:0000029")),
-                                     `population`: String = "Adult",
+                                     `access_requirements`: Seq[ACCESS_REQUIREMENTS] = Seq(ACCESS_REQUIREMENTS(), ACCESS_REQUIREMENTS(`code` = "DUO:0000021"), ACCESS_REQUIREMENTS(`code` = "DUO:0000026")),
+                                     `population`: String = "Pediatric and adult",
                                      `study_version`: String = "1",
-                                     `expected_number_participants`: String = "12",
-                                     `expected_number_biospecimens`: String = "15",
-                                     `expected_number_files`: String = "16",
-                                     `restricted_number_participants`: String = "2",
-                                     `restricted_number_biospecimens`: String = "3",
-                                     `restricted_number_files`: String = "3",
-                                     `data_categories`: Seq[String] = Seq("genomics", "proteomics"),
+                                     `expected_number_participants`: String = "5",
+                                     `expected_number_biospecimens`: String = "5",
+                                     `expected_number_files`: String = "32",
+                                     `restricted_number_participants`: String = null,
+                                     `restricted_number_biospecimens`: String = null,
+                                     `restricted_number_files`: String = null,
+                                     `data_categories`: Seq[String] = Seq("genomics"),
                                      `study_designs`: Seq[String] = Seq("case_only", "registry"),
-                                     `data_collection_methods`: Seq[String] = Seq("medical_records", "investigator_assessment"),
+                                     `data_collection_methods`: Seq[String] = Seq("investigator_assessment", "participant_caregiver_report"),
                                      `data_sets`: Seq[DATA_SETS] = Seq(DATA_SETS(), DATA_SETS(`name` = "d2", `description`= "description 2")),
-                                     `study_id`: String = "CAG",
-                                     `security` : String = "R")
+                                     `study_id`: String = "study1",
+                                     `security` : String = "U")
 
-case class ACCESS_AUTHORITY(`type`: String = "url",
-                   `value`: String = "https://sdas.cartagene.qc.ca")
+case class ACCESS_AUTHORITY(`type`: String = "email",
+                   `value`: String = "jacques.michaud.med@ssss.gouv.qc.ca")
 
-case class ACCESS_LIMITATIONS(`code`: String = "DUO:0000005",
+case class ACCESS_LIMITATIONS(`code`: String = "DUO:0000006",
                               `display`: Option[String] = None)
 
-case class ACCESS_REQUIREMENTS(`code`: String = "DUO:0000019",
+case class ACCESS_REQUIREMENTS(`code`: String = "DUO:0000016",
                                `display`: Option[String] = None)
 
 case class DATA_SETS(`name`: String = "d1",

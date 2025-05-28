@@ -10,30 +10,30 @@ package models
 case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000001",
                            `owner`: String = "CQDG",
                            `bio_informatic_analysis`: Option[String] = None,
-                           `labAliquotID`: String = "1000004041-H09",
-                           `ldm_sample_id`: String = "S03411",
-                           `run_name`: String = "1002",
+                           `labAliquotID`: String = null, //FIXME
+                           `ldm_sample_id`: String = null,  //FIXME
+                           `run_name`: String = null, //FIXME
                            `read_length`: Option[String] = Some("151"),
                            `is_paired_end`: Boolean = true,
                            `run_alias`: Option[String] = None,
-                           `run_date`: String = "2021-08-18",
+                           `run_date`: String = null, //FIXME
                            `capture_kit`: Option[String] = None,
-                           `platform`: String = "NovaSeq S4 PE150",
+                           `platform`: String = "Illumina HiSeq 2000 PE100",
                            `experimental_strategy`: String = "WGS",
                            `sequencer_id`: Option[String] = None,
-                           `workflow_name`: String = "GenPipes WES",
-                           `workflow_version`: String = "SW null", //SW null
+                           `workflow_name`: String = null,
+                           `workflow_version`: String = null, //FIXME
                            `genome_build`: String = "GRCh38",
-                           `_for`: String = "PRT0000001",
+                           `_for`: String = "PRT0000003",
                            `analysis_files`: Seq[ANALYSIS_FILE] = Seq(
-                             ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-                             ANALYSIS_FILE("Aligned-reads", "FIL0000227"),
-                             ANALYSIS_FILE("SNV", "FIL0000225"),
-                             ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
-                             ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-                             ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222"),
+                             ANALYSIS_FILE("Annotated-SNV", "FIL0000101"),
+                             ANALYSIS_FILE("Aligned-reads", "FIL0000102"),
+                             ANALYSIS_FILE("SNV", "FIL0000104"),
+                             ANALYSIS_FILE("Germline-CNV", "FIL0000106"),
+                             ANALYSIS_FILE("Germline-structural-variant", "FIL0000108"),
+                             ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000110"),
                            ),
-                           `study_id`: String = "CAG")
+                           `study_id`: String = "study1")
 
 case class ANALYSIS_FILE(
                           data_type: String,

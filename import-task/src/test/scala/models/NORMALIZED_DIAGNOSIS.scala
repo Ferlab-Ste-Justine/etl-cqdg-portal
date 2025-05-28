@@ -8,9 +8,9 @@ package models
 
 
 case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000001",
-                                `fhir_id`: String = "DIA0000003",
-                                `diagnosis_source_text`: String = "Eczema",
-                                `diagnosis_mondo_code`: String = "MONDO:0004980",
-                                `diagnosis_ICD_code`: String = "L20.9",
-                                `age_at_diagnosis`: String = "HP:0003577",
-                                `study_id`: String = "CAG")
+                                `fhir_id`: String = "DIA0000002",
+                                `diagnosis_source_text`: String = "Intractable Epilepsy",
+                                `diagnosis_mondo_code`: String = "MONDO:0005027",
+                                `diagnosis_ICD_code`: String = "G40.31",
+                                `age_at_diagnosis`: String = "HP:0011462",
+                                `study_id`: String = "study1")

@@ -168,7 +168,7 @@ object Transformations {
       .withColumn("contact_extensions", flatten(col("contact")("extension")))
       .withColumn("contact_institutions", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_INSTITUTIONS_SD), col => col("valueString")))
       .withColumn("contact_emails", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_TYPE_SD), col => col("valueString")))
-      .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url")))
+      .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url"))(0))
       .withColumn("citation_statement", citationsOf("CitationStatement")(0))
       .withColumn("selection_criteria", citationsOf("SelectionCriteria")(0))
       .withColumn("funding_sources", citationsOf("FundingSource"))

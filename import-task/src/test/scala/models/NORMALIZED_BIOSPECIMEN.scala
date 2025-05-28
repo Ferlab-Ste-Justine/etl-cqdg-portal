@@ -8,12 +8,12 @@ package models
 
 
 case class NORMALIZED_BIOSPECIMEN(`fhir_id`: String = "BIO0000001",
-                                  `subject`: String = "PRT0000001",
+                                  `subject`: String = "PRT0000002",
                                   `biospecimen_tissue_source`: BIOSPECIMEN_TISSUE_SOURCE = BIOSPECIMEN_TISSUE_SOURCE(),
-                                  `age_biospecimen_collection`: String = "HP:0003596",
-                                  `submitter_biospecimen_id`: String = "biospecimen21162",
-                                  `study_id`: String = "CAG",
-                                  `security`: String = "R")
+                                  `age_biospecimen_collection`: String = "HP:0011463",
+                                  `submitter_biospecimen_id`: String = "B-S03388",
+                                  `study_id`: String = "study1",
+                                  `security`: String = null)
 
 case class BIOSPECIMEN_TISSUE_SOURCE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
                                      `code`: String = "NCIT:C12434",
