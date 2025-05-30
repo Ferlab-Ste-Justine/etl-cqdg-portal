@@ -91,8 +91,6 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       )
     )
 
-    study_centric.show(false)
-
     study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs
       Seq(studyCentricOutput)
   }
