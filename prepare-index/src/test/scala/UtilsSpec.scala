@@ -1,9 +1,9 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.Utils._
 import model._
-import org.apache.spark.sql.{DataFrame, Row}
-import org.apache.spark.sql.functions.{col, explode}
-import org.apache.spark.sql.types.{ArrayType, IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.functions.{array, col, lit}
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, Row, functions}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -97,45 +97,16 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       FILE_INPUT(`participant_id` = "P3"),
     ).toDF()
     val biospecimenDF = Seq.empty[BIOSPECIMEN_INPUT].toDF()
-    val seqExperimentDF = Seq.empty[SEQUENCING_EXPERIMENT_INPUT].toDF()
+    val seqExperimentDF = Seq.empty[SEQUENCING_EXPERIMENT_SINGLE].toDF()
+      .withColumn("ldm_sample_id", lit("").cast(StringType))
+      .withColumn("lab_aliquot_ids", array().cast(ArrayType(StringType)))
+      .withColumn("is_paired_end", lit(false).cast(BooleanType))
     val samplesDF = Seq.empty[SAMPLE_INPUT].toDF()
 
     val output = inputPatients.addFilesWithBiospecimen(filesDf, biospecimenDF, seqExperimentDF, samplesDF)
 
     output.select("participant_id").as[String].collect() should not contain "P4"
   }
-
-
-//  "addFilesWithBiospecimen" should "map TBI and CRAI files as ref" in {
-//    // For now, we assume that only one attachment per file input (CRAI, CRAM, TBI, ... are all in separate FHIR documents)
-//    val filesDf = Seq(
-//      FILE_INPUT(`fhir_id` = "FHIR_ID_1", `participant_id` = "P1", `data_type`= "SNV", `files` = Seq(
-//        FILE_ATTACHMENT(`file_name` = "Filename1", `file_format` = "gVCF"),
-//      )),
-//      FILE_INPUT(`fhir_id` = "FHIR_ID_2", `participant_id` = "P1", `data_type` = "SNV", `relates_to` = Some("FHIR_ID_1"), `files` = Seq(
-//        FILE_ATTACHMENT(`file_name` = "Filename2", `file_format` = "TBI")
-//      )),
-//      FILE_INPUT(`fhir_id` = "FHIR_ID_3", `participant_id` = "P2", `data_type` = "Aligned Reads", `relates_to` = Some("FHIR_ID_4"), `files` = Seq(
-//        FILE_ATTACHMENT(`file_name` = "Filename3", `file_format` = "CRAI"),
-//      )),
-//      FILE_INPUT(`fhir_id` = "FHIR_ID_4", `participant_id` = "P2", `data_type` = "Aligned Reads", `files` = Seq(
-//        FILE_ATTACHMENT(`file_name` = "Filename4", `file_format` = "CRAM")
-//      ))
-//    ).toDF()
-//
-//    val biospecimenDF = Seq.empty[BIOSPECIMEN_INPUT].toDF()
-//    val seqExperimentDF = Seq.empty[SEQUENCING_EXPERIMENT_INPUT].toDF()
-//    val samplesDF = Seq.empty[SAMPLE_INPUT].toDF()
-//
-//    val output = inputPatients.addFilesWithBiospecimen(filesDf, biospecimenDF, seqExperimentDF, samplesDF)
-//
-//    val result = output
-//      .withColumn("file", explode(col("files")))
-//      .select("file")
-//          .select("file.file_id", "file.relates_to")
-//
-//    result.as[(String, String)].collect() should contain theSameElementsAs Seq(("FHIR_ID_1", "FHIR_ID_2"), ("FHIR_ID_4", "FHIR_ID_3"))
-//  }
 
   "addParticipantWithBiospecimen" should "only return files with participant" in {
     val filesDf = Seq(
@@ -157,14 +128,16 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     ).toDF()
 
     val seqExperiment = Seq(
-      SEQUENCING_EXPERIMENT_INPUT(`analysis_files` = Seq(
+      SEQUENCING_EXPERIMENT_SINGLE(`analysis_files` = Seq(
         ANALYSIS_FILE("Aligned-reads", "F1"),
       )),
-      SEQUENCING_EXPERIMENT_INPUT(`analysis_files` = Seq(
+      SEQUENCING_EXPERIMENT_SINGLE(`analysis_files` = Seq(
         ANALYSIS_FILE("snv", "F2"),
-      ), `is_paired_end` = false),
+      )),
     ).toDF()
-
+      .withColumn("ldm_sample_id", lit("").cast(StringType))
+      .withColumn("lab_aliquot_ids", array().cast(ArrayType(StringType)))
+      .withColumn("is_paired_end", functions.when(col("analysis_files")(0)("data_type") === "Aligned-reads", lit(true)).otherwise(lit(false)))
 
     val output = filesDf.addSequencingExperiment(seqExperiment)
 

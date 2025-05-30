@@ -21,8 +21,8 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         SIMPLE_PARTICIPANT(`participant_id` = "P2")
       ).toDF(),
       "normalized_document_reference" -> Seq(
-        DOCUMENTREFERENCE(`fhir_id` = "F1", `participant_id` = "P1"),
-        DOCUMENTREFERENCE(`fhir_id` = "F2", `participant_id` = "P2"),
+        DOCUMENTREFERENCE(`fhir_id` = "1", `participant_id` = "P1"),
+        DOCUMENTREFERENCE(`fhir_id` = "2", `participant_id` = "P2"),
       ).toDF(),
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
@@ -30,7 +30,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       ).toDF(),
       "normalized_task" -> Seq(
         TASK(fhir_id = "1"),
-        TASK(fhir_id = "2")
+        TASK(fhir_id = "2", ldm_sample_id = "S16524")
       ).toDF(),
       "normalized_sample_registration" -> Seq(
         SAMPLE_INPUT(fhir_id = "S1", `subject` = "P1", `parent` = "B1"),
@@ -53,8 +53,8 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         `biospecimens` = Seq(BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1", `sample_2_id` = "S1")),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(
-            `file_id` = Some("F1"),
-            `file_2_id` = Some("F1"),
+            `file_id` = Some("1"),
+            `file_2_id` = Some("1"),
             `file_name` = Some("file5.json"),
             `file_format` = Some("TGZ"),
             `file_size` = Some(56.0),
@@ -64,6 +64,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(
               BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1",  `sample_2_id` = "S1")),
+            `sequencing_experiment` = Some(SEQUENCING_EXPERIMENT_SINGLE())
           ),
         )
       )

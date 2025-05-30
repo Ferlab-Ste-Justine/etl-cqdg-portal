@@ -3,9 +3,8 @@ import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.StudyCentric
 import model._
 import org.apache.spark.sql.DataFrame
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
-import pureconfig.generic.auto._
+import org.scalatest.matchers.should.Matchers
 
 class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
@@ -87,10 +86,12 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       `file_count` = 7,
       `datasets` = Seq(
         // Dataset file_count should be 6 as CRAI files should be excluded
-        DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"), `experimental_strategies` = Seq("WXS"), `participant_count` = 1, `file_count` = 6),
-        DATASET(`name` = "dataset2", `description` = Some("desc"), `data_types` = Seq("GCNV"), `experimental_strategies` = Nil, `participant_count` = 1, `file_count` = 1)
+        DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"), `experimental_strategies_1` = Seq(CODEABLE("WXS")), `participant_count` = 1, `file_count` = 6),
+        DATASET(`name` = "dataset2", `description` = Some("desc"), `data_types` = Seq("GCNV"), `experimental_strategies_1` = Nil, `participant_count` = 1, `file_count` = 1)
       )
     )
+
+    study_centric.show(false)
 
     study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs
       Seq(studyCentricOutput)
