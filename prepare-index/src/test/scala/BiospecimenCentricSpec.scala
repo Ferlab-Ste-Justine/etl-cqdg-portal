@@ -68,8 +68,8 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
       "normalized_task" -> Seq(TASK(`fhir_id` = "SXP0029366", `_for` = "P1", `analysis_files` = Seq(ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-        ANALYSIS_FILE("Aligned-reads", "FIL0000227"),
-        ANALYSIS_FILE("SNV", "FIL0000225"),
+        ANALYSIS_FILE("Aligned-reads", "D1"),
+        ANALYSIS_FILE("SNV", "D4"),
         ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
         ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
         ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")))).toDF(),
@@ -94,6 +94,8 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     //B3 has a participant (NONE) that does exist
     biospecimenIds should not contain "B3"
 
+    output("es_index_biospecimen_centric").show(false)
+
     val biospecimen_centricCollect = output("es_index_biospecimen_centric").as[BIOSPECIMEN_CENTRIC].collect()
 
     biospecimen_centricCollect.find(_.`biospecimen_id` == "B1") shouldBe Some(
@@ -114,7 +116,17 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
 //            `relates_to` = Some("D2"),  //CRAI
             `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
             `biospecimen_reference` = Seq("B1"),
-            `sequencing_experiment` = null
+            `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
+              `analysis_files` = Seq(
+                ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
+                ANALYSIS_FILE("Aligned-reads", "D1"),
+                ANALYSIS_FILE("SNV", "D4"),
+                ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
+                ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
+                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222"),
+              )
+            ),
+            `sample` = Some(TASK_SAMPLE())
           )
         ),
         `sample_id`= "sam1",
@@ -141,7 +153,17 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
 //            `relates_to` = Some("D5"), //CRAI
             `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
             `biospecimen_reference` = Seq("B4"),
-            `sequencing_experiment` = null
+            `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
+              `analysis_files` = Seq(
+                ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
+                ANALYSIS_FILE("Aligned-reads", "D1"),
+                ANALYSIS_FILE("SNV", "D4"),
+                ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
+                ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
+                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222"),
+              )
+            ),
+            `sample` = Some(TASK_SAMPLE())
           )
         ),
         `sample_id` = "sam2",

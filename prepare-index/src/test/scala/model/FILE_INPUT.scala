@@ -31,5 +31,6 @@ case class FILE_WITH_SEQ_EXPERIMENT(
                                      `data_category`: String = "Genomics",
                                      `dataset`: Option[String] = Some("Dataset1"),
                                      `sequencing_experiment`: SEQUENCING_EXPERIMENT_SINGLE = SEQUENCING_EXPERIMENT_SINGLE(),
+                                     `sample`: Option[TASK_SAMPLE] = Some(TASK_SAMPLE()),
                           )
 

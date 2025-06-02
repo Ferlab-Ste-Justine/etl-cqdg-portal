@@ -8,12 +8,12 @@ package models
 
 
 case class NORMALIZED_SAMPLE_REGISTRATION(`subject`: String = "PRT0000001",
-                                          `parent`: String = "BIO0000001",
-                                          `fhir_id`: String = "SAM0000001",
+                                          `parent`: String = "BIO0000003",
+                                          `fhir_id`: String = "SAM0000002",
                                           `sample_type`: SAMPLE_TYPE = SAMPLE_TYPE(),
-                                          `submitter_sample_id`: String = "S03411",
-                                          `study_id`: String = "CAG")
+                                          `submitter_sample_id`: String = "S03387",
+                                          `study_id`: String = "study1")
 
 case class SAMPLE_TYPE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
-                       `code`: String = "DNA",
+                       `code`: String = "NCIT:C449",
                        `display`: Option[String] = None)

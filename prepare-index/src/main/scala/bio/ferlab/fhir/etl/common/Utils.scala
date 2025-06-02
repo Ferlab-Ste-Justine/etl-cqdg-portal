@@ -147,15 +147,30 @@ object Utils {
         .withColumnRenamed("_for", "participant_id")
         .withColumnRenamed("fhir_id", "analysis_id")
         .withColumn("type_of_sequencing", when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads")))
-        .withColumn("run_date", split(col("run_date"), "\\.")(0))
         .drop("study_id", "is_paired_end")
 
       val seqExperimentByFile = sequencingExperimentClean
         .withColumn("all_files_exp", explode(col("analysis_files")))
         .groupBy("all_files_exp")
-        .agg(collect_list(struct(sequencingExperimentClean.columns.filterNot(Seq("participant_id", "all_files", "all_files_exp").contains).map(e => col(e)): _*))(0) as "sequencing_experiment")
+        .agg(
+          collect_list(
+            struct(
+              struct(
+                col("lab_aliquot_ids").as("lab_aliquot_ids"),
+                col("ldm_sample_id").as("ldm_sample_id")
+              ).as("sample"),
+              struct(
+                sequencingExperimentClean.columns
+                  .filterNot(Seq("participant_id", "all_files", "all_files_exp", "lab_aliquot_ids", "ldm_sample_id").contains)
+                  .map(e => col(e)): _*
+              ).as("sequencing_experiment")
+            )
+          )(0) as "sequencing_experiment_struct"
+        )
+        .withColumn("sample", col("sequencing_experiment_struct")("sample"))
+        .withColumn("sequencing_experiment", col("sequencing_experiment_struct")("sequencing_experiment"))
         .withColumn("fhir_id", col("all_files_exp")("file_id"))
-        .drop("all_files_exp")
+        .drop("all_files_exp", "sequencing_experiment_struct")
 
       df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
     }
@@ -269,7 +284,7 @@ object Utils {
         .groupBy("study_id", "dataset")
         .agg(
           collect_set("data_type") as "data_types",
-          collect_set("sequencing_experiment.experimental_strategy") as "experimental_strategies",
+          collect_set("sequencing_experiment.experimental_strategy_1") as "experimental_strategies_1",
           size(collect_set("fhir_id")) as "file_count",
           size(collect_set("participant_id")) as "participant_count"
         )
@@ -286,7 +301,7 @@ object Utils {
           col("dataset") as "name",
           col("dataset_desc") as "description",
           col("data_types"),
-          col("experimental_strategies"),
+          col("experimental_strategies_1"),
           col("file_count"),
           col("participant_count"),
         ))
@@ -317,10 +332,10 @@ object Utils {
 
       val experimentalStrategiesCount = cleanTask
         .join(cleanFilesDF, Seq("pivot", "study_id"), "inner")
-        .groupBy("study_id", "experimental_strategy")
+        .groupBy("study_id", "experimental_strategy_1")
         .agg(size(collect_set(col("file")("file_name"))) as "file_count")
         .groupBy("study_id")
-        .agg(collect_list(struct(col("experimental_strategy"), col("file_count"))) as "experimental_strategies")
+        .agg(collect_list(struct(col("experimental_strategy_1"), col("file_count"))) as "experimental_strategies_1")
 
       df.join(experimentalStrategiesCount, Seq("study_id"), "left_outer")
     }

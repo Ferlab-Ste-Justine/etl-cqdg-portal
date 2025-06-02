@@ -412,6 +412,16 @@
                 "experimental_strategy" : {
                   "type": "keyword"
                 },
+                "experimental_strategy_1" : {
+                  "properties": {
+                    "code": {
+                      "type": "keyword"
+                    },
+                    "display": {
+                      "type": "keyword"
+                    }
+                  }
+                },
                 "sequencer_id" : {
                   "type": "keyword"
                 },
@@ -422,6 +432,41 @@
                   "type": "keyword"
                 },
                 "genome_build" : {
+                  "type": "keyword"
+                },
+                "selection" : {
+                  "properties": {
+                    "code": {
+                      "type": "keyword"
+                    },
+                    "display": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "source" : {
+                  "properties": {
+                    "code": {
+                      "type": "keyword"
+                    },
+                    "display": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "protocol" : {
+                  "type": "keyword"
+                },
+                "target_capture_kit" : {
+                  "type": "keyword"
+                },
+                "target_loci" : {
+                  "type": "keyword"
+                },
+                "pipeline" : {
+                  "type": "keyword"
+                },
+                "run_ids" : {
                   "type": "keyword"
                 },
                 "analysis_files" : {

@@ -8,12 +8,12 @@ package models
 
 
 case class NORMALIZED_PHENOTYPE(`fhir_id`: String = "PHE0000002",
-                                `age_at_phenotype`: String = "HP:0003596",
-                                `phenotype_source_text`: String = "Hypertension",
+                                `age_at_phenotype`: String = "HP:0011462",
+                                `phenotype_source_text`: String = "Intractable Seizures",
                                 `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
-                                `cqdg_participant_id`: String = "PRT0000002",
+                                `cqdg_participant_id`: String = "PRT0000001",
                                 `phenotype_observed`: String = "POS",
-                                `study_id`: String = "CAG")
+                                `study_id`: String = "study1")
 
 case class PHENOTYPE_HPO_CODE(`system`: String = "http://purl.obolibrary.org/obo/hp.owl",
-                              `code`: String = "HP:0000822")
+                              `code`: String = "HP:0001250")

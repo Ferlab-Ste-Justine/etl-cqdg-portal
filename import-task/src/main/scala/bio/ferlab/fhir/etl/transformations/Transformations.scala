@@ -33,27 +33,65 @@ object Transformations {
       .withColumn("bio_informatic_analysis", filter(col("code")("coding"), col => col("system") === TASK_BIO_INFO)(0)("display"))
       .withColumn("seq_exp", filter(col("extension"), col => col("url") === SEQUENCING_EXPERIMENT_S_D)(0))
       .withColumn("workflow", filter(col("extension"), col => col("url") === WORKFLOW_S_D)(0))
-      .withColumn("labAliquotID", filter(col("seq_exp")("extension"), col => col("url") === "labAliquotId")(0)("valueString"))
-      .withColumn("ldm_sample_id", filter(col("seq_exp")("extension"), col => col("url") === "ldmSampleId")(0)("valueString"))
-      .withColumn("run_name", filter(col("seq_exp")("extension"), col => col("url") === "runName")(0)("valueString"))
+      .withColumn("task_sample_ext", filter(col("extension"), col => col("url") === TASK_SAMPLE_S_D)(0))
+      .withColumn("lab_aliquot_ids", filter(col("task_sample_ext")("extension"), col => col("url") === "labAliquotId")("valueString"))
+      .withColumn("ldm_sample_id", filter(col("task_sample_ext")("extension"), col => col("url") === "ldmSampleId")(0)("valueString"))
+      .withColumn("run_ids", filter(col("seq_exp")("extension"), col => col("url") === "runIds")("valueString"))
+      .withColumn(
+        "run_dates",
+        transform(
+          filter(col("seq_exp")("extension"), col => col("url") === "runDates")("valueDate"),
+          date => date_from_unix_date(date)
+        )
+      )
       .withColumn("read_length", split(filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"), ",")(0))
       .withColumn("is_paired_end", filter(col("seq_exp")("extension"), col => col("url") === "isPairedEnd")(0)("valueBoolean"))
-      .withColumn("run_alias", filter(col("seq_exp")("extension"), col => col("url") === "runAlias")(0)("valueString"))
       // date extracted from fhir are one day before, Likely due to improper time zone setup on the fhir server. This should be fixed
       // and date_add function removed...
-      .withColumn("run_date", date_add(date_from_unix_date(filter(col("seq_exp")("extension"), col => col("url") === "runDate")(0)("valueDate")), 1))
       .withColumn("capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString"))
       .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
-      .withColumn("experimental_strategy", filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code"))
+      .withColumn("target_capture_kit", filter(col("seq_exp")("extension"), col => col("url") === "targetCaptureKit")(0)("valueString"))
+      .withColumn("protocol", filter(col("seq_exp")("extension"), col => col("url") === "protocol")(0)("valueString"))
+      .withColumn("target_loci", filter(col("seq_exp")("extension"), col => col("url") === "targetLoci")(0)("valueString"))
+      .withColumn(
+        "experimental_strategy_1",
+        struct(
+          filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code").as("code"),
+          filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("display").as("display")
+        )
+      )
+      .withColumn( //FIXME remove this field after all studies are updated (replace _1)
+        "experimental_strategy",
+        filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code")
+      )
       .withColumn("sequencer_id", filter(col("seq_exp")("extension"), col => col("url") === "sequencerId")(0)("valueString"))
-      .withColumn("workflow_name", filter(col("workflow")("extension"), col => col("url") === "workflowName")(0)("valueString"))
-      .withColumn("workflow_version", filter(col("workflow")("extension"), col => col("url") === "workflowVersion")(0)("valueString"))
+      .withColumn(
+        "source",
+        transform(
+          filter(col("seq_exp")("extension"), col => col("url") === "source")("valueCoding"),
+          coding => struct(
+            coding("code").as("code"),
+            coding("display").as("display")
+          )
+        )(0)
+      )
+      .withColumn(
+        "selection",
+        transform(
+          filter(col("seq_exp")("extension"), col => col("url") === "selection")("valueCoding"),
+          coding => struct(
+            coding("code").as("code"),
+            coding("display").as("display")
+          )
+        )(0)
+      )
       .withColumn("genome_build", filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code"))
+      .withColumn("pipeline", filter(col("workflow")("extension"), col => col("url") === "pipeline")(0)("valueString"))
       .withColumn("_for", regexp_extract(col("for")("reference"), patientExtract, 1))
       .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
       .withColumn("analysis_files", transform(col("output"), col => struct(col("type")("coding")(0)("code") as "data_type", col("valueReference")("reference") as "file_id")))
     ),
-    Drop("seq_exp", "extension", "workflow", "code", "output", "for")
+    Drop("seq_exp", "extension", "workflow", "task_sample_ext", "code", "output", "for")
   )
 
   val biospecimenMappings: List[Transformation] = List(
@@ -168,7 +206,7 @@ object Transformations {
       .withColumn("contact_extensions", flatten(col("contact")("extension")))
       .withColumn("contact_institutions", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_INSTITUTIONS_SD), col => col("valueString")))
       .withColumn("contact_emails", transform(filter(col("contact_extensions"), col => col("url") === CONTACT_TYPE_SD), col => col("valueString")))
-      .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url")))
+      .withColumn("website", transform(filter(col("relatedArtifact"), col => col("label") === "StudyWebsite"), col => col("url"))(0))
       .withColumn("citation_statement", citationsOf("CitationStatement")(0))
       .withColumn("selection_criteria", citationsOf("SelectionCriteria")(0))
       .withColumn("funding_sources", citationsOf("FundingSource"))

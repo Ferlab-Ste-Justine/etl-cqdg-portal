@@ -7,19 +7,19 @@ package models
 
 
 
-case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000212",
-                                         `participant_id`: String = "PRT0000003",
-                                         `biospecimen_reference`: Seq[String] = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
+case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000101",
+                                         `participant_id`: String = "PRT0000004",
+                                         `biospecimen_reference`: Seq[String] = Seq("SAM0000003", "SAM0000004", "SAM0000001"),
                                          `data_type`: String = "Annotated-SNV",
                                          `data_category`: String = "genomics",
                                          `dataset`: String = "d1",
                                          `files`: Seq[FILES] = Seq(FILES()),
-                                         `study_id`: String = "CAG",
+                                         `study_id`: String = "study1",
                                          `relates_to`: Option[String] = None,
-                                         `security`: String = "R")
+                                         `security`: String = null)
 
-case class FILES(`file_name`: String = "FIL0000212.variants_12345.snv.vep.vcf.gz",
+case class FILES(`file_name`: String = "FIL0000101.variants_HSJ0140.vep.vcf.gz",
                  `file_format`: String = "VCF",
                  `file_size`: Float = 8.0f,
-                 `ferload_url`: String = "s3://cqdg-dev-file-import/studies/CAG/study_version_1/vcf_annotated/variants_12345.snv.vep.vcf.gz",
+                 `ferload_url`: String = "s3://cqdg-dev-file-import/studies/study1/study_version_1/WGS/annotation/variants_HSJ0140.vep.vcf.gz",
                  `file_hash`: Option[String] = None)

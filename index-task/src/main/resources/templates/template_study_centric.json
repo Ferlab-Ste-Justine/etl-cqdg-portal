@@ -136,6 +136,16 @@
             "experimental_strategies": {
               "type": "keyword"
             },
+            "experimental_strategies_1": {
+              "properties": {
+                "code": {
+                    "type": "keyword"
+                },
+                "display": {
+                  "type": "keyword"
+                }
+              }
+            },
             "participant_count": {
               "type": "integer"
             },
@@ -161,6 +171,24 @@
           "properties": {
             "experimental_strategy": {
               "type": "keyword"
+            },
+            "file_count": {
+              "type": "integer"
+            }
+          }
+        },
+        "experimental_strategies_1": {
+          "type": "nested",
+          "properties": {
+            "experimental_strategy": {
+              "properties": {
+                "code": {
+                  "type": "keyword"
+                },
+                "display": {
+                  "type": "keyword"
+                }
+              }
             },
             "file_count": {
               "type": "integer"

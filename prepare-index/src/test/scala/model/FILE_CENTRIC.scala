@@ -17,6 +17,7 @@ case class FILE_CENTRIC(
                          participants: Seq[PARTICIPANT_WITH_BIOSPECIMEN] = Seq.empty,
                          study: STUDY_LIGHT = STUDY_LIGHT(),
                          sequencing_experiment: SEQUENCING_EXPERIMENT_SINGLE = SEQUENCING_EXPERIMENT_SINGLE(),
+                         `sample`: Option[TASK_SAMPLE] = Some(TASK_SAMPLE()),
                        )
 
 case class FILE_FACET_IDS(

@@ -10,11 +10,11 @@ package models
 case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000001",
                               `sex`: String = "female",
                               `deceasedBoolean`: Boolean = false,
-                              `age_at_recruitment`: String = "HP:0003584",
-                              `ethnicity`: String = "French Canadian",
-                              `submitter_participant_id`: String = "35849409716",
+                              `age_at_recruitment`: String = "HP:0011462",
+                              `ethnicity`: String = null,
+                              `submitter_participant_id`: String = "HSJ-184-106",
                               `vital_status`: String = "Alive",
-                              `age_of_death`: String = "HP:0003593",
-                              `study_id`: String = "CAG",
-                              `security`: String = "R")
+                              `age_of_death`: String = null,
+                              `study_id`: String = "study1",
+                              `security`: String = null)
 

@@ -8,7 +8,7 @@ package models
 
 
 case class NORMALIZED_DISEASE_STATUS(`fhir_id`: String = "FAM0000001DS",
-                                     `subject`: String = "PRT0000001",
-                                     `disease_status`: String = "Unknown",
-                                     `study_id`: String = "CAG")
+                                     `subject`: String = "PRT0000004",
+                                     `disease_status`: String = "Yes",
+                                     `study_id`: String = "study1")
 

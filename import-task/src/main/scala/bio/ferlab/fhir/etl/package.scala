@@ -12,11 +12,14 @@ package object etl {
   val DOCUMENT_DATA_CATEGORY = s"$SYSTEM_URL_CQDG/CodeSystem/data-category"
   val TASK_BIO_INFO = s"$SYSTEM_URL_CQDG/CodeSystem/bioinfo-analysis-code"
   val DATASETS_CS = s"$SYSTEM_URL_CQDG/CodeSystem/cqdg-dataset-cs"
+  val SOURCE_CS = s"$SYSTEM_URL_CQDG/CodeSystem/sequencing-experiment-source"
+  val SELECTION_CS = s"$SYSTEM_URL_CQDG/CodeSystem/sequencing-experiment-selection"
 
   //  *********** STRUCTURE DEFINITION **************
   val AGE_AT_EVENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtEvent"
   val SEQUENCING_EXPERIMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SequencingExperimentExtension"
   val WORKFLOW_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/WorkflowExtension"
+  val TASK_SAMPLE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SampleExtension"
   val DOCUMENT_SIZE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/FullSizeExtension"
   val AGE_AT_RECRUITMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtRecruitment"
   // Patient
