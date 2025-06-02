@@ -3,6 +3,7 @@ package model
 case class SEQUENCING_EXPERIMENT_SINGLE(
                                   `owner`: String = "CQDG",
                                   `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
+                                  `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
                                   `selection`: CODEABLE = CODEABLE("RR", "RR_display"),
                                   `source`: CODEABLE = CODEABLE("TSC", "TSC_display"),
                                   `protocol`: String = "protocol2",

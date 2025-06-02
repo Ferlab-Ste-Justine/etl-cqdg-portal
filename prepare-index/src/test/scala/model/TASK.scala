@@ -6,8 +6,8 @@ case class TASK(
                  `bio_informatic_analysis`: String = "GGBA",
                  `lab_aliquot_ids`: Seq[String] = Seq("nanuq_sample_id"),
                  `ldm_sample_id`: String = "S16523",
-                 `run_ids`: Seq[String] = Seq("runNameExample"), //TODO
-                 `run_dates`: Seq[String] = Seq("2007-04-14"), //TODO
+                 `run_ids`: Seq[String] = Seq("runNameExample"),
+                 `run_dates`: Seq[String] = Seq("2007-04-14"),
                  `read_length`: Option[String] = Some("151"),
                  `selection`: CODEABLE = CODEABLE("RR", "RR_display"),
                  `source`: CODEABLE = CODEABLE("TSC", "TSC_display"),
@@ -18,6 +18,7 @@ case class TASK(
                  `is_paired_end`: Boolean = true,
                  `capture_kit`: String = "RocheKapaHyperExome",
                  `platform`: String = "Illumina",
+                 `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
                  `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
                  `sequencer_id`: String = "NB552318",
                  `genome_build`: String = "GRCh38",

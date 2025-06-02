@@ -60,6 +60,10 @@ object Transformations {
           filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("display").as("display")
         )
       )
+      .withColumn( //FIXME remove this field after all studies are updated (replace _1)
+        "experimental_strategy",
+        filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code")
+      )
       .withColumn("sequencer_id", filter(col("seq_exp")("extension"), col => col("url") === "sequencerId")(0)("valueString"))
       .withColumn(
         "source",

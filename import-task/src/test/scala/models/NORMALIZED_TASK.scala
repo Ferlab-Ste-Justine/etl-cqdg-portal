@@ -25,6 +25,7 @@ case class NORMALIZED_TASK(`fhir_id`: String = "SXP0000001",
                            `capture_kit`: Option[String] = None,
                            `platform`: String = "Illumina HiSeq 2000 PE100",
                            `experimental_strategy_1`: CODEABLE = CODEABLE("WGS"),
+                           `experimental_strategy`: String = "WGS", // FIXME remove this field after all studies are updated (replace _1)
                            `sequencer_id`: Option[String] = None,
                            `genome_build`: String = "GRCh38",
                            `_for`: String = "PRT0000003",
