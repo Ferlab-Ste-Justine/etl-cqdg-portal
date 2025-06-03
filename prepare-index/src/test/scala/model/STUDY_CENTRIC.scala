@@ -64,6 +64,7 @@ case class DATASET(
                     `name`: String = "name 1",
                     `description`: Option[String] = None,
                     `data_types`: Seq[String] = Seq("SNV"),
+                    `experimental_strategies`: Seq[String] = Seq("WGS"),
                     `experimental_strategies_1`: Seq[CODEABLE] = Seq(CODEABLE("WGS")),
                     `participant_count`: Int = 100,
                     `file_count`: Int = 100,

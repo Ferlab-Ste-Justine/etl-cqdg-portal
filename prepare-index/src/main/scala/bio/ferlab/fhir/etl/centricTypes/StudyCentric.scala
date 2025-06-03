@@ -126,7 +126,10 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       ))
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("title", "name")
-      // TODO this column is temporary and will be removed in the future -
+      .drop("fhir_id", "access_requirements", "access_limitations", "data_sets")
+
+    // TODO these column are temporary and will be removed in the future -
+    val updateTempDF= transformedStudyDf
       .withColumn(
         "experimental_strategies",
         sparkTransform(
@@ -137,8 +140,25 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
           )
         )
       )
-      .drop("fhir_id", "access_requirements", "access_limitations", "data_sets")
+      .withColumn(
+        "datasets",
+        sparkTransform(
+          col("datasets"),
+          element => struct(
+            element("name") as "name",
+            element("description") as "description",
+            element("data_types") as "data_types",
+            element("experimental_strategies_1") as "experimental_strategies_1",
+            sparkTransform(
+              element("experimental_strategies_1"),
+              exp => exp("code")
+            ) as "experimental_strategies",
+            element("file_count") as "file_count",
+            element("participant_count") as "participant_count"
+          )
+        )
+      )
 
-    Map(mainDestination.id -> transformedStudyDf)
+    Map(mainDestination.id -> updateTempDF)
   }
 }
