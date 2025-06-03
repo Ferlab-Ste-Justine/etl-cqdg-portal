@@ -126,6 +126,17 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       ))
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("title", "name")
+      // TODO this column is temporary and will be removed in the future -
+      .withColumn(
+        "experimental_strategies",
+        sparkTransform(
+          col("experimental_strategies_1"),
+          element => struct(
+            element("experimental_strategy_1")("code") as "experimental_strategy",
+            element("file_count") as "file_count"
+          )
+        )
+      )
       .drop("fhir_id", "access_requirements", "access_limitations", "data_sets")
 
     Map(mainDestination.id -> transformedStudyDf)

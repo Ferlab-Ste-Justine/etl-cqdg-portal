@@ -33,6 +33,7 @@ case class STUDY_CENTRIC (
                            `family_count`: Int = 1,
                            `sample_count`: Int = 1,
                            `experimental_strategies_1`: Seq[(CODEABLE, String)] = Seq((CODEABLE("WXS"), "6")),
+                           `experimental_strategies`: Seq[(String, String)] = Seq(("WXS", "6")),
                            `family_data`: Boolean = true,
                            `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                            `study_id`: String = "STU0000001",
