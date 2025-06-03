@@ -41,7 +41,7 @@ object Transformations {
         "run_dates",
         transform(
           filter(col("seq_exp")("extension"), col => col("url") === "runDates")("valueDate"),
-          date => date_from_unix_date(date)
+          date => date_format(date_from_unix_date(date), "yyyy-MM-dd")
         )
       )
       .withColumn("read_length", split(filter(col("seq_exp")("extension"), col => col("url") === "readLength")(0)("valueString"), ",")(0))
