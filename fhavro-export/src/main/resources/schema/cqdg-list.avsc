@@ -433,6 +433,152 @@
                         "string"
                       ],
                       "default":null
+                    },
+                    {
+                      "name": "extension",
+                      "type": {
+                        "type": "array",
+                        "items": {
+                          "type": "record",
+                          "name": "ExtensionInner",
+                          "doc": "An Extension",
+                          "namespace": "bio.ferlab.fhir",
+                          "fields": [
+                            {
+                              "name": "url",
+                              "type": [
+                                "null",
+                                "string"
+                              ],
+                              "default": null
+                            },
+                            {
+                              "name":"valueString",
+                              "type":[
+                                "null",
+                                "string"
+                              ],
+                              "default":null
+                            },
+                            {
+                              "name": "valueInteger",
+                              "type": [
+                                "null",
+                                "int"
+                              ],
+                              "default": null
+                            },
+                            {
+                              "name": "valueUrl",
+                              "type": [
+                                "null",
+                                "string"
+                              ],
+                              "default": null
+                            },
+                            {
+                              "name":"valueContactPoint",
+                              "type":{
+                                "type":"record",
+                                "name":"ContactPoint",
+                                "doc":"Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.",
+                                "namespace":"bio.ferlab.fhir",
+                                "fields":[
+                                  {
+                                    "name":"id",
+                                    "type":[
+                                      "null",
+                                      "string"
+                                    ],
+                                    "default":null
+                                  },
+                                  {
+                                    "name":"system",
+                                    "type":[
+                                      "null",
+                                      "string"
+                                    ],
+                                    "default":null
+                                  },
+                                  {
+                                    "name":"value",
+                                    "type":[
+                                      "null",
+                                      "string"
+                                    ],
+                                    "default":null
+                                  },
+                                  {
+                                    "name":"use",
+                                    "type":[
+                                      "null",
+                                      "string"
+                                    ],
+                                    "default":null
+                                  },
+                                  {
+                                    "name":"rank",
+                                    "type":[
+                                      "null",
+                                      "int"
+                                    ],
+                                    "default":null
+                                  },
+                                  {
+                                    "type":"bio.ferlab.fhir.Period",
+                                    "name":"period",
+                                    "default":{
+
+                                    }
+                                  }
+                                ],
+                                "default":{
+
+                                }
+                              },
+                              "default":{
+
+                              }
+                            },
+                            {
+                              "name": "extension",
+                              "type": {
+                                "type": "array",
+                                "items": {
+                                  "type": "record",
+                                  "name": "ExtensionInnerInner",
+                                  "doc": "An Extension",
+                                  "namespace": "bio.ferlab.fhir",
+                                  "fields": [
+                                    {
+                                      "name": "url",
+                                      "type": [
+                                        "null",
+                                        "string"
+                                      ],
+                                      "default": null
+                                    },
+                                    {
+                                      "name": "valueUrl",
+                                      "type": [
+                                        "null",
+                                        "string"
+                                      ],
+                                      "default": null
+                                    }
+                                  ],
+                                  "default": {}
+                                },
+                                "default": []
+                              },
+                              "default": []
+                            }
+                          ],
+                          "default": {}
+                        },
+                        "default": []
+                      },
+                      "default": []
                     }
                   ],
                   "default": {}

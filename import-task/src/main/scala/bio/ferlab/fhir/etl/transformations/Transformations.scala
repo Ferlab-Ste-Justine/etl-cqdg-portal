@@ -94,6 +94,28 @@ object Transformations {
     Drop("seq_exp", "extension", "workflow", "task_sample_ext", "code", "output", "for")
   )
 
+  val listMappings: List[Transformation] = List(
+    Custom(_
+      .select("fhir_id", "study_id", "identifier", "title", "entry", "extension")
+      .withColumn("nameEn", col("title"))
+      .withColumn("studies", transform(col("entry"), e => e("item")("reference")))
+      .withColumn("program_id", col("identifier")(0)("value"))
+      .withColumn("research_program_ext", firstNonNull(filter(col("extension"), col => col("url") === RESEARCH_PROGRAM_SD))("extension"))
+      .withColumn("descriptionFR", filter(col("research_program_ext"), col => col("url") === "descriptionFR")(0)("valueString"))
+      .withColumn("descriptionEN", filter(col("research_program_ext"), col => col("url") === "descriptionEN")(0)("valueString"))
+      .withColumn("research_program_related_artifact_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)(0)("extension")(0))
+//      .withColumn("research_program_related_artifact", struct(
+//        col("research_program_related_artifact_raw")("website") as "website",
+//        col("research_program_related_artifact_raw")("citationStatement") as "citationStatement",
+//        col("research_program_related_artifact_raw")("logo") as "logo"
+//      ))
+
+      .withColumn("research_program_contacts", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_CONTACT_SD))
+      .withColumn("research_program_partners", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_PARTNER_SD))
+    ),
+    Drop("title", "entry", "extension", "identifier")
+  )
+
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
       .select("fhir_id", "extension", "identifier", "subject", "study_id", "type", "meta", "parent")
@@ -311,6 +333,7 @@ object Transformations {
   val extractionMappings: Map[String, List[Transformation]] = Map(
     "patient" -> patientMappings,
     "task" -> taskMappings,
+    "list" -> listMappings,
     "biospecimen" -> biospecimenMappings,
     "sample_registration" -> sampleRegistrationMappings,
     "research_study" -> researchstudyMappings,

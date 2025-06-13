@@ -31,7 +31,8 @@ object ConfigurationGenerator extends App {
     SourceConfig("observation", Some("family_relationship"), partitionByStudyIdAndReleaseId),
     SourceConfig("observation", Some("tumor_normal_designation"), partitionByStudyIdAndReleaseId),
     SourceConfig("group", None, partitionByStudyIdAndReleaseId),
-    SourceConfig("task", None, partitionByStudyIdAndReleaseId)
+    SourceConfig("task", None, partitionByStudyIdAndReleaseId),
+    SourceConfig("list", None, partitionByStudyIdAndReleaseId)
   )
 
   val storage = "storage"
