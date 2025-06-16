@@ -103,17 +103,63 @@ object Transformations {
       .withColumn("research_program_ext", firstNonNull(filter(col("extension"), col => col("url") === RESEARCH_PROGRAM_SD))("extension"))
       .withColumn("descriptionFR", filter(col("research_program_ext"), col => col("url") === "descriptionFR")(0)("valueString"))
       .withColumn("descriptionEN", filter(col("research_program_ext"), col => col("url") === "descriptionEN")(0)("valueString"))
-      .withColumn("research_program_related_artifact_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)(0)("extension")(0))
-//      .withColumn("research_program_related_artifact", struct(
-//        col("research_program_related_artifact_raw")("website") as "website",
-//        col("research_program_related_artifact_raw")("citationStatement") as "citationStatement",
-//        col("research_program_related_artifact_raw")("logo") as "logo"
-//      ))
-
-      .withColumn("research_program_contacts", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_CONTACT_SD))
-      .withColumn("research_program_partners", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_PARTNER_SD))
+      .withColumn("research_program_related_artifact_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)(0)("extension"))
+      .withColumn("research_program_related_artifact", struct(
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "website"))("valueUrl") as "website",
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "citationStatement"))("valueString") as "citation_statement",
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "logo"))("valueUrl") as "logo",
+      ))
+      .withColumn("research_program_contacts_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_CONTACT_SD))
+      .withColumn(
+        "research_program_contacts",
+        transform(
+          col("research_program_contacts_raw"),
+          contact =>
+            struct(
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "name")
+              )("valueString").as("name"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "contactInstitution")
+              )("valueString").as("contact_institution"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "ProgramRoleEN")
+              )("valueString").as("program_role_en"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "ProgramRoleFR")
+              )("valueString").as("program_role_fr"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)
+              )("extension")(0)("valueUrl").as("contact_picture"),
+                 transform(filter(contact("extension"), ext => ext("url") === "telecom")("valueContactPoint"),
+                   col => struct(col("value"), col("system"))).as("telecom")
+            )
+        )
+      )
+      .withColumn("research_program_partners_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_PARTNER_SD))
+      .withColumn(
+        "research_program_partners",
+        transform(
+          col("research_program_partners_raw"),
+          contact =>
+            struct(
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "name")
+              )("valueString").as("name"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "logo")
+              )("valueUrl").as("logo"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === "rank")
+              )("valueInteger").as("rank"),
+            )
+        )
+      )
     ),
-    Drop("title", "entry", "extension", "identifier")
+    Drop("title", "entry", "extension", "identifier", "research_program_related_artifact_raw", "research_program_contacts_raw")
   )
 
   val biospecimenMappings: List[Transformation] = List(

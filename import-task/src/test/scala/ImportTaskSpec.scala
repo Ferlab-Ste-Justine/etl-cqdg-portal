@@ -86,9 +86,7 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     val task = dfs.flatMap(p => p.find(q => q._1 == "normalized_task")).head._2.as[NORMALIZED_TASK].collect()
     val list = dfs.flatMap(p => p.find(q => q._1 == "normalized_list")).head._2 //.as[NORMALIZED_TASK].collect()
 
-    list.select("research_program_related_artifact_raw").printSchema()
-    list.select("research_program_related_artifact_raw", "research_program_related_artifact").show(false)
-//    list.show(false)
+    list.show(false)
 
     patients.filter(_.`fhir_id` == "PRT0000001").head shouldEqual NORMALIZED_PATIENT()
     normalizedDiagnosis.filter(_.`subject` == "PRT0000001").head shouldEqual NORMALIZED_DIAGNOSIS()
