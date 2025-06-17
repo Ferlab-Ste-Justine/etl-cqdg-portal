@@ -84,9 +84,7 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     val normalizedDocumentReference = dfs.flatMap(p => p.find(q => q._1 == "normalized_document_reference")).head._2.as[NORMALIZED_DOCUMENT_REFERENCE].collect()
     val group = dfs.flatMap(p => p.find(q => q._1 == "normalized_group")).head._2.as[NORMALIZED_GROUP].collect()
     val task = dfs.flatMap(p => p.find(q => q._1 == "normalized_task")).head._2.as[NORMALIZED_TASK].collect()
-    val list = dfs.flatMap(p => p.find(q => q._1 == "normalized_list")).head._2 //.as[NORMALIZED_TASK].collect()
-
-    list.show(false)
+    val list = dfs.flatMap(p => p.find(q => q._1 == "normalized_list")).head._2.as[NORMALIZED_LIST].collect()
 
     patients.filter(_.`fhir_id` == "PRT0000001").head shouldEqual NORMALIZED_PATIENT()
     normalizedDiagnosis.filter(_.`subject` == "PRT0000001").head shouldEqual NORMALIZED_DIAGNOSIS()
@@ -98,5 +96,16 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     normalizedDocumentReference.filter(_.`fhir_id` == "FIL0000101").head shouldBe NORMALIZED_DOCUMENT_REFERENCE()
     group.filter(_.`internal_family_id` == "FM00000001").head shouldEqual NORMALIZED_GROUP()
     task.filter(_.`fhir_id` == "SXP0000001").head shouldEqual NORMALIZED_TASK()
+    list.head shouldEqual NORMALIZED_LIST(
+      research_program_contacts = Seq(
+        RESEARCH_PROGRAM_CONTACTS(`telecom` = Seq.empty[TELECOM]),
+        RESEARCH_PROGRAM_CONTACTS(`name` = null, `institution` = "RI-MUHC", `role_en` = null, `role_fr` = null,
+          `picture_url` = null, `telecom` = Seq(TELECOM(), TELECOM(`value` = "info@rare.quebec", `system` = "email"))),
+      ),
+      research_program_partners = Seq(
+        RESEARCH_PROGRAM_PARTNERS(),
+        RESEARCH_PROGRAM_PARTNERS(`name` = "Genome Quebec", `logo` = "/partners_logos/genome_qc.svg", `rank` = 1),
+      ),
+    )
   }
 }
