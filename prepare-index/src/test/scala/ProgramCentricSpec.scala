@@ -1,13 +1,14 @@
 import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
-import bio.ferlab.fhir.etl.centricTypes.StudyCentric
+import bio.ferlab.fhir.etl.centricTypes.{ProgramCentric, StudyCentric}
 import model._
+import model.centric.PROGRAM_CENTRIC
 import model.input.LIST_INPUT
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
+class ProgramCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
@@ -59,42 +60,21 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
   val studyDataset: Seq[DATASET_INPUT] = Seq(DATASET_INPUT(`name` = "dataset1", `description` = None), DATASET_INPUT(`name` = "dataset2", `description` = Some("desc")))
 
 
-  "transform" should "prepare index study_centric" in {
+  "transform" should "prepare index program_centric" in {
     val data: Map[String, DataFrame] = Map(
-      "normalized_research_study" -> Seq(RESEARCHSTUDY(`data_sets` = studyDataset)).toDF(),
-      "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
-      "normalized_document_reference" -> Seq(document1, document2, document3, document4, document5, document6, document12, document7).toDF(),
-      "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
-      "normalized_group" -> Seq(group1, group2).toDF(),
-      "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
-      "normalized_task" -> Seq(TASK()).toDF(),
       "normalized_list" -> Seq(LIST_INPUT()).toDF(),
-      "normalized_phenotype" -> Seq(phenotype1, phenotype2, phenotype3).toDF(),
-      "normalized_biospecimen" -> Seq(biospecimen1, biospecimen2).toDF(),
-      "normalized_sample_registration" -> Seq(sample1, sample2, sample3, sample4).toDF(),
-      "duo_terms" -> read(getClass.getResource("/duo_terms.csv").toString, "csv", Map("header" -> "true"), None, None),
     )
 
-    val output = new StudyCentric(List("STU0000001"))(conf).transform(data)
+    val output = new ProgramCentric()(conf).transform(data)
 
-    output.keys should contain("es_index_study_centric")
+    output.keys should contain("es_index_program_centric")
 
-    val study_centric = output("es_index_study_centric")
+    val program_centric = output("es_index_program_centric")
 
-    val studyCentricOutput = STUDY_CENTRIC(
-      `participant_count` = 2, // PRT0000001, PRT0000002
-      `data_types` = Seq(("SSUP","1"),("Annotated-SNV","1"), ("SNV","1"), ("GCNV","2"), ("ALIR","1"), ("GSV","1")),
-      `sample_count` = 4,
-      `file_count` = 7,
-      `datasets` = Seq(
-        // Dataset file_count should be 6 as CRAI files should be excluded
-        DATASET(`name` = "dataset1", `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"), `experimental_strategies` = Seq("WXS"), `experimental_strategies_1` = Seq(CODEABLE("WXS")), `participant_count` = 1, `file_count` = 6),
-        DATASET(`name` = "dataset2", `description` = Some("desc"), `data_types` = Seq("GCNV"), `experimental_strategies` = Nil, `experimental_strategies_1` = Nil, `participant_count` = 1, `file_count` = 1)
-      )
-    )
+    val programCentricOutput = PROGRAM_CENTRIC()
 
-    study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs
-      Seq(studyCentricOutput)
+    program_centric.as[PROGRAM_CENTRIC].collect() should contain theSameElementsAs
+      Seq(programCentricOutput)
   }
 
 }

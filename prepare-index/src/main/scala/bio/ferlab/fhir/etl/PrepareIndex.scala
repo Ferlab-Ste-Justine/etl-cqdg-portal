@@ -1,7 +1,7 @@
 package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.spark3.SparkApp
-import bio.ferlab.fhir.etl.centricTypes.{BiospecimenCentric, FileCentric, ParticipantCentric, SimpleParticipant, StudyCentric}
+import bio.ferlab.fhir.etl.centricTypes.{BiospecimenCentric, FileCentric, ParticipantCentric, ProgramCentric, SimpleParticipant, StudyCentric}
 import org.apache.spark.sql.functions.col
 
 object PrepareIndex extends SparkApp {
@@ -39,5 +39,6 @@ object PrepareIndex extends SparkApp {
       new ParticipantCentric(filteredStudies).run()
       new FileCentric(filteredStudies).run()
       new BiospecimenCentric(filteredStudies).run()
+      new ProgramCentric().run()
   }
 }

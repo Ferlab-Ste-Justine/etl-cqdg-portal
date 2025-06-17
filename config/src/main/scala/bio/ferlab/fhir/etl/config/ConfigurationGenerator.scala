@@ -78,6 +78,7 @@ object ConfigurationGenerator extends App {
       Index("participant_centric", partitionByStudyIdAndReleaseId),
       Index("file_centric", partitionByStudyIdAndReleaseId),
       Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
+      Index("program_centric", partitionByStudyIdAndReleaseId),
     ).flatMap(index => {
       Seq(
         DatasetConf(

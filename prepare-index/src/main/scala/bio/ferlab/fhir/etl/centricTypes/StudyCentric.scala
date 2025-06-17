@@ -18,6 +18,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
   val normalized_group: DatasetConf = conf.getDataset("normalized_group")
   val normalized_diagnosis: DatasetConf = conf.getDataset("normalized_diagnosis")
   val normalized_task: DatasetConf = conf.getDataset("normalized_task")
+  val normalized_list: DatasetConf = conf.getDataset("normalized_list")
   val normalized_biospecimen: DatasetConf = conf.getDataset("normalized_biospecimen")
   val normalized_phenotype: DatasetConf = conf.getDataset("normalized_phenotype")
   val normalized_sequencing_experiment: DatasetConf = conf.getDataset("normalized_task")
@@ -28,7 +29,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
     Seq(
       normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
       normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen,
-      normalized_sample_registration)
+      normalized_sample_registration, normalized_list)
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))).toMap
 
   }
@@ -70,6 +71,16 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       participantsWithFiles
         .groupBy("study_id")
         .agg(size(collect_set("subject")) as "participant_count")
+
+    val programDf = data(normalized_list.id)
+      .select("fhir_id", "studies")
+      .withColumn("study_id", explode(col("studies")))
+      .groupBy("study_id")
+      .agg(
+        collect_set(
+          col("fhir_id"),
+        ) as "programs",
+      )
 
     val participantsRenamed = data(normalized_patient.id).withColumnRenamed("fhir_id", "participant_id")
 
@@ -126,6 +137,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       ))
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("title", "name")
+      .join(programDf, Seq("study_id"), "left_outer")
       .drop("fhir_id", "access_requirements", "access_limitations", "data_sets")
 
     // TODO these column are temporary and will be removed in the future -
