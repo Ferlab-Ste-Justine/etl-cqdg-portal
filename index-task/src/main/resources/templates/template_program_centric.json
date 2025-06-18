@@ -1,0 +1,115 @@
+{
+  "index_patterns" : ["program_centric*"],
+  "priority" : 1,
+  "template": {
+    "settings" : {
+      "number_of_shards" : 5,
+      "index": {
+        "max_result_window" : 10000
+      },
+      "analysis": {
+        "normalizer": {
+          "custom_normalizer": {
+            "type": "custom",
+            "char_filter": [],
+            "filter": "lowercase"
+          }
+        }
+      }
+    },
+    "mappings": {
+      "properties": {
+        "program_id": {
+          "type": "keyword"
+        },
+        "name_en": {
+          "type": "keyword"
+        },
+        "name_fr": {
+          "type": "keyword"
+        },
+        "studies": {
+          "type": "keyword"
+        },
+        "description_fr": {
+          "type": "keyword"
+        },
+        "description_en": {
+          "type": "keyword"
+        },
+        "website": {
+          "type": "keyword"
+        },
+        "citation_statement": {
+          "type": "keyword"
+        },
+        "logo_url": {
+          "type": "keyword"
+        },
+        "managers": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "institution": {
+              "type": "keyword"
+            },
+            "role_en": {
+              "type": "keyword"
+            },
+            "role_fr": {
+              "type": "keyword"
+            },
+            "picture_url": {
+              "type": "keyword"
+            },
+            "email": {
+              "type": "keyword"
+            },
+            "website": {
+              "type": "keyword"
+            }
+          }
+        },
+        "contacts": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "institution": {
+              "type": "keyword"
+            },
+            "role_en": {
+              "type": "keyword"
+            },
+            "role_fr": {
+              "type": "keyword"
+            },
+            "picture_url": {
+              "type": "keyword"
+            },
+            "email": {
+              "type": "keyword"
+            },
+            "website": {
+              "type": "keyword"
+            }
+          }
+        },
+        "partners": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "logo_url": {
+              "type": "keyword"
+            },
+            "rank": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

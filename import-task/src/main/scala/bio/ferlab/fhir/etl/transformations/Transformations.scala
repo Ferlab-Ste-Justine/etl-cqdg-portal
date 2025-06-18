@@ -94,6 +94,10 @@ object Transformations {
     Drop("seq_exp", "extension", "workflow", "task_sample_ext", "code", "output", "for")
   )
 
+  private def firstValue(contact: Column, key: String, valueType: String = "valueString"): Column =
+    firstNonNull(filter(contact("extension"), ext => ext("url") === key))(valueType)
+
+
   val listMappings: List[Transformation] = List(
     Custom(_
       .select("fhir_id", "study_id", "identifier", "title", "entry", "extension")
@@ -120,18 +124,10 @@ object Transformations {
           col("research_program_contacts_raw"),
           contact =>
             struct(
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "name")
-              )("valueString").as("name"),
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "contactInstitution")
-              )("valueString").as("institution"),
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "ProgramRoleEN")
-              )("valueString").as("role_en"),
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "ProgramRoleFR")
-              )("valueString").as("role_fr"),
+              firstValue(contact, "name").as("name"),
+              firstValue(contact, "contactInstitution").as("institution"),
+              firstValue(contact, "ProgramRoleEN").as("role_en"),
+              firstValue(contact, "ProgramRoleFR").as("role_fr"),
               firstNonNull(
                 filter(contact("extension"), ext => ext("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)
               )("extension")(0)("valueUrl").as("picture_url"),
@@ -147,15 +143,9 @@ object Transformations {
           col("research_program_partners_raw"),
           contact =>
             struct(
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "name")
-              )("valueString").as("name"),
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "logo")
-              )("valueUrl").as("logo"),
-              firstNonNull(
-                filter(contact("extension"), ext => ext("url") === "rank")
-              )("valueInteger").as("rank"),
+              firstValue(contact, "name").as("name"),
+              firstValue(contact, "logo", "valueUrl").as("logo"),
+              firstValue(contact, "rank", "valueInteger").as("rank"),
             )
         )
       )
