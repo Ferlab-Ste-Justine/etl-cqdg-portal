@@ -16,7 +16,7 @@ object IndexTask extends App {
   val Array(
   release_id,       // release id
   study_ids,        // study ids separated by ;
-  jobType,          // study_centric or participant_centric or file_centric or biospecimen_centric
+  jobType,          // study_centric or participant_centric or file_centric or biospecimen_centric or program_centric
   env,            // qa/dev/prd
   project,        // cqdg
   esUrl,
@@ -74,25 +74,28 @@ object IndexTask extends App {
   implicit val esClient: ElasticSearchClient =
     new ElasticSearchClient(s"$esUrl:$esPort", esUsername, esPassword)
 
-  val ds: DatasetConf = jobType.toLowerCase match {
-    case "study_centric" => conf.getDataset("es_index_study_centric")
-    case "participant_centric" => conf.getDataset("es_index_participant_centric")
-    case "file_centric" => conf.getDataset("es_index_file_centric")
-    case "biospecimen_centric" => conf.getDataset("es_index_biospecimen_centric")
+  jobType.toLowerCase match {
+    case "program_centric" =>
+      println(s"Run Index Task to fill index program_centric_$release_id")
+      // Program is unic, not per study
+      val programDf: DataFrame = conf.getDataset("es_index_program_centric").read
+      new Indexer("index", templatePath, "program_centric").run(programDf)
+
+    case _ =>
+      val ds: DatasetConf = conf.getDataset(s"es_index_${jobType.toLowerCase}_$release_id")
+
+      val studyList = study_ids.split(",")
+
+      studyList.foreach(studyId => {
+        val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
+
+        println(s"Run Index Task to fill index $indexName")
+
+        val df: DataFrame = ds.read
+          .where(col("study_id") === studyId)
+
+        new Indexer("index", templatePath, indexName)
+          .run(df)
+      })
   }
-
-  val studyList = study_ids.split(",")
-
-  studyList.foreach(studyId => {
-    val indexName = s"${jobType}_${studyId}_$release_id".toLowerCase
-
-    println(s"Run Index Task to fill index $indexName")
-
-    val df: DataFrame = ds.read
-      .where(col("study_id") === studyId)
-
-    new Indexer("index", templatePath, indexName)
-      .run(df)
-  })
-
 }
