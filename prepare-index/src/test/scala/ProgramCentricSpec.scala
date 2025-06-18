@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.{ProgramCentric, StudyCentric}
 import model._
-import model.centric.PROGRAM_CENTRIC
+import model.centric.{PROGRAM_CENTRIC, CONTACT => PROGRAM_CONTACT}
 import model.input.LIST_INPUT
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
@@ -71,7 +71,10 @@ class ProgramCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession
 
     val program_centric = output("es_index_program_centric")
 
-    val programCentricOutput = PROGRAM_CENTRIC()
+    val programCentricOutput = PROGRAM_CENTRIC(`contacts` = Seq(
+      PROGRAM_CONTACT(`name` = null, `institution` = "RI-MUHC", `role_en` = null, `role_fr` = null,
+        `picture_url` = null, `email` = "info@rare.quebec", `website` = "https://rare.quebec")
+    ))
 
     program_centric.as[PROGRAM_CENTRIC].collect() should contain theSameElementsAs
       Seq(programCentricOutput)
