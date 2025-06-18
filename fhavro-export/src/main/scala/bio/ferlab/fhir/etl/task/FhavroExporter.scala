@@ -41,24 +41,6 @@ class FhavroExporter(bucketName: String, studyId: String)
     //should only be one matched
     val fhirStudy = fhirStudyBundle.getEntry.asScala.toList.headOption.map(_.getResource.asInstanceOf[ResearchStudy])
 
-//    val bundleWithStudy = bundle.withTag(null, s"study:$studyId")
-
-//    val bundleEnrichedWithVersion = fhirStudy match {
-//      case Some(study) => {
-//        val studyVersion = extractVersionFromRessource(study)
-//        if(studyVersion.isDefined){
-//          bundleWithStudy.withTag(null, studyVersion.get)
-//        } else {
-//          bundleWithStudy
-//        }
-//      }
-//      case None => bundleWithStudy
-//    }
-
-    //    val bundleEnriched = request.`type` match {
-    //      case "Organization" | "List" => bundle // fetch all
-    //      case _ => bundleEnrichedWithVersion    // filter by tags
-    //    }
     val bundleEnriched = request.`type` match {
       case "Organization" | "List" =>
         fhirClient.search()
