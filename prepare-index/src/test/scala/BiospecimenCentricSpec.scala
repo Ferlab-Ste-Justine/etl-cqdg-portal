@@ -94,8 +94,6 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     //B3 has a participant (NONE) that does exist
     biospecimenIds should not contain "B3"
 
-    output("es_index_biospecimen_centric").show(false)
-
     val biospecimen_centricCollect = output("es_index_biospecimen_centric").as[BIOSPECIMEN_CENTRIC].collect()
 
     biospecimen_centricCollect.find(_.`biospecimen_id` == "B1") shouldBe Some(

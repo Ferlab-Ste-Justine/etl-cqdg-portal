@@ -60,9 +60,6 @@ class ProgramCentric()(implicit configuration: Configuration) extends ETL {
       )
       .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom")
 
-    transformedProgramDf.select("managers","contacts").printSchema()
-    transformedProgramDf.select("managers", "contacts").show(false)
-
     Map(mainDestination.id -> transformedProgramDf)
   }
 }
