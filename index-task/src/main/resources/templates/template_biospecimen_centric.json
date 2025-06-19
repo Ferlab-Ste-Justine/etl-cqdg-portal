@@ -51,6 +51,19 @@
             "domain": {
               "type": "keyword"
             },
+            "programs": {
+              "properties": {
+                "program_id": {
+                  "type": "keyword"
+                },
+                "name_en": {
+                  "type": "keyword"
+                },
+                "name_fr": {
+                  "type": "keyword"
+                }
+              }
+            },
             "data_access_codes": {
               "properties": {
                 "access_requirements": {

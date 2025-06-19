@@ -8,7 +8,8 @@ object Utils {
 
   implicit class DataFrameOperations(df: DataFrame) {
     def addStudy(studyDf: DataFrame): DataFrame = {
-      val requiredStudyCols = Seq("study_code", "name", "population", "domain", "data_access_codes", "access_authority")
+      val requiredStudyCols = Seq("study_code", "name", "population", "domain", "data_access_codes",
+        "access_authority", "programs")
       val cols = studyDf.columns.filter(requiredStudyCols.contains(_))
 
       val refactorStudyDf = studyDf

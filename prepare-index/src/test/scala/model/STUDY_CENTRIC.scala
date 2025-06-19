@@ -18,7 +18,7 @@ case class STUDY_CENTRIC (
                            `study_code`: String = "cag",
                            `population`: String = "Adult",
                            `study_version`: String = "1",
-                           `programs`: Seq[String] = Seq("cqdg-program-rare-qc"),
+                           `programs`: Seq[PROGRAM] = Seq(PROGRAM()),
                            `expected_number_participants`: String = "12",
                            `expected_number_biospecimens`: String = "15",
                            `expected_number_files`: String = "16",
@@ -49,6 +49,7 @@ case class STUDY_LIGHT (
                          `domain`: Seq[String] = Seq("General health"),
                          `data_access_codes`: ACCESS_REQUIREMENTS = ACCESS_REQUIREMENTS(),
                          `access_authority`: CONTACT = CONTACT(),
+                         `programs`: Seq[PROGRAM] = Seq(PROGRAM()),
                          )
 
 case class DATA_ACCESS_CODES(
@@ -60,6 +61,12 @@ case class ACCESS_REQUIREMENTS(
                               `access_requirements`: Seq[String] = Seq("Ethics approval required (DUO:0000021)", "Project specific restriction (DUO:0000027)"),
                               `access_limitations`: Seq[String] = Seq("General research use (DUO:0000005)")
                               )
+
+case class PROGRAM(
+                    `program_id`: String = "RARE-QC",
+                    `name_en`: String = "RARE.Qc",
+                    `name_fr`: String = "RARE.Qc – Le réseau pour avancer la recherche en maladies rares au Québec"
+                  )
 
 case class DATASET(
                     `name`: String = "name 1",

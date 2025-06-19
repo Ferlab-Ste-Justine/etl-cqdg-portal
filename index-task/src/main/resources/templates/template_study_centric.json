@@ -99,6 +99,19 @@
         "study_version" : {
           "type" : "keyword"
         },
+        "programs": {
+          "properties": {
+            "program_id": {
+              "type": "keyword"
+            },
+            "name_en": {
+              "type": "keyword"
+            },
+            "name_fr": {
+              "type": "keyword"
+            }
+          }
+        },
         "data_types": {
           "type": "nested",
           "properties": {
