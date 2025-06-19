@@ -18,6 +18,7 @@ case class STUDY_CENTRIC (
                            `study_code`: String = "cag",
                            `population`: String = "Adult",
                            `study_version`: String = "1",
+                           `programs`: Seq[String] = Seq("cqdg-program-rare-qc"),
                            `expected_number_participants`: String = "12",
                            `expected_number_biospecimens`: String = "15",
                            `expected_number_files`: String = "16",

@@ -94,6 +94,66 @@ object Transformations {
     Drop("seq_exp", "extension", "workflow", "task_sample_ext", "code", "output", "for")
   )
 
+  private def firstValue(contact: Column, key: String, valueType: String = "valueString"): Column =
+    firstNonNull(filter(contact("extension"), ext => ext("url") === key))(valueType)
+
+
+  val listMappings: List[Transformation] = List(
+    Custom(_
+      .select("fhir_id", "study_id", "identifier", "title", "entry", "extension")
+      .withColumn("name_en", col("title"))
+      .withColumn("studies", transform(col("entry"), e => regexp_extract(e("item")("reference"), ".*/(.*)", 1)))
+      .withColumn("program_id", col("identifier")(0)("value"))
+      .withColumn("research_program_ext", firstNonNull(filter(col("extension"), col => col("url") === RESEARCH_PROGRAM_SD))("extension"))
+      .withColumn("name_fr", filter(col("research_program_ext"), col => col("url") === "nameFR")(0)("valueString"))
+      .withColumn("description_fr", filter(col("research_program_ext"), col => col("url") === "descriptionFR")(0)("valueString"))
+      .withColumn("description_en", filter(col("research_program_ext"), col => col("url") === "descriptionEN")(0)("valueString"))
+      .withColumn("research_program_related_artifact_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)(0)("extension"))
+      .withColumn("research_program_related_artifact", struct(
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "website"))("valueUrl") as "website",
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "citationStatement"))("valueString") as "citation_statement",
+        firstNonNull(filter(col("research_program_related_artifact_raw"),
+          col => col("url") === "logo"))("valueUrl") as "logo_url",
+      ))
+      .withColumn("research_program_contacts_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_CONTACT_SD))
+      .withColumn(
+        "research_program_contacts",
+        transform(
+          col("research_program_contacts_raw"),
+          contact =>
+            struct(
+              firstValue(contact, "name").as("name"),
+              firstValue(contact, "contactInstitution").as("institution"),
+              firstValue(contact, "ProgramRoleEN").as("role_en"),
+              firstValue(contact, "ProgramRoleFR").as("role_fr"),
+              firstNonNull(
+                filter(contact("extension"), ext => ext("url") === RESEARCH_PROGRAM_RELATED_ARTIFACT_SD)
+              )("extension")(0)("valueUrl").as("picture_url"),
+                 transform(filter(contact("extension"), ext => ext("url") === "telecom")("valueContactPoint"),
+                   col => struct(col("value"), col("system"))).as("telecom")
+            )
+        )
+      )
+      .withColumn("research_program_partners_raw", filter(col("research_program_ext"), col => col("url") === RESEARCH_PROGRAM_PARTNER_SD))
+      .withColumn(
+        "research_program_partners",
+        transform(
+          col("research_program_partners_raw"),
+          contact =>
+            struct(
+              firstValue(contact, "name").as("name"),
+              firstValue(contact, "logo", "valueUrl").as("logo"),
+              firstValue(contact, "rank", "valueInteger").as("rank"),
+            )
+        )
+      )
+    ),
+    Drop("title", "entry", "extension", "identifier", "research_program_related_artifact_raw",
+      "research_program_contacts_raw", "research_program_ext", "research_program_partners_raw")
+  )
+
   val biospecimenMappings: List[Transformation] = List(
     Custom { _
       .select("fhir_id", "extension", "identifier", "subject", "study_id", "type", "meta", "parent")
@@ -311,6 +371,7 @@ object Transformations {
   val extractionMappings: Map[String, List[Transformation]] = Map(
     "patient" -> patientMappings,
     "task" -> taskMappings,
+    "list" -> listMappings,
     "biospecimen" -> biospecimenMappings,
     "sample_registration" -> sampleRegistrationMappings,
     "research_study" -> researchstudyMappings,

@@ -41,23 +41,28 @@ class FhavroExporter(bucketName: String, studyId: String)
     //should only be one matched
     val fhirStudy = fhirStudyBundle.getEntry.asScala.toList.headOption.map(_.getResource.asInstanceOf[ResearchStudy])
 
-    val bundleWithStudy = bundle.withTag(null, s"study:$studyId")
-
-    val bundleEnrichedWithVersion = fhirStudy match {
-      case Some(study) => {
-        val studyVersion = extractVersionFromRessource(study)
-        if(studyVersion.isDefined){
-          bundleWithStudy.withTag(null, studyVersion.get)
-        } else {
-          bundleWithStudy
-        }
-      }
-      case None => bundleWithStudy
-    }
-
     val bundleEnriched = request.`type` match {
-      case "Organization" => bundle
-      case _ => bundleEnrichedWithVersion
+      case "Organization" | "List" =>
+        fhirClient.search()
+          .forResource(request.`type`)
+          .returnBundle(classOf[Bundle])
+      case _ =>
+        val bundleWithStudy = fhirClient.search()
+          .forResource(request.`type`)
+          .returnBundle(classOf[Bundle])
+          .withTag(null, s"study:$studyId")
+
+        val bundleEnrichedWithVersion = fhirStudy match {
+          case Some(study) =>
+            val studyVersion = extractVersionFromRessource(study)
+            if (studyVersion.isDefined) {
+              bundleWithStudy.withTag(null, studyVersion.get)
+            } else {
+              bundleWithStudy
+            }
+          case None => bundleWithStudy
+        }
+        bundleEnrichedWithVersion
     }
 
     request.profile.foreach(bundleEnriched.withProfile)

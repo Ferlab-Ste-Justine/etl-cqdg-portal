@@ -38,4 +38,8 @@ package object etl {
   val DATA_CATEGORY_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/DataCategoryExtension"
   val STUDY_DESIGN_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/StudyDesignExtension"
   val DATA_COLLECTION_METHODS_DS = s"$SYSTEM_URL_CQDG/StructureDefinition/DataCollectionMethodExtension"
+  val RESEARCH_PROGRAM_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/research-program"
+  val RESEARCH_PROGRAM_RELATED_ARTIFACT_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/research-program-related-artifact"
+  val RESEARCH_PROGRAM_CONTACT_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/research-program-contact"
+  val RESEARCH_PROGRAM_PARTNER_SD = s"$SYSTEM_URL_CQDG/StructureDefinition/research-program-partner"
 }
