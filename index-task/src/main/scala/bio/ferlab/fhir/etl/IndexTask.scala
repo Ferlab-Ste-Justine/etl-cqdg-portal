@@ -78,11 +78,11 @@ object IndexTask extends App {
     case "program_centric" =>
       println(s"Run Index Task to fill index program_centric_$release_id")
       // Program is unic, not per study
-      val programDf: DataFrame = conf.getDataset(s"es_index_program_centric_$release_id").read
-      new Indexer("index", templatePath, "program_centric").run(programDf)
+      val programDf: DataFrame = conf.getDataset(s"es_index_program_centric").read
+      new Indexer("index", templatePath, s"program_centric_$release_id").run(programDf)
 
     case _ =>
-      val ds: DatasetConf = conf.getDataset(s"es_index_${jobType.toLowerCase}_$release_id")
+      val ds: DatasetConf = conf.getDataset(s"es_index_${jobType.toLowerCase}")
 
       val studyList = study_ids.split(",")
 
