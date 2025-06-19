@@ -2,6 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.StudyCentric
 import model._
+import model.input.LIST_INPUT
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -67,6 +68,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "normalized_group" -> Seq(group1, group2).toDF(),
       "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
       "normalized_task" -> Seq(TASK()).toDF(),
+      "normalized_list" -> Seq(LIST_INPUT()).toDF(),
       "normalized_phenotype" -> Seq(phenotype1, phenotype2, phenotype3).toDF(),
       "normalized_biospecimen" -> Seq(biospecimen1, biospecimen2).toDF(),
       "normalized_sample_registration" -> Seq(sample1, sample2, sample3, sample4).toDF(),

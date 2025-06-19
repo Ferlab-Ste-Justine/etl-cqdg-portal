@@ -31,7 +31,8 @@ object ConfigurationGenerator extends App {
     SourceConfig("observation", Some("family_relationship"), partitionByStudyIdAndReleaseId),
     SourceConfig("observation", Some("tumor_normal_designation"), partitionByStudyIdAndReleaseId),
     SourceConfig("group", None, partitionByStudyIdAndReleaseId),
-    SourceConfig("task", None, partitionByStudyIdAndReleaseId)
+    SourceConfig("task", None, partitionByStudyIdAndReleaseId),
+    SourceConfig("list", None, partitionByStudyIdAndReleaseId)
   )
 
   val storage = "storage"
@@ -77,6 +78,7 @@ object ConfigurationGenerator extends App {
       Index("participant_centric", partitionByStudyIdAndReleaseId),
       Index("file_centric", partitionByStudyIdAndReleaseId),
       Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
+      Index("program_centric", partitionByStudyIdAndReleaseId),
     ).flatMap(index => {
       Seq(
         DatasetConf(
