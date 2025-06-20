@@ -102,7 +102,7 @@ object Transformations {
     Custom(_
       .select("fhir_id", "study_id", "identifier", "title", "entry", "extension")
       .withColumn("name_en", col("title"))
-      .withColumn("studies", transform(col("entry"), e => regexp_extract(e("item")("reference"), ".*/(.*)", 1)))
+      .withColumn("study_codes", transform(col("entry"), e => regexp_extract(e("item")("reference"), ".*/(.*)", 1)))
       .withColumn("program_id", col("identifier")(0)("value"))
       .withColumn("research_program_ext", firstNonNull(filter(col("extension"), col => col("url") === RESEARCH_PROGRAM_SD))("extension"))
       .withColumn("name_fr", filter(col("research_program_ext"), col => col("url") === "nameFR")(0)("valueString"))

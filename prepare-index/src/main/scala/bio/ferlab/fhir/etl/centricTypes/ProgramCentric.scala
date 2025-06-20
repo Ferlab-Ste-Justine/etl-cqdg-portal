@@ -58,7 +58,8 @@ class ProgramCentric()(implicit configuration: Configuration) extends ETL {
         "contacts",
         filter(col("research_program_contacts_telecom"), contact => !isManager(contact))
       )
-      .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom")
+      .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom",
+        "research_program_contacts")
 
     Map(mainDestination.id -> transformedProgramDf)
   }

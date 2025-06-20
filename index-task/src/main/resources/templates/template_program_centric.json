@@ -28,7 +28,7 @@
         "name_fr": {
           "type": "keyword"
         },
-        "studies": {
+        "study_codes": {
           "type": "keyword"
         },
         "description_fr": {
