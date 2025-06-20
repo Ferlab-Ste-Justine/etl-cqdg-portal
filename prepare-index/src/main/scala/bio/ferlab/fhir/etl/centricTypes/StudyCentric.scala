@@ -73,12 +73,16 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
         .agg(size(collect_set("subject")) as "participant_count")
 
     val programDf = data(normalized_list.id)
-      .select("fhir_id", "studies")
+      .select("name_en", "name_fr", "program_id", "studies")
       .withColumn("study_id", explode(col("studies")))
       .groupBy("study_id")
       .agg(
         collect_set(
-          col("fhir_id"),
+          struct (
+            col("program_id"),
+            col("name_en"),
+            col("name_fr"),
+          )
         ) as "programs",
       )
 
