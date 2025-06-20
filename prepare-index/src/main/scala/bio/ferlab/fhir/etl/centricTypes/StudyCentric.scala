@@ -73,8 +73,8 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
         .agg(size(collect_set("subject")) as "participant_count")
 
     val programDf = data(normalized_list.id)
-      .select("name_en", "name_fr", "program_id", "studies")
-      .withColumn("study_id", explode(col("studies")))
+      .select("name_en", "name_fr", "program_id", "study_codes")
+      .withColumn("study_id", explode(col("study_codes")))
       .groupBy("study_id")
       .agg(
         collect_set(

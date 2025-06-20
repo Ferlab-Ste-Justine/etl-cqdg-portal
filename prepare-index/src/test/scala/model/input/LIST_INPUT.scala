@@ -7,7 +7,7 @@ package model.input
 case class LIST_INPUT(`fhir_id`: String = "cqdg-program-rare-qc",
                            `name_en`: String = "RARE.Qc",
                            `name_fr`: String = "RARE.Qc – Le réseau pour avancer la recherche en maladies rares au Québec",
-                           `studies`: Seq[String] = Seq("STU0000001"),
+                           `study_codes`: Seq[String] = Seq("STU0000001"),
                            `program_id`: String = "RARE-QC",
                            `description_fr`: String = "RARE.Qc est un réseau québécois",
                            `description_en`: String = "RARE.Qc is a Quebec-based.",
