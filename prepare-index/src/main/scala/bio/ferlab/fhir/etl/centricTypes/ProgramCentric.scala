@@ -8,7 +8,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-class ProgramCentric()(implicit configuration: Configuration) extends ETL {
+class ProgramCentric(studyIds: List[String])(implicit configuration: Configuration) extends ETL {
 
   override val mainDestination: DatasetConf = conf.getDataset("es_index_program_centric")
   val normalized_list: DatasetConf = conf.getDataset("normalized_list")
@@ -16,7 +16,7 @@ class ProgramCentric()(implicit configuration: Configuration) extends ETL {
   override def extract(lastRunDateTime: LocalDateTime = minDateTime,
                        currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     Seq(normalized_list)
-      .map(ds => ds.id -> ds.read).toMap // Read all lists, as we don't filter by study_id for program centric
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))).toMap // Read all lists, as we don't filter by study_id for program centric
 
   }
 
@@ -59,7 +59,8 @@ class ProgramCentric()(implicit configuration: Configuration) extends ETL {
         filter(col("research_program_contacts_telecom"), contact => !isManager(contact))
       )
       .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom",
-        "research_program_contacts")
+        "research_program_contacts", "study_id")
+      .distinct()
 
     Map(mainDestination.id -> transformedProgramDf)
   }
