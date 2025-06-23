@@ -19,7 +19,7 @@ class ProgramCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession
       "normalized_list" -> Seq(LIST_INPUT()).toDF(),
     )
 
-    val output = new ProgramCentric()(conf).transform(data)
+    val output = new ProgramCentric(List("SD_Z6MWD3H0"))(conf).transform(data)
 
     output.keys should contain("es_index_program_centric")
 

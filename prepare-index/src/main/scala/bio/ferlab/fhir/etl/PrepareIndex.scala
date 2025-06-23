@@ -39,6 +39,6 @@ object PrepareIndex extends SparkApp {
       new ParticipantCentric(filteredStudies).run()
       new FileCentric(filteredStudies).run()
       new BiospecimenCentric(filteredStudies).run()
-      new ProgramCentric().run()
+      new ProgramCentric(filteredStudies).run()
   }
 }
