@@ -59,7 +59,7 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
         filter(col("research_program_contacts_telecom"), contact => !isManager(contact))
       )
       .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom",
-        "research_program_contacts", "study_id")
+        "research_program_contacts")
       .distinct()
 
     Map(mainDestination.id -> transformedProgramDf)
