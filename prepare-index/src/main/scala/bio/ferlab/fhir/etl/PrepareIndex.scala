@@ -30,15 +30,17 @@ object PrepareIndex extends SparkApp {
   jobName match {
     case "study_centric" =>
     case "participant_centric" =>
-      new ParticipantCentric(filteredStudies).run()
+      if (filteredStudies.nonEmpty) new ParticipantCentric(filteredStudies).run()
     case "file_centric" =>
-      new FileCentric(filteredStudies).run()
+      if (filteredStudies.nonEmpty) new FileCentric(filteredStudies).run()
     case "biospecimen_centric" =>
-      new BiospecimenCentric(filteredStudies).run()
+      if (filteredStudies.nonEmpty) new BiospecimenCentric(filteredStudies).run()
     case "all" =>
-      new ParticipantCentric(filteredStudies).run()
-      new FileCentric(filteredStudies).run()
-      new BiospecimenCentric(filteredStudies).run()
-      new ProgramCentric(filteredStudies).run()
+      if (filteredStudies.nonEmpty) {
+        new ParticipantCentric(filteredStudies).run()
+        new FileCentric(filteredStudies).run()
+        new BiospecimenCentric(filteredStudies).run()
+        new ProgramCentric(filteredStudies).run()
+      }
   }
 }

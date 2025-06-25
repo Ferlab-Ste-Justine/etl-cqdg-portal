@@ -32,6 +32,7 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
 
 
     val transformedProgramDf = data(normalized_list.id)
+      .dropDuplicates("fhir_id")
       .withColumn("website", col("research_program_related_artifact")("website"))
       .withColumn("citation_statement", col("research_program_related_artifact")("citation_statement"))
       .withColumn("logo_url", col("research_program_related_artifact")("logo_url"))
@@ -60,7 +61,6 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
       )
       .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom",
         "research_program_contacts")
-      .distinct()
 
     Map(mainDestination.id -> transformedProgramDf)
   }
