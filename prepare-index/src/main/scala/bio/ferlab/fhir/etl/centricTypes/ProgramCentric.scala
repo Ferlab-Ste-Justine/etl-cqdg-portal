@@ -24,12 +24,8 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
                          lastRunDateTime: LocalDateTime = minDateTime,
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
 
-    import org.apache.spark.sql.functions.{coalesce, lit, lower}
-
     val isManager = (contact: org.apache.spark.sql.Column) =>
-      lower(coalesce(contact.getField("role_en"), lit(""))).equalTo(lit("manager")) ||
-        lower(coalesce(contact.getField("role_fr"), lit(""))).equalTo(lit("gestionnaire"))
-
+      contact.getField("role_en").isNotNull || contact.getField("role_fr").isNotNull
 
     val transformedProgramDf = data(normalized_list.id)
       .dropDuplicates("fhir_id")
