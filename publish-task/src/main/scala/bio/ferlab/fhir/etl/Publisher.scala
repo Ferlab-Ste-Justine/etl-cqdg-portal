@@ -51,6 +51,9 @@ object Publisher {
 
     val (body, status) = esHttpClient.executeHttpRequest(httpRequest)
 
+    println(s"status: $status")
+    println(s"body: $body")
+
     if(status < 300) {
       val bodyParsed = body.map( _.split("\n").filter(s => s.matches(regex)).toSeq)
       bodyParsed.getOrElse(Nil)
