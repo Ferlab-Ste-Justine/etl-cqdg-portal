@@ -31,8 +31,11 @@ object PublishTask {
 
     val studyList = study_ids.map(s => s.split(",").map(_.toLowerCase).toSeq)
     val jobs = jobTypes.split(",").toSeq
+    println("before retrieveIndexesFromRegex")
     val oldIndices = retrieveIndexesFromRegex(generateRegexCurrentAlias(jobs, studyList), "aliases")(esNodes, esPort)
     val desiredIndices = retrieveIndexesFromRegex(generateRegexDesiredIndex(jobs, releaseId, studyList), "indices")(esNodes, esPort)
+    println(oldIndices)
+    println(desiredIndices)
 
     val results =
       studyList match {
