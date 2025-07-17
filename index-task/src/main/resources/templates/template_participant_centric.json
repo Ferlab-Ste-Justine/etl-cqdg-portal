@@ -315,6 +315,7 @@
               "type": "keyword"
             },
             "programs": {
+              "type": "nested",
               "properties": {
                 "program_id": {
                   "type": "keyword"
