@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.StudyCentric
 import model._
-import model.input.LIST_INPUT
+import model.input.{BIOSPECIMEN_INPUT, LIST_INPUT, SAMPLE_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

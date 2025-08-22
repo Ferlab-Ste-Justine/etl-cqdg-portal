@@ -2,6 +2,7 @@ import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.datalake.testutils.TestETLContext
 import bio.ferlab.fhir.etl.SpecimenEnricher
 import model._
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_INPUT, SAMPLE_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -32,7 +33,7 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_1", subject = "P1", `submitter_biospecimen_id` = "BS_1"),
         BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_2", subject = "P2", `submitter_biospecimen_id` = "BS_2"),
-        BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_3", subject = "P3", `submitter_biospecimen_id` = "BS_3", biospecimen_tissue_source = CODE_SYSTEM(`code` = "Unknown", `display` = null))
+        BIOSPECIMEN_INPUT(fhir_id = "FHIR_BS_3", subject = "P3", `submitter_biospecimen_id` = "BS_3", biospecimen_tissue_source = CODE_SYSTEM_INPUT(`code` = "Unknown"))
       ).toDF(),
       "normalized_research_study" -> Seq(
         RESEARCHSTUDY(`study_code` = "study_code1"),

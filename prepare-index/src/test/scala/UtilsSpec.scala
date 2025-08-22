@@ -1,6 +1,7 @@
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.Utils._
 import model._
+import model.input.{BIOSPECIMEN_INPUT, SAMPLE_INPUT}
 import org.apache.spark.sql.functions.{array, col, lit}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row, functions}

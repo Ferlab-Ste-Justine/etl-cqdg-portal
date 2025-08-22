@@ -160,7 +160,7 @@ object Transformations {
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
-        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
+        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
       .withColumn("age_biospecimen_collection", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
@@ -173,7 +173,7 @@ object Transformations {
       .select("identifier", "type", "subject", "parent", "study_id", "fhir_id")
       .where(size(col("parent")) > 0)
       .withColumn("sample_type",
-        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
+        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
       .withColumn("submitter_sample_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("subject",  regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("parent", firstNonNull(transform(col("parent"),  col => regexp_extract(col("reference"), specimenExtract, 1))))

@@ -15,5 +15,4 @@ case class NORMALIZED_SAMPLE_REGISTRATION(`subject`: String = "PRT0000001",
                                           `study_id`: String = "study1")
 
 case class SAMPLE_TYPE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
-                       `code`: String = "NCIT:C449",
-                       `display`: Option[String] = None)
+                       `code`: String = "NCIT:C449")
