@@ -112,8 +112,8 @@ object Utils {
 
       df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
         .withColumn(targetCol,
-          when(col(targetCol)("display").isNotNull,
-            concat_ws(" ", col(targetCol)("display"), concat(lit("("), col(targetCol)("code"), lit(")"))))
+          when(col("id").isNotNull && col("name").isNotNull,
+            concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
             .otherwise(col(targetCol)("code"))
         ).select(columns.map(col): _*)
     }

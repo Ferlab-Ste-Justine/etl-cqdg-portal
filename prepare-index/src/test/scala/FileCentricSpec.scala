@@ -2,6 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader
 import bio.ferlab.fhir.etl.centricTypes.FileCentric
 import model._
+import model.input.{BIOSPECIMEN_INPUT, SAMPLE_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -51,6 +52,9 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val output = new FileCentric(List("STU0000001"))(conf).transform(data)
     output.keys should contain("es_index_file_centric")
+
+    val toto = output("es_index_file_centric")
+    toto.show(false)
 
     val file_centric = output("es_index_file_centric").as[FILE_CENTRIC].collect()
 

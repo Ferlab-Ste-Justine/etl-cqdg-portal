@@ -16,5 +16,4 @@ case class NORMALIZED_BIOSPECIMEN(`fhir_id`: String = "BIO0000001",
                                   `security`: String = null)
 
 case class BIOSPECIMEN_TISSUE_SOURCE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
-                                     `code`: String = "NCIT:C12434",
-                                     `display`: Option[String] = None)
+                                     `code`: String = "NCIT:C12434")
