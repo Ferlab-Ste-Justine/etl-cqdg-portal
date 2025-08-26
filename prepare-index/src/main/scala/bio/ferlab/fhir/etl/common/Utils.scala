@@ -150,9 +150,6 @@ object Utils {
         .withColumn("type_of_sequencing", when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads")))
         .drop("study_id", "is_paired_end")
 
-      sequencingExperiment.show(false)
-      sequencingExperimentClean.show(false)
-
       val seqExperimentByFile = sequencingExperimentClean
         .withColumn("all_files_exp", explode(col("analysis_files")))
         .groupBy("all_files_exp")
@@ -175,11 +172,6 @@ object Utils {
         .withColumn("sequencing_experiment", col("sequencing_experiment_struct")("sequencing_experiment"))
         .withColumn("fhir_id", col("all_files_exp")("file_id"))
         .drop("all_files_exp", "sequencing_experiment_struct")
-
-      seqExperimentByFile.show(false)
-      df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
-        .filter(col("fhir_id") === "FI0005613")
-        .show(false)
 
       df.join(seqExperimentByFile, Seq("fhir_id"), "left_outer")
     }
