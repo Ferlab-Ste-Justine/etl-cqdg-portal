@@ -24,6 +24,7 @@ package object etl {
   val AGE_AT_RECRUITMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtRecruitment"
   // Patient
   val ETHNICITY_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/QCEthnicity"
+  val GENDER_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/QCGender"
   val AGE_OF_DEATH_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeOfDeath"
   // ResearchStudy
   val ACCESS_LIMITATIONS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AccessLimitations"

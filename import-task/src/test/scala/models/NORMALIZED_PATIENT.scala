@@ -7,8 +7,8 @@ package models
 
 
 
-case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000001",
-                              `sex`: String = "female",
+case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000004",
+                              `gender`: String = "Woman",
                               `deceasedBoolean`: Boolean = false,
                               `age_at_recruitment`: String = "HP:0011462",
                               `ethnicity`: String = null,

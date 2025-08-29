@@ -7,7 +7,7 @@ package models
 
 
 
-case class NORMALIZED_SAMPLE_REGISTRATION(`subject`: String = "PRT0000001",
+case class NORMALIZED_SAMPLE_REGISTRATION(`subject`: String = "PRT0000004",
                                           `parent`: String = "BIO0000003",
                                           `fhir_id`: String = "SAM0000002",
                                           `sample_type`: SAMPLE_TYPE = SAMPLE_TYPE(),

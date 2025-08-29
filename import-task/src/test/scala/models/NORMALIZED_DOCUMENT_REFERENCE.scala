@@ -8,7 +8,7 @@ package models
 
 
 case class NORMALIZED_DOCUMENT_REFERENCE(`fhir_id`: String = "FIL0000101",
-                                         `participant_id`: String = "PRT0000004",
+                                         `participant_id`: String = "PRT0000002",
                                          `biospecimen_reference`: Seq[String] = Seq("SAM0000003", "SAM0000004", "SAM0000001"),
                                          `data_type`: String = "Annotated-SNV",
                                          `data_category`: String = "genomics",

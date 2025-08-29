@@ -8,7 +8,7 @@ package models
 
 
 case class NORMALIZED_BIOSPECIMEN(`fhir_id`: String = "BIO0000001",
-                                  `subject`: String = "PRT0000002",
+                                  `subject`: String = "PRT0000003",
                                   `biospecimen_tissue_source`: BIOSPECIMEN_TISSUE_SOURCE = BIOSPECIMEN_TISSUE_SOURCE(),
                                   `age_biospecimen_collection`: String = "HP:0011463",
                                   `submitter_biospecimen_id`: String = "B-S03388",

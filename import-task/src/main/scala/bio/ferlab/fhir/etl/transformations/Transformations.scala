@@ -10,7 +10,7 @@ object Transformations {
 
   val patientMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
+      .select("fhir_id", "study_id", "identifier", "extension", "deceasedBoolean", "meta")
       .withColumn("age_at_recruitment", ageFromExtension(col("extension"), AGE_AT_RECRUITMENT_S_D))
       .withColumn("ethnicity",
         firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
@@ -21,10 +21,12 @@ object Transformations {
           .otherwise(lit("Unknown"))
       )
       .withColumn("age_of_death", ageFromExtension(col("extension"), AGE_OF_DEATH_S_D))
-      .withColumnRenamed("gender", "sex")
+      .withColumn("gender", transform(firstNonNull(filter(col("extension"),col => col("url") === GENDER_S_D)("valueCodeableConcept"))("coding"),
+        col => when(isnotnull(col("display")), col("display")).otherwise(col("code")))(0))
+
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
-    Drop("identifier", "extension", "meta", "gender")
+    Drop("identifier", "extension", "meta")
   )
 
   val taskMappings: List[Transformation] = List(
