@@ -9,7 +9,7 @@ package models
 
 case class NORMALIZED_GROUP(`internal_family_id`: String = "FM00000001",
                             `family_type`: String = "Case-parent trio",
-                            `family_members`: Seq[String] = Seq("PRT0000003", "PRT0000004", "PRT0000005"),
+                            `family_members`: Seq[String] = Seq("PRT0000002", "PRT0000001", "PRT0000003"),
                             `submitter_family_id`: String = "HSJ0140",
                             `study_id`: String = "study1")
 

@@ -18,8 +18,8 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     val data: Map[String, DataFrame] = Map(
       "simple_participant" -> Seq(
         SIMPLE_PARTICIPANT(`participant_id` = "P1", `participant_2_id` = "P1"), //has file
-        SIMPLE_PARTICIPANT(`participant_id` = "P2", `participant_2_id` = "P2", `sex` = "female"), //does not have files
-        SIMPLE_PARTICIPANT(`participant_id` = "P3", `participant_2_id` = "P3", `sex` = "female"),
+        SIMPLE_PARTICIPANT(`participant_id` = "P2", `participant_2_id` = "P2", `gender` = "Woman", `sex` = "Female"), //does not have files
+        SIMPLE_PARTICIPANT(`participant_id` = "P3", `participant_2_id` = "P3", `gender` = "Woman", `sex` = "Female"),
       ).toDF(),
       "normalized_document_reference" -> Seq(
         DOCUMENTREFERENCE(
@@ -140,7 +140,8 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         `participant` = SIMPLE_PARTICIPANT(
           `participant_id` = "P3",
           `participant_2_id` = "P3",
-          `sex` = "female"
+          `gender` = "Woman",
+          `sex` = "Female"
         ),
         `files` = Seq(
           FILE_WITH_SEQ_EXPERIMENT(

@@ -10,21 +10,27 @@ object Transformations {
 
   val patientMappings: List[Transformation] = List(
     Custom(_
-      .select("fhir_id", "study_id", "identifier", "extension", "gender", "deceasedBoolean", "meta")
+      .select("fhir_id", "study_id", "identifier", "extension", "meta")
       .withColumn("age_at_recruitment", ageFromExtension(col("extension"), AGE_AT_RECRUITMENT_S_D))
-      .withColumn("ethnicity",
-        firstNonNull(firstNonNull(filter(col("extension"),col => col("url") === ETHNICITY_S_D)("valueCodeableConcept"))("coding"))("code")
-      )
+      .withColumn("ethnicity", extractFromExtensionValueCoding(col("extension"), ETHNICITY_S_D))
       .withColumn("submitter_participant_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary"))("value"))
-      .withColumn("vital_status", when(col("deceasedBoolean"), lit("Deceased"))
-          .when(!col("deceasedBoolean"), lit("Alive"))
-          .otherwise(lit("Unknown"))
-      )
+      .withColumn("vital_status", extractFromExtensionValueCoding(col("extension"), VITAL_STATUS_S_D))
       .withColumn("age_of_death", ageFromExtension(col("extension"), AGE_OF_DEATH_S_D))
-      .withColumnRenamed("gender", "sex")
+      .withColumn("genderExt", firstNonNull(filter(col("extension"),col => col("url") === GENDER_S_D))("extension"))
+      .withColumn("gender", extractFromExtensionValueCoding(col("genderExt"), "gender"))
+      .withColumn("gender_another_category", firstNonNull(filter(col("genderExt"),col => col("url") === "genderAnotherCategory"))("valueString"))
+      .withColumn("gender_collect_method", extractFromExtensionValueCoding(col("genderExt"), "genderCollectionMethod"))
+      .withColumn("sexAtBirthExt", firstNonNull(filter(col("extension"),col => col("url") === SEX_AT_BIRTH_S_D))("extension"))
+      .withColumn("sex", extractFromExtensionValueCoding(col("sexAtBirthExt"), "sexAtBirth"))
+      .withColumn("sex_another_category", firstNonNull(filter(col("sexAtBirthExt"),col => col("url") === "sexAtBirthAnotherCategory"))("valueString"))
+      .withColumn("sex_collect_method", extractFromExtensionValueCoding(col("sexAtBirthExt"), "sexAtBirthCollectionMethod"))
+      .withColumn("raceExt", firstNonNull(filter(col("extension"),col => col("url") === RACE_S_D))("extension"))
+      .withColumn("race", extractFromExtensionValueCoding(col("raceExt"), "race"))
+      .withColumn("race_another_racial_category", firstNonNull(filter(col("raceExt"),col => col("url") === "raceAnotherCategory"))("valueString"))
+      .withColumn("race_collect_method", extractFromExtensionValueCoding(col("raceExt"), "raceCollectionMethod"))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
     ),
-    Drop("identifier", "extension", "meta", "gender")
+    Drop("identifier", "extension", "meta", "genderExt", "sexAtBirthExt", "raceExt")
   )
 
   val taskMappings: List[Transformation] = List(
