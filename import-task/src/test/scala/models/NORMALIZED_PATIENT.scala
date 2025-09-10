@@ -8,15 +8,10 @@ package models
 
 
 case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000005",
-                              `gender`: String = "Woman",
-                              `gender_another_category`: Option[String] = None,
-                              `gender_collect_method`: String = "Self-identified",
+                              `gender`: DEMOGRAPHICS = DEMOGRAPHICS(),
                               `sex`: String = "Female",
-                              `sex_another_category`: Option[String] = None,
-                              `sex_collect_method`: String = "Clinician-recorded",
-                              `race`: String = "White",
-                              `race_another_racial_category`: Option[String] = None,
-                              `race_collect_method`: String = "Self-identified",
+                              `sex_at_birth`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "Female", `display` = null, `collect_method` = CODEABLE(`code` = "Clinician-recorded", `display` = null)),
+                              `race`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "White", `display` = null, `collect_method` = CODEABLE(`code` = "Self-identified", `display` = null)),
                               `age_at_recruitment`: String = "HP:0011462",
                               `ethnicity`: String = "French Canadian",
                               `submitter_participant_id`: String = "HSJ-184-106",
@@ -25,3 +20,9 @@ case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000005",
                               `study_id`: String = "study1",
                               `security`: String = null)
 
+case class DEMOGRAPHICS   (
+                          `code`: String = "Woman",
+                          `display`: String = null,
+                          `another_category`: Option[String] = None,
+                          `collect_method`: CODEABLE = CODEABLE(`code` = "Self-identified", `display` = null)
+                        )
