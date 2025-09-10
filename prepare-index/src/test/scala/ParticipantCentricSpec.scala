@@ -50,7 +50,6 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     participant_centric.find(_.`participant_id` == "P1") shouldBe Some(
       PARTICIPANT_CENTRIC(
         `participant_id`= "P1",
-        `vital_status` = Some("Unknown"),
         `biospecimens` = Seq(BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1", `sample_2_id` = "S1")),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(

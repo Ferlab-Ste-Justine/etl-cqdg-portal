@@ -7,11 +7,18 @@ package models
 
 
 
-case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000004",
+case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000005",
                               `gender`: String = "Woman",
-                              `deceasedBoolean`: Boolean = false,
+                              `gender_another_category`: Option[String] = None,
+                              `gender_collect_method`: String = "Self-identified",
+                              `sex`: String = "Female",
+                              `sex_another_category`: Option[String] = None,
+                              `sex_collect_method`: String = "Clinician-recorded",
+                              `race`: String = "White",
+                              `race_another_racial_category`: Option[String] = None,
+                              `race_collect_method`: String = "Self-identified",
                               `age_at_recruitment`: String = "HP:0011462",
-                              `ethnicity`: String = null,
+                              `ethnicity`: String = "French Canadian",
                               `submitter_participant_id`: String = "HSJ-184-106",
                               `vital_status`: String = "Alive",
                               `age_of_death`: String = null,

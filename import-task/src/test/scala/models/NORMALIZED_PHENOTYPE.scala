@@ -11,7 +11,7 @@ case class NORMALIZED_PHENOTYPE(`fhir_id`: String = "PHE0000002",
                                 `age_at_phenotype`: String = "HP:0011462",
                                 `phenotype_source_text`: String = "Intractable Seizures",
                                 `phenotype_HPO_code`: PHENOTYPE_HPO_CODE = PHENOTYPE_HPO_CODE(),
-                                `cqdg_participant_id`: String = "PRT0000004",
+                                `cqdg_participant_id`: String = "PRT0000005",
                                 `phenotype_observed`: String = "POS",
                                 `study_id`: String = "study1")
 

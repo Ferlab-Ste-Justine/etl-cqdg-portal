@@ -7,7 +7,7 @@ package models
 
 
 
-case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000004",
+case class NORMALIZED_DIAGNOSIS(`subject`: String = "PRT0000005",
                                 `fhir_id`: String = "DIA0000002",
                                 `diagnosis_source_text`: String = "Intractable Epilepsy",
                                 `diagnosis_mondo_code`: String = "MONDO:0005027",

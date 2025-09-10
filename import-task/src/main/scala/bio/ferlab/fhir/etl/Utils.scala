@@ -18,6 +18,17 @@ object Utils {
 
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
   def extractDisplay: Column => Column = col => when(isnull(col("coding")(0)("display")), col("coding")(0)("code")).otherwise(col("coding")(0)("display"))
+
+  def extractFromExtensionValueCoding(extensionCol: Column, url: String): Column =
+    extractDisplayOrCode(
+      firstNonNull(filter(extensionCol, col => col("url") === url))("valueCodeableConcept")("coding")
+    )
+
+  def extractDisplayOrCode(codingCol: Column): Column =
+    transform(codingCol, col =>
+      when(isnull(col("display")), col("code")).otherwise(col("display"))
+    )(0)
+
   val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
 
   val extractKeywords: UserDefinedFunction =
