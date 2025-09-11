@@ -9,7 +9,7 @@ package models
 
 case class NORMALIZED_PATIENT(`fhir_id`: String = "PRT0000005",
                               `gender`: DEMOGRAPHICS = DEMOGRAPHICS(),
-                              `sex`: String = "Female",
+                              `sex`: String = "female",
                               `sex_at_birth`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "Female", `display` = null, `collect_method` = CODEABLE(`code` = "Clinician-recorded", `display` = null)),
                               `race`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "White", `display` = null, `collect_method` = CODEABLE(`code` = "Self-identified", `display` = null)),
                               `age_at_recruitment`: String = "HP:0011462",

@@ -19,7 +19,7 @@ object Transformations {
       .withColumn("genderExt", firstNonNull(filter(col("extension"),col => col("url") === GENDER_S_D))("extension"))
       .withColumn("gender", extractDemographicStruct(col("genderExt"), "gender"))
       .withColumn("sexAtBirthExt", firstNonNull(filter(col("extension"),col => col("url") === SEX_AT_BIRTH_S_D))("extension"))
-      .withColumn("sex", extractFromExtensionValueCoding(col("sexAtBirthExt"), "sexAtBirth"))
+      .withColumn("sex", lower(extractFromExtensionValueCoding(col("sexAtBirthExt"), "sexAtBirth")))
       .withColumn("sex_at_birth", extractDemographicStruct(col("sexAtBirthExt"), "sexAtBirth"))
       .withColumn("raceExt", firstNonNull(filter(col("extension"),col => col("url") === RACE_S_D))("extension"))
       .withColumn("race", extractDemographicStruct(col("raceExt"), "race"))
