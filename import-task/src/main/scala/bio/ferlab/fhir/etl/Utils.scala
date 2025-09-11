@@ -19,6 +19,18 @@ object Utils {
   def firstNonNull: Column => Column = arr => filter(arr, a => a.isNotNull)(0)
   def extractDisplay: Column => Column = col => when(isnull(col("coding")(0)("display")), col("coding")(0)("code")).otherwise(col("coding")(0)("display"))
 
+  def extractDemographicStruct(ext: Column, _type: String): Column = {
+    struct(
+      firstNonNull(filter(ext, col => col("url") === _type))("valueCodeableConcept")("coding")(0)("code").as("code"),
+      firstNonNull(filter(ext, col => col("url") === _type))("valueCodeableConcept")("coding")(0)("display").as("display"),
+      struct(
+        firstNonNull(filter(ext, col => col("url") === s"${_type}CollectionMethod"))("valueCodeableConcept")("coding")(0)("code").as("code"),
+        firstNonNull(filter(ext, col => col("url") === s"${_type}CollectionMethod"))("valueCodeableConcept")("coding")(0)("display").as("display")
+      ).as("collect_method"),
+      firstNonNull(filter(ext, col => col("url") === s"${_type}AnotherCategory"))("valueString").as("another_category")
+    ).as(_type)
+  }
+
   def extractFromExtensionValueCoding(extensionCol: Column, url: String): Column =
     extractDisplayOrCode(
       firstNonNull(filter(extensionCol, col => col("url") === url))("valueCodeableConcept")("coding")

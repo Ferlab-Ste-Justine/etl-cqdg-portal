@@ -32,29 +32,74 @@
         "sex": {
           "type": "keyword"
         },
-        "sex_another_category": {
-          "type": "keyword"
-        },
-        "sex_collect_method": {
-          "type": "keyword"
+        "sex_at_birth": {
+          "properties": {
+            "code": {
+              "type": "keyword"
+            },
+            "display": {
+              "type": "keyword"
+            },
+            "another_category": {
+              "type": "keyword"
+            },
+            "collect_method": {
+              "properties": {
+                "code": {
+                  "type": "keyword"
+                },
+                "display": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
         },
         "gender": {
-          "type": "keyword"
-        },
-        "gender_another_category": {
-          "type": "keyword"
-        },
-        "gender_collect_method": {
-          "type": "keyword"
+          "properties": {
+            "code": {
+              "type": "keyword"
+            },
+            "display": {
+              "type": "keyword"
+            },
+            "another_category": {
+              "type": "keyword"
+            },
+            "collect_method": {
+              "properties": {
+                "code": {
+                  "type": "keyword"
+                },
+                "display": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
         },
         "race": {
-          "type": "keyword"
-        },
-        "race_another_racial_category": {
-          "type": "keyword"
-        },
-        "race_collect_method": {
-          "type": "keyword"
+          "properties": {
+            "code": {
+              "type": "keyword"
+            },
+            "display": {
+              "type": "keyword"
+            },
+            "another_category": {
+              "type": "keyword"
+            },
+            "collect_method": {
+              "properties": {
+                "code": {
+                  "type": "keyword"
+                },
+                "display": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
         },
         "vital_status": {
           "type": "keyword"

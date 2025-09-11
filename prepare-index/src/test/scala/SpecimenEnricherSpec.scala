@@ -15,8 +15,8 @@ class SpecimenEnricherSpec extends AnyFlatSpec with Matchers with WithSparkSessi
     val data: Map[String, DataFrame] = Map(
       "normalized_patient" -> Seq(
         PATIENT_INPUT(fhir_id = "P1", `submitter_participant_id` = "P1_internal"),
-        PATIENT_INPUT(fhir_id = "P2", `submitter_participant_id` = "P2_internal", `gender` = "Woman"),
-        PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `gender` = "Woman"),
+        PATIENT_INPUT(fhir_id = "P2", `submitter_participant_id` = "P2_internal", `gender` = DEMOGRAPHICS()),
+        PATIENT_INPUT(fhir_id = "P3", `submitter_participant_id` = "P3_internal", `gender` = DEMOGRAPHICS()),
       ).toDF(),
       "normalized_family_relationship" -> Seq(
         FAMILY_RELATIONSHIP_NEW(internal_family_relationship_id = "FAMRO1", focus_participant_id = "P1", submitter_participant_id = "P1", relationship_to_proband = "Proband"),

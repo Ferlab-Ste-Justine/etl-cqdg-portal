@@ -35,7 +35,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         SIMPLE_PARTICIPANT(
           `participant_id` = "P2",
           `participant_2_id` = "P2",
-          `gender` = "Woman",
+          `gender` = DEMOGRAPHICS(),
           `sex` = "Female",
           `family_relationships` = Seq(FAMILY_RELATIONSHIP_WITH_FAMILY(), FAMILY_RELATIONSHIP_WITH_FAMILY(`participant_id` = "P2", `submitter_participant_id` = "EXT_P2", `focus_participant_id` = "P1", `relationship_to_proband` = "Proband", `family_id` = "FAM1"))
         )
@@ -76,19 +76,20 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
           `biospecimens` = Set(
             BIOSPECIMEN(
+              `biospecimen_id` = "B1",
+            ),
+            BIOSPECIMEN(
               `biospecimen_id` = "B2",
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
-            ),
-            BIOSPECIMEN(
-              `biospecimen_id` = "B1",
             ),
           ),
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
             `participant_id` = "P1",
             `participant_2_id` = "P1",
-            `gender` = "Man",
+            `gender` = DEMOGRAPHICS(`code` = "Man"),
             `sex` = "Male",
+            `sex_at_birth` = DEMOGRAPHICS(`code` = "Male", `collect_method` = CODEABLE(`code` = "Clinician-recorded", `display` = null)),
             `biospecimens` = Set(
               BIOSPECIMEN(
                 `biospecimen_id` = "B2",
@@ -133,8 +134,9 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
           `participant_id` = "P1",
           `participant_2_id` = "P1",
-          `gender` = "Man",
+          `gender` = DEMOGRAPHICS(`code` = "Man"),
           `sex` = "Male",
+          `sex_at_birth` = DEMOGRAPHICS(`code` = "Male", `collect_method` = CODEABLE(`code` = "Clinician-recorded", `display` = null)),
           `biospecimens` = Set(
             BIOSPECIMEN(
               `biospecimen_id` = "B2",

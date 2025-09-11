@@ -14,24 +14,26 @@ case class PATIENT(
                   )
 
 case class PATIENT_INPUT(
-                    `study_id`: String = "STU0000001",
-                    `fhir_id`: String = "PRT0483534",
-                    `gender`: String = "Woman",
-                    `gender_another_category`: Option[String] = None,
-                    `gender_collect_method`: String = "Self-identified",
-                    `sex`: String = "Female",
-                    `sex_another_category`: Option[String] = None,
-                    `sex_collect_method`: String = "Clinician-recorded",
-                    `race`: String = "White",
-                    `race_another_racial_category`: Option[String] = None,
-                    `race_collect_method`: String = "Self-identified",
-                    `vital_status`: String = "Alive",
-                    `age_at_recruitment`: String = "Young",
-                    `ethnicity`: String = "European",
-                    `submitter_participant_id`: String = "35849427674",
-                    `security`: String = "U",
-                    `age_of_death`: String = "Old",
+                          `study_id`: String = "STU0000001",
+                          `fhir_id`: String = "PRT0483534",
+                          `gender`: DEMOGRAPHICS = DEMOGRAPHICS(`collect_method` = CODEABLE(`code` = "Self-identified", `display` = null)),
+                          `sex`: String = "Female",
+                          `sex_at_birth`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "Female", `collect_method` = CODEABLE(`code` = "Clinician-recorded", `display` = null)),
+                          `race`: DEMOGRAPHICS = DEMOGRAPHICS(`code` = "White", `collect_method` = CODEABLE(`code` = "Self-identified", `display` = null)),
+                          `vital_status`: String = "Alive",
+                          `age_at_recruitment`: String = "Young",
+                          `ethnicity`: String = "European",
+                          `submitter_participant_id`: String = "35849427674",
+                          `security`: String = "U",
+                          `age_of_death`: String = "Old",
                   )
+
+case class DEMOGRAPHICS   (
+                            `code`: String = "Woman",
+                            `display`: String = null,
+                            `another_category`: Option[String] = None,
+                            `collect_method`: CODEABLE = CODEABLE(`code` = "Self-identified", `display` = null)
+                          )
 
 
 case class CAUSE_OF_DEATH(
