@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, D
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.BiospecimenCentric
 import model._
-import model.input.{BIOSPECIMEN_INPUT, SAMPLE_INPUT}
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
@@ -62,10 +62,25 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
       ).toDF(),
 
       "normalized_biospecimen" -> Seq(
-        BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
+        BIOSPECIMEN_INPUT(
+          `fhir_id` = "B1",
+          `subject` = "P1",
+          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "NCIT:C12434"),
+          `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("location1")),
+          `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("histological_type5")),
+          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C164014", `display` = null)),
+        ),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2"),
         BIOSPECIMEN_INPUT(`fhir_id` = "B3", `subject` = "NONE"),
-        BIOSPECIMEN_INPUT(`fhir_id` = "B4", `subject` = "P3"),
+        BIOSPECIMEN_INPUT(
+          `fhir_id` = "B4",
+          `subject` = "P3",
+          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "Missing - Not collected", `display` = Some("Missing - Not Collected")),
+          `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(display = Some("Missing - Restricted Access"), `system` = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes" , `code` = "Missing - Restricted access", `text` = Some("location2")),
+          `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "Missing - Not provided", `text` = Some("histological_type4")),
+          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:XXXXX", `display` = null)),
+          `tumor_normal_designation` = "Normal"
+        ),
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
       "normalized_task" -> Seq(TASK(`fhir_id` = "SXP0029366", `_for` = "P1", `analysis_files` = Seq(ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
@@ -105,6 +120,9 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `participant_id` = "P1",
           `participant_2_id` = "P1",
         ),
+        `cancer_anatomic_location` = CODE_SYSTEM_TEXT(display = "Blood (NCIT:C12434)", `code` = "NCIT:C12434", `text` = Some("location1")),
+        `tumor_histological_type` = CODE_SYSTEM_TEXT(display = "Blood (NCIT:C12434)", `code` = "NCIT:C12434", `text` = Some("histological_type5")),
+        `cancer_biospecimen_type` = Some("Solid Tissue Specimen (NCIT:C164014)"),
         `files` = Seq(
           FILE_WITH_SEQ_EXPERIMENT(
             `file_id` = "D1",
@@ -143,6 +161,11 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `gender` = DEMOGRAPHICS(),
           `sex` = "Female"
         ),
+        `biospecimen_tissue_source` = "Missing - Not Collected",
+        `cancer_anatomic_location` = CODE_SYSTEM_TEXT(display = "Missing - Restricted Access", `code` = "Missing - Restricted access", `text` = Some("location2")),
+        `tumor_histological_type` = CODE_SYSTEM_TEXT(display = "Missing - Not provided", `code` = "Missing - Not provided", `text` = Some("histological_type4")),
+        `tumor_normal_designation` = "Normal",
+        `cancer_biospecimen_type` = Some("NCIT:XXXXX"),
         `files` = Seq(
           FILE_WITH_SEQ_EXPERIMENT(
             `file_id` = "D4",

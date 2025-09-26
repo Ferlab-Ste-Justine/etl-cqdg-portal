@@ -25,6 +25,10 @@ package object etl {
   // Patient
   val ETHNICITY_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/QCEthnicity"
   val GENDER_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Gender"
+  val CANCER_ANATOMIC_LOCATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/CancerBiospecimenAnatomicLocation"
+  val TUMOR_HISTOLOGICAL_TYPE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/TumorHistologicalType"
+  val TUMOR_NORMAL_DESIGNATION_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/TumorNormalDesignation"
+  val CANCER_BIOSPECIMEN_TYPE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/CancerBiospecimenType"
   val SEX_AT_BIRTH_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SexAtBirth"
   val RACE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/Race"
   val VITAL_STATUS_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/VitalStatus"

@@ -114,8 +114,27 @@ object Utils {
         .withColumn(targetCol,
           when(col("id").isNotNull && col("name").isNotNull,
             concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
-            .otherwise(col(targetCol)("code"))
+            .otherwise(
+              when(col(targetCol)("display").isNotNull, col(targetCol)("display"))
+                .otherwise(col(targetCol)("code"))
+            )
         ).select(columns.map(col): _*)
+    }
+
+    def joinNcitTermsReplaceDisplay(ncitTerms: DataFrame, targetCol: String): DataFrame = {
+      val columns = df.columns
+
+      df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
+        .withColumn(targetCol, struct(
+          col(targetCol)("code") as "code",
+          col(targetCol)("text") as "text",
+          when(col("id").isNotNull && col("name").isNotNull,
+            concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
+            .otherwise(
+              when(col(targetCol)("display").isNotNull, col(targetCol)("display"))
+                .otherwise(col(targetCol)("code"))
+            ) as "display"
+        )).select(columns.map(col): _*)
     }
 
     def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {

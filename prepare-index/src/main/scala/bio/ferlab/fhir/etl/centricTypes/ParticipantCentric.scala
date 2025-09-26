@@ -33,12 +33,18 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val patientDF = data(simple_participant.id).drop("study")
 
+    val biospecimenDF = data(normalized_biospecimen.id)
+      .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
+      .joinNcitTerms(data(ncit_terms.id), "cancer_biospecimen_type")
+      .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
+      .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "cancer_anatomic_location")
+
     val transformedParticipant =
       patientDF
         .addStudy(data(es_index_study_centric.id))
         .addFilesWithBiospecimen (
           data(normalized_drs_document_reference.id),
-          data(normalized_biospecimen.id).joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source"),
+          biospecimenDF,
           data(normalized_sequencing_experiment.id),
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type"),
         )

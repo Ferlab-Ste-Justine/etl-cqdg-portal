@@ -10,10 +10,24 @@ package models
 case class NORMALIZED_BIOSPECIMEN(`fhir_id`: String = "BIO0000001",
                                   `subject`: String = "PRT0000004",
                                   `biospecimen_tissue_source`: BIOSPECIMEN_TISSUE_SOURCE = BIOSPECIMEN_TISSUE_SOURCE(),
+                                  `cancer_anatomic_location`: BIOSPECIMEN_NCIT_TERM = BIOSPECIMEN_NCIT_TERM(`system` = "http://purl.obolibrary.org/obo/ncit.owl", `code` = "NCIT:C6657", `text` = Some("location")),
+                                  `tumor_histological_type`: BIOSPECIMEN_NCIT_TERM = BIOSPECIMEN_NCIT_TERM(`code` = "Missing - Not provided", `text` = Some("histological_type5")),
+                                  `cancer_biospecimen_type`: Option[CODEABLE] = Some(CODEABLE(`code` = "NCIT:164032", `display` = null)),
+                                  `tumor_normal_designation`: String = "Not applicable",
                                   `age_biospecimen_collection`: String = "HP:0011463",
                                   `submitter_biospecimen_id`: String = "B-S03388",
                                   `study_id`: String = "study1",
                                   `security`: String = null)
 
-case class BIOSPECIMEN_TISSUE_SOURCE(`system`: String = "http://purl.obolibrary.org/obo/ncit.owl",
-                                     `code`: String = "NCIT:C12434")
+case class BIOSPECIMEN_NCIT_TERM(
+                                  `display`: Option[String] = None,
+                                  `system`: String = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes",
+                                  `code`: String = "Missing - Restricted access",
+                                  `text`: Option[String] = None
+                                )
+
+case class BIOSPECIMEN_TISSUE_SOURCE(
+                                      `display`: Option[String] = None,
+                                      `system`: String = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes",
+                                      `code`: String = "Missing - Restricted access",
+                                    )

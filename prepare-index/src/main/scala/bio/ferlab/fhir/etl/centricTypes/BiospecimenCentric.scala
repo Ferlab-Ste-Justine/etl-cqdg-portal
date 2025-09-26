@@ -39,6 +39,9 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
     val transformedBiospecimen =
       biospecimenDF
         .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
+        .joinNcitTerms(data(ncit_terms.id), "cancer_biospecimen_type")
+        .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "cancer_anatomic_location")
+        .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
         .addStudy(data(es_index_study_centric.id))
         .addParticipant(data(simple_participant.id))
         .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
