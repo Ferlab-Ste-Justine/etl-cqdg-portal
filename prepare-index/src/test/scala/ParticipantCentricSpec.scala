@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.ParticipantCentric
 import model._
-import model.input.{BIOSPECIMEN_INPUT, SAMPLE_INPUT}
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.functions.col
 import org.scalatest.matchers.should.Matchers
@@ -26,7 +26,14 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         DOCUMENTREFERENCE(`fhir_id` = "2", `participant_id` = "P2"),
       ).toDF(),
       "normalized_biospecimen" -> Seq(
-        BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
+        BIOSPECIMEN_INPUT(
+          `fhir_id` = "B1",
+          `subject` = "P1",
+          `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("locationB1")),
+          `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`display`= Some("Missing - Not Provided"), `system`= "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes", `code` = "Missing - Not provided", `text` = Some("histological_type5")),
+          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "NCIT:C12434"),
+          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C12434"))
+    ),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2"),
       ).toDF(),
       "normalized_task" -> Seq(
@@ -50,7 +57,23 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     participant_centric.find(_.`participant_id` == "P1") shouldBe Some(
       PARTICIPANT_CENTRIC(
         `participant_id`= "P1",
-        `biospecimens` = Seq(BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1", `sample_2_id` = "S1")),
+        `biospecimens` = Seq(
+          BIOSPECIMEN(
+            `biospecimen_id` = "B1",
+            `sample_id` = "S1",
+            `sample_2_id` = "S1",
+            cancer_anatomic_location = CODE_SYSTEM_TEXT(
+              display = "Blood (NCIT:C12434)",
+              code = "NCIT:C12434",
+              text = Some("locationB1")
+            ),
+            tumor_histological_type = CODE_SYSTEM_TEXT(
+              display = "Missing - Not Provided",
+              code = "Missing - Not provided",
+              text = Some("histological_type5")
+            )
+          ),
+        ),
         `files` = Seq(
           FILE_WITH_BIOSPECIMEN(
             `file_id` = Some("1"),
@@ -63,7 +86,24 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `data_type` = Some("SSUP"),
             `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(
-              BIOSPECIMEN(`biospecimen_id` = "B1", `age_biospecimen_collection` =  "Young", `sample_id` = "S1",  `sample_2_id` = "S1")),
+              BIOSPECIMEN(
+                biospecimen_id = "B1",
+                age_biospecimen_collection = "Young",
+                sample_id = "S1",
+                sample_2_id = "S1",
+                cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                  display = "Blood (NCIT:C12434)",
+                  code = "NCIT:C12434",
+                  text = Some("locationB1")
+                ),
+                tumor_histological_type = CODE_SYSTEM_TEXT(
+                  display = "Missing - Not Provided",
+                  code = "Missing - Not provided",
+                  text = Some("histological_type5")
+                )
+              )
+
+            ),
             `sequencing_experiment` = Some(SEQUENCING_EXPERIMENT_SINGLE())
           ),
         )

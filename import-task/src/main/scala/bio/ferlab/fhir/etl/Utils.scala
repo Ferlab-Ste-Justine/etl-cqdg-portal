@@ -2,7 +2,7 @@ package bio.ferlab.fhir.etl
 
 import org.apache.spark.sql.Column
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{col, _}
 
 
 object Utils {
@@ -35,6 +35,17 @@ object Utils {
     extractDisplayOrCode(
       firstNonNull(filter(extensionCol, col => col("url") === url))("valueCodeableConcept")("coding")
     )
+
+
+  def extractTumorNCITStruct(extensionKey: String): Column = {
+    val ext = filter(col("extension"), col => col("url") === extensionKey)(0)("extension")
+    struct(
+      firstNonNull(filter(ext, x => x.getField("url") === "sourceText"))("valueString").as("text"),
+      firstNonNull(filter(ext, x => x.getField("url") === "ncitCode"))("valueCodeableConcept")("coding")(0)("code").as("code"),
+      firstNonNull(filter(ext, x => x.getField("url") === "ncitCode"))("valueCodeableConcept")("coding")(0)("display").as("display"),
+      firstNonNull(filter(ext, x => x.getField("url") === "ncitCode"))("valueCodeableConcept")("coding")(0)("system").as("system")
+    )
+  }
 
   def extractDisplayOrCode(codingCol: Column): Column =
     transform(codingCol, col =>

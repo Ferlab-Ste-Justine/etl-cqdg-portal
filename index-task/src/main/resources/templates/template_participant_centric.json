@@ -135,6 +135,38 @@
             "biospecimen_2_id": {
               "type": "keyword"
             },
+            "cancer_anatomic_location": {
+              "properties": {
+                "display": {
+                  "type": "keyword"
+                },
+                "code": {
+                  "type": "keyword"
+                },
+                "text": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "tumor_histological_type": {
+              "properties": {
+                "display": {
+                  "type": "keyword"
+                },
+                "code": {
+                  "type": "keyword"
+                },
+                "text": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "cancer_biospecimen_type": {
+              "type": "keyword"
+            },
+            "tumor_normal_designation": {
+              "type": "keyword"
+            },
             "biospecimen_tissue_source": {
               "type": "keyword"
             },

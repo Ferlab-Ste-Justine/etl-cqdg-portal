@@ -33,11 +33,17 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
                          currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
     val fileDF = data(normalized_drs_document_reference.id)
 
+    val biospeciemDF = data(normalized_biospecimen.id)
+      .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
+      .joinNcitTerms(data(ncit_terms.id), "cancer_biospecimen_type")
+      .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
+      .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "cancer_anatomic_location")
+
     val transformedFile =
       fileDF
         .addParticipantWithBiospecimen(
           data(simple_participant.id),
-          data(normalized_biospecimen.id).joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source"),
+          biospeciemDF,
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
         )
         .addStudy(data(es_index_study_centric.id))

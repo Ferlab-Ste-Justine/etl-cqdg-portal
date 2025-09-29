@@ -22,8 +22,16 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         DOCUMENTREFERENCE(`fhir_id` = "13", `participant_id` = "P1", `biospecimen_reference` = Seq("B2"), `relates_to` = Some("12"), `files` = Seq(FILE(`file_name` = "file.2", `file_format` = "CRAI"))),
       ).toDF(),
       "normalized_biospecimen" -> Seq(
-        BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
-        BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P1"),
+        BIOSPECIMEN_INPUT(
+          `fhir_id` = "B1",
+          `subject` = "P1",
+          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C12434")),
+        ),
+        BIOSPECIMEN_INPUT(
+          `fhir_id` = "B2",
+          `subject` = "P1",
+          `cancer_biospecimen_type` = None,
+        ),
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
       "simple_participant" -> Seq(
@@ -77,11 +85,32 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           `biospecimens` = Set(
             BIOSPECIMEN(
               `biospecimen_id` = "B1",
+              cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                display = "Blood (NCIT:C12434)",
+                code = "NCIT:C12434",
+                text = Some("location")
+              ),
+              tumor_histological_type = CODE_SYSTEM_TEXT(
+                display = "Missing - Not Provided",
+                code = "Missing - Not provided",
+                text = Some("histological_type5")
+              )
             ),
             BIOSPECIMEN(
               `biospecimen_id` = "B2",
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
+              cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                display = "Blood (NCIT:C12434)",
+                code = "NCIT:C12434",
+                text = Some("location")
+              ),
+              tumor_histological_type = CODE_SYSTEM_TEXT(
+                display = "Missing - Not Provided",
+                code = "Missing - Not provided",
+                text = Some("histological_type5")
+              ),
+              `cancer_biospecimen_type` = None,
             ),
           ),
           `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
@@ -95,9 +124,30 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
                 `biospecimen_id` = "B2",
                 `sample_id` = "sam2",
                 `sample_2_id` = "sam2",
+                cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                  display = "Blood (NCIT:C12434)",
+                  code = "NCIT:C12434",
+                  text = Some("location")
+                ),
+                tumor_histological_type = CODE_SYSTEM_TEXT(
+                  display = "Missing - Not Provided",
+                  code = "Missing - Not provided",
+                  text = Some("histological_type5")
+                ),
+                `cancer_biospecimen_type` = None,
               ),
               BIOSPECIMEN(
                 `biospecimen_id` = "B1",
+                cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                  display = "Blood (NCIT:C12434)",
+                  code = "NCIT:C12434",
+                  text = Some("location")
+                ),
+                tumor_histological_type = CODE_SYSTEM_TEXT(
+                  display = "Missing - Not Provided",
+                  code = "Missing - Not provided",
+                  text = Some("histological_type5")
+                )
               ),
             )
           )),
@@ -126,9 +176,30 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
             `biospecimen_id` = "B2",
             `sample_id` = "sam2",
             `sample_2_id` = "sam2",
+            cancer_anatomic_location = CODE_SYSTEM_TEXT(
+              display = "Blood (NCIT:C12434)",
+              code = "NCIT:C12434",
+              text = Some("location")
+            ),
+            tumor_histological_type = CODE_SYSTEM_TEXT(
+              display = "Missing - Not Provided",
+              code = "Missing - Not provided",
+              text = Some("histological_type5")
+            ),
+            `cancer_biospecimen_type` = None,
           ),
           BIOSPECIMEN(
             `biospecimen_id` = "B1",
+            cancer_anatomic_location = CODE_SYSTEM_TEXT(
+              display = "Blood (NCIT:C12434)",
+              code = "NCIT:C12434",
+              text = Some("location")
+            ),
+            tumor_histological_type = CODE_SYSTEM_TEXT(
+              display = "Missing - Not Provided",
+              code = "Missing - Not provided",
+              text = Some("histological_type5")
+            )
           ),
         ),
         `participants` = Seq(PARTICIPANT_WITH_BIOSPECIMEN(
@@ -142,9 +213,30 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
               `biospecimen_id` = "B2",
               `sample_id` = "sam2",
               `sample_2_id` = "sam2",
+              cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                display = "Blood (NCIT:C12434)",
+                code = "NCIT:C12434",
+                text = Some("location")
+              ),
+              tumor_histological_type = CODE_SYSTEM_TEXT(
+                display = "Missing - Not Provided",
+                code = "Missing - Not provided",
+                text = Some("histological_type5")
+              ),
+              `cancer_biospecimen_type` = None,
             ),
             BIOSPECIMEN(
               `biospecimen_id` = "B1",
+              cancer_anatomic_location = CODE_SYSTEM_TEXT(
+                display = "Blood (NCIT:C12434)",
+                code = "NCIT:C12434",
+                text = Some("location")
+              ),
+              tumor_histological_type = CODE_SYSTEM_TEXT(
+                display = "Missing - Not Provided",
+                code = "Missing - Not provided",
+                text = Some("histological_type5")
+              )
             ),
           )
         )),

@@ -161,7 +161,25 @@ object Transformations {
       .where(size(col("parent")) === 0)
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("biospecimen_tissue_source",
-        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code"))(0))
+        transform(col("type")("coding"), col => struct(col("system") as "system", col("code") as "code", col("display") as "display"))(0))
+      .withColumn("tumor_normal_designation", transform(
+        filter(col("extension"), col => col("url") === TUMOR_NORMAL_DESIGNATION_S_D)(0)("valueCodeableConcept")("coding"),
+        col => when(col("display").isNull, col("code")).otherwise(col("display"))
+      )(0))
+      .withColumn(
+        "cancer_biospecimen_type",
+        struct(
+          firstNonNull(
+            filter(col("extension"), col => col("url") === CANCER_BIOSPECIMEN_TYPE_S_D)
+          )("valueCodeableConcept")("coding")(0)("code").as("code"),
+          firstNonNull(
+            filter(col("extension"), col => col("url") === CANCER_BIOSPECIMEN_TYPE_S_D)
+          )("valueCodeableConcept")("coding")(0)("display").as("display")
+        )
+      )
+      .withColumn("cancer_anatomic_location", extractTumorNCITStruct(CANCER_ANATOMIC_LOCATION_S_D))
+      .withColumn("tumor_histological_type", extractTumorNCITStruct(TUMOR_HISTOLOGICAL_TYPE_S_D))
+
       .withColumn("age_biospecimen_collection", ageFromExtension(col("extension"), AGE_AT_EVENT_S_D))
       .withColumn("submitter_biospecimen_id", firstNonNull(filter(col("identifier"), col => col("use") === "secondary")("value")))
       .withColumn("security", filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code"))
@@ -195,19 +213,9 @@ object Transformations {
   val observationDiseaseStatus: List[Transformation] = List(
     Custom(_
       .select("study_id", "fhir_id", "code", "subject", "valueCodeableConcept")
-      .filter(array_contains(col("code")("coding")("code"),"Disease Status"))
+      .filter(array_contains(col("code")("coding")("code"),"Disease-Status"))
       .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("disease_status", col("valueCodeableConcept")("coding")("code")(0))
-    ),
-    Drop("code", "valueCodeableConcept")
-  )
-
-  val observationTumorNormalDesignation: List[Transformation] = List(
-    Custom(_
-      .select("study_id", "fhir_id", "code", "subject", "valueCodeableConcept")
-      .filter(array_contains(col("code")("coding")("code"),"Tumor Normal Designation"))
-      .withColumn("subject", regexp_extract(col("subject")("reference"), patientExtract, 1))
-      .withColumn("tumor_normal_designation", col("valueCodeableConcept")("coding")("code")(0))
     ),
     Drop("code", "valueCodeableConcept")
   )
@@ -216,7 +224,7 @@ object Transformations {
     Custom(_
       .select("study_id", "fhir_id", "code", "subject", "focus", "valueCodeableConcept", "category")
       .withColumnRenamed("fhir_id", "internal_family_relationship_id")
-      .where(col("code")("coding")(0)("code") === "Family Relationship")
+      .where(col("code")("coding")(0)("code") === "Family-relationship")
       .withColumn("submitter_participant_id",  regexp_extract(col("subject")("reference"), patientExtract, 1))
       .withColumn("focus_participant_id", firstNonNull(transform(col("focus"),  col => regexp_extract(col("reference"), patientExtract, 1))))
       .withColumn("relationship_to_proband", firstNonNull(transform(col("valueCodeableConcept")("coding"), col => col("code"))))
@@ -383,7 +391,6 @@ object Transformations {
     "family_relationship" -> observationFamilyRelationshipMappings,
     "cause_of_death" -> observationCauseOfDeathMappings,
     "disease_status" -> observationDiseaseStatus,
-    "tumor_normal_designation" -> observationTumorNormalDesignation,
   )
 
 }
