@@ -1,6 +1,6 @@
 package model
 
-import model.input.{CODE_SYSTEM_INPUT, CODE_SYSTEM_INPUT_TEXT}
+import model.input.{CODE_SYSTEM_DISPLAY_INPUT, CODE_SYSTEM_INPUT_TEXT}
 
 case class BIOSPECIMEN_CENTRIC(
                                 `biospecimen_id`: String = "BIO0031886",

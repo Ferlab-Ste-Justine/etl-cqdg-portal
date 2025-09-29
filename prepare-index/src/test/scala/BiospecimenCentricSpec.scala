@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, D
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.BiospecimenCentric
 import model._
-import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_DISPLAY_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
 import org.apache.spark.sql.DataFrame
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
@@ -65,7 +65,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         BIOSPECIMEN_INPUT(
           `fhir_id` = "B1",
           `subject` = "P1",
-          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "NCIT:C12434"),
+          `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "NCIT:C12434"),
           `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("location1")),
           `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("histological_type5")),
           `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C164014", `display` = null)),
@@ -75,7 +75,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         BIOSPECIMEN_INPUT(
           `fhir_id` = "B4",
           `subject` = "P3",
-          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "Missing - Not collected", `display` = Some("Missing - Not Collected")),
+          `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "Missing - Not collected", `display` = Some("Missing - Not Collected")),
           `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(display = Some("Missing - Restricted Access"), `system` = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes" , `code` = "Missing - Restricted access", `text` = Some("location2")),
           `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "Missing - Not provided", `text` = Some("histological_type4")),
           `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:XXXXX", `display` = null)),

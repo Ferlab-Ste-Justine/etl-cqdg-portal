@@ -3,6 +3,7 @@ package bio.ferlab.fhir.etl.common
 import bio.ferlab.fhir.etl.common.OntologyUtils._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{when, _}
+import org.apache.spark.sql.types.StructType
 
 object Utils {
 
@@ -109,13 +110,19 @@ object Utils {
 
     def joinNcitTerms(ncitTerms: DataFrame, targetCol: String): DataFrame = {
       val columns = df.columns
+      val hasDisplay = df.schema(targetCol).dataType match {
+        case s: StructType => s.fieldNames.contains("display")
+        case _ => false
+      }
+
+      val displayCol = if (hasDisplay) col(targetCol)("display") else lit(null)
 
       df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
         .withColumn(targetCol,
           when(col("id").isNotNull && col("name").isNotNull,
             concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
             .otherwise(
-              when(col(targetCol)("display").isNotNull, col(targetCol)("display"))
+              when(displayCol.isNotNull, displayCol)
                 .otherwise(col(targetCol)("code"))
             )
         ).select(columns.map(col): _*)

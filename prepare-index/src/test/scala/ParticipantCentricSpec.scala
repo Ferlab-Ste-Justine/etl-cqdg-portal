@@ -2,7 +2,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, S
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.ParticipantCentric
 import model._
-import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_DISPLAY_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.functions.col
 import org.scalatest.matchers.should.Matchers
@@ -31,7 +31,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `subject` = "P1",
           `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("locationB1")),
           `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`display`= Some("Missing - Not Provided"), `system`= "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes", `code` = "Missing - Not provided", `text` = Some("histological_type5")),
-          `biospecimen_tissue_source` = CODE_SYSTEM_INPUT(`code` = "NCIT:C12434"),
+          `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "NCIT:C12434"),
           `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C12434"))
     ),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2"),
