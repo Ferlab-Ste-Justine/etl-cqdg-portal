@@ -63,6 +63,8 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
         .join(shortStudyCode, Seq("study_id"), "left_outer")
         .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
 
+    transformedParticipant.show(false)
+
     Map(mainDestination.id -> transformedParticipant)
   }
 }
