@@ -40,6 +40,11 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
 
     val studyDF = data(normalized_researchstudy.id)
 
+    println("eeeeeeeeeeeeeeeee")
+    data(normalized_researchstudy.id).show(false)
+    data(normalized_patient.id).show(false)
+    println("eeeeeeeeeeeeeeeee")
+
     val samplesCount =
       data(normalized_patient.id)
         .select("fhir_id", "study_id")
