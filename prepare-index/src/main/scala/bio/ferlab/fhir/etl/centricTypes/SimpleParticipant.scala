@@ -63,43 +63,9 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
         .join(shortStudyCode, Seq("study_id"), "left_outer")
         .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
 
-    patientDF.show(false)
+    data(normalized_researchstudy.id).show(false)
     println("-----------1----")
-    patientDF
-      .addCauseOfDeath(data(normalized_cause_of_death.id))
-      .addDiseaseStatus(data(normalized_disease_status.id))
-      .show(false)
-    println("------------2---")
-    patientDF
-      .addCauseOfDeath(data(normalized_cause_of_death.id))
-      .addDiseaseStatus(data(normalized_disease_status.id))
-      .addDiagnosisPhenotypes(
-        data(normalized_phenotype.id),
-        data(normalized_disease.id)
-      )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
-      .show(false)
-    println("------------3---")
-    patientDF
-      .addCauseOfDeath(data(normalized_cause_of_death.id))
-      .addDiseaseStatus(data(normalized_disease_status.id))
-      .addDiagnosisPhenotypes(
-        data(normalized_phenotype.id),
-        data(normalized_disease.id)
-      )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
-      .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
-      .show(false)
-    println("------------4---")
-    patientDF
-      .addCauseOfDeath(data(normalized_cause_of_death.id))
-      .addDiseaseStatus(data(normalized_disease_status.id))
-      .addDiagnosisPhenotypes(
-        data(normalized_phenotype.id),
-        data(normalized_disease.id)
-      )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
-      .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
-      .join(shortStudyCode, Seq("study_id"), "left_outer")
-    println("--------------F-")
-    transformedParticipant.show(false)
+    data(normalized_researchstudy.id).show(false)
 
     Map(mainDestination.id -> transformedParticipant)
   }
