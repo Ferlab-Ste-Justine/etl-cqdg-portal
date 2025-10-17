@@ -63,7 +63,7 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
         .join(shortStudyCode, Seq("study_id"), "left_outer")
         .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
 
-    data(normalized_researchstudy.id).show(false)
+    data(normalized_patient.id).show(false)
     println("-----------1----")
     data(normalized_researchstudy.id).show(false)
 
