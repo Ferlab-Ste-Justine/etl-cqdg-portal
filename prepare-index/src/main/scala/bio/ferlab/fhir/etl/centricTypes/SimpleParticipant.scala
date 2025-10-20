@@ -32,13 +32,7 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
     (Seq(
       normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death,
       normalized_group, normalized_family_relationship, normalized_researchstudy)
-      .map(ds => ds.id -> {
-        println("rrrrrrrrrrrrrrrrrrrrrrr")
-        studyIds.foreach(println)
-        ds.read.show(false)
-        println("rrrrrrrrrrrrrrrrrrrrrrr")
-        ds.read.where(col("study_id").isin(studyIds: _*))
-      }
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))
       ) ++ Seq(
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,
@@ -69,10 +63,6 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
         .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
         .join(shortStudyCode, Seq("study_id"), "left_outer")
         .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
-
-    data(normalized_patient.id).show(false)
-    println("-----------1----")
-    data(normalized_researchstudy.id).show(false)
 
     Map(mainDestination.id -> transformedParticipant)
   }
