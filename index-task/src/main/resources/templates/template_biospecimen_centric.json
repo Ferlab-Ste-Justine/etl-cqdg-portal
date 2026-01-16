@@ -7,7 +7,7 @@
     "settings": {
       "number_of_shards": 5,
       "index": {
-        "max_result_window" : 12000
+        "max_result_window": 12000
       },
       "analysis": {
         "normalizer": {
@@ -23,7 +23,7 @@
       "properties": {
         "biospecimen_id": {
           "type": "keyword",
-          "normalizer" : "custom_normalizer"
+          "normalizer": "custom_normalizer"
         },
         "cancer_anatomic_location": {
           "properties": {
@@ -71,14 +71,14 @@
         },
         "study": {
           "properties": {
-            "study_code" : {
-              "type" : "keyword"
+            "study_code": {
+              "type": "keyword"
             },
             "name": {
               "type": "keyword"
             },
-            "population" : {
-              "type" : "keyword"
+            "population": {
+              "type": "keyword"
             },
             "domain": {
               "type": "keyword"
@@ -490,44 +490,44 @@
             },
             "sequencing_experiment": {
               "properties": {
-                "analysis_id" : {
+                "analysis_id": {
                   "type": "keyword"
                 },
-                "owner" : {
+                "owner": {
                   "type": "keyword"
                 },
-                "bio_informatic_analysis" : {
+                "bio_informatic_analysis": {
                   "type": "keyword"
                 },
-                "labAliquotID" : {
+                "labAliquotID": {
                   "type": "keyword"
                 },
-                "type_of_sequencing" : {
+                "type_of_sequencing": {
                   "type": "keyword"
                 },
-                "read_length" : {
+                "read_length": {
                   "type": "keyword"
                 },
-                "run_name" : {
+                "run_name": {
                   "type": "keyword"
                 },
-                "run_alias" : {
+                "run_alias": {
                   "type": "keyword"
                 },
-                "run_date" : {
+                "run_date": {
                   "type": "date",
                   "format": "yyyy-MM-dd"
                 },
-                "capture_kit" : {
+                "capture_kit": {
                   "type": "keyword"
                 },
-                "platform" : {
+                "platform": {
                   "type": "keyword"
                 },
-                "experimental_strategy" : {
+                "experimental_strategy": {
                   "type": "keyword"
                 },
-                "experimental_strategy_1" : {
+                "experimental_strategy_1": {
                   "properties": {
                     "code": {
                       "type": "keyword"
@@ -537,19 +537,19 @@
                     }
                   }
                 },
-                "sequencer_id" : {
+                "sequencer_id": {
                   "type": "keyword"
                 },
-                "workflow_name" : {
+                "workflow_name": {
                   "type": "keyword"
                 },
-                "workflow_version" : {
+                "workflow_version": {
                   "type": "keyword"
                 },
-                "genome_build" : {
+                "genome_build": {
                   "type": "keyword"
                 },
-                "selection" : {
+                "selection": {
                   "properties": {
                     "code": {
                       "type": "keyword"
@@ -559,7 +559,7 @@
                     }
                   }
                 },
-                "source" : {
+                "source": {
                   "properties": {
                     "code": {
                       "type": "keyword"
@@ -569,22 +569,22 @@
                     }
                   }
                 },
-                "protocol" : {
+                "protocol": {
                   "type": "keyword"
                 },
-                "target_capture_kit" : {
+                "target_capture_kit": {
                   "type": "keyword"
                 },
-                "target_loci" : {
+                "target_loci": {
                   "type": "keyword"
                 },
-                "pipeline" : {
+                "pipelines": {
                   "type": "keyword"
                 },
-                "run_ids" : {
+                "run_ids": {
                   "type": "keyword"
                 },
-                "analysis_files" : {
+                "analysis_files": {
                   "properties": {
                     "data_type": {
                       "type": "keyword"
@@ -606,18 +606,18 @@
         },
         "sample_id": {
           "type": "keyword",
-          "normalizer" : "custom_normalizer"
+          "normalizer": "custom_normalizer"
         },
         "sample_2_id": {
           "type": "keyword",
-          "normalizer" : "custom_normalizer"
+          "normalizer": "custom_normalizer"
         },
         "sample_type": {
           "type": "keyword"
         },
         "submitter_sample_id": {
           "type": "keyword",
-          "normalizer" : "custom_normalizer"
+          "normalizer": "custom_normalizer"
         }
       }
     }
