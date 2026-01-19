@@ -3,8 +3,7 @@ package model
 case class SEQUENCING_EXPERIMENT_SINGLE(
     `owner`: String = "CQDG",
     `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
-    `experimental_strategy`: String =
-      "WXS", // FIXME remove this field after all studies are updated (replace _1)
+    `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
     `selection`: CODEABLE = CODEABLE("RR", "RR_display"),
     `source`: CODEABLE = CODEABLE("TSC", "TSC_display"),
     `protocol`: String = "protocol2",
@@ -13,7 +12,7 @@ case class SEQUENCING_EXPERIMENT_SINGLE(
     `pipelines`: Seq[String] = Seq("testPipeline1", "testPipeline2"),
     `run_ids`: Seq[String] = Seq("runNameExample"),
     `run_dates`: Seq[String] = Seq("2007-04-14"),
-//                                  `is_paired_end`: Boolean = false,
+    // `is_paired_end`: Boolean = false,
     `analysis_files`: Seq[ANALYSIS_FILE] = Seq(
       ANALYSIS_FILE("Annotated-SNV", "12"),
       ANALYSIS_FILE("Aligned-reads", "1"),

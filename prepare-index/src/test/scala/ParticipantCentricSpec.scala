@@ -1,27 +1,15 @@
-import bio.ferlab.datalake.commons.config.{
-  Configuration,
-  ConfigurationLoader,
-  SimpleConfiguration
-}
+import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, SimpleConfiguration}
 import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.centricTypes.ParticipantCentric
 import model._
-import model.input.{
-  BIOSPECIMEN_INPUT,
-  CODE_SYSTEM_DISPLAY_INPUT,
-  CODE_SYSTEM_INPUT_TEXT,
-  SAMPLE_INPUT
-}
+import model.input.{BIOSPECIMEN_INPUT, CODE_SYSTEM_DISPLAY_INPUT, CODE_SYSTEM_INPUT_TEXT, SAMPLE_INPUT}
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.functions.col
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
 import pureconfig.generic.auto._
 
-class ParticipantCentricSpec
-    extends AnyFlatSpec
-    with Matchers
-    with WithSparkSession {
+class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
   import spark.implicits._
 
@@ -50,13 +38,11 @@ class ParticipantCentricSpec
           ),
           `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(
             `display` = Some("Missing - Not Provided"),
-            `system` =
-              "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes",
+            `system` = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes",
             `code` = "Missing - Not provided",
             `text` = Some("histological_type5")
           ),
-          `biospecimen_tissue_source` =
-            CODE_SYSTEM_DISPLAY_INPUT(`code` = "NCIT:C12434"),
+          `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "NCIT:C12434"),
           `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C12434"))
         ),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2")
@@ -117,8 +103,7 @@ class ParticipantCentricSpec
             `ferload_url` = Some(
               "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a"
             ),
-            `biospecimen_reference` =
-              Seq("SAM0000001", "SAM0000002", "SAM0000003"),
+            `biospecimen_reference` = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
             `data_type` = Some("SSUP"),
             `dataset` = Some("Dataset1"),
             `biospecimens` = Seq(

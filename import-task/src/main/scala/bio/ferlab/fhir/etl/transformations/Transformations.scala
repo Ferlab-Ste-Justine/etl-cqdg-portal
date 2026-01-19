@@ -481,8 +481,7 @@ object Transformations {
               col("extension"),
               col => col("url") === TUMOR_NORMAL_DESIGNATION_S_D
             )(0)("valueCodeableConcept")("coding"),
-            col =>
-              when(col("display").isNull, col("code")).otherwise(col("display"))
+            col => when(col("display").isNull, col("code")).otherwise(col("display"))
           )(0)
         )
         .withColumn(
