@@ -21,8 +21,8 @@ libraryDependencies ++= Seq(
 
   // TEST
   "org.scalatest" %% "scalatest" % "3.2.9" % Test,
-  "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.40.5" % "test",
-  "org.testcontainers" % "localstack" % "1.17.1" % "test"
+  "org.testcontainers" % "localstack" % "1.21.4" % Test,
+  "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.38.8" % Test
 )
 
 Test / fork := true
