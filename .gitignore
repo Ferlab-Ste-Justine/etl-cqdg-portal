@@ -109,3 +109,10 @@ metastore_db/*
 
 /tmp
 .DS_store
+
+# Metals
+.metals/
+.bloop/
+
+# VS Code
+.vscode/

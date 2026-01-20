@@ -14,7 +14,7 @@ case class TASK(
                  `protocol`: String = "protocol2",
                  `target_capture_kit`: String = "targetCaptureKit2",
                  `target_loci`: String = "targetedLoci2",
-                 `pipeline`: String = "testPipeline",
+                 `pipelines`: Seq[String] = Seq("testPipeline1", "testPipeline2"),
                  `is_paired_end`: Boolean = true,
                  `capture_kit`: String = "RocheKapaHyperExome",
                  `platform`: String = "Illumina",

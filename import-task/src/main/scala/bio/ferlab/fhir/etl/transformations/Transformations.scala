@@ -87,7 +87,7 @@ object Transformations {
         )(0)
       )
       .withColumn("genome_build", filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code"))
-      .withColumn("pipeline", filter(col("workflow")("extension"), col => col("url") === "pipeline")(0)("valueString"))
+      .withColumn("pipelines", filter(col("workflow")("extension"), col => col("url") === "pipeline")("valueString"))
       .withColumn("_for", regexp_extract(col("for")("reference"), patientExtract, 1))
       .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
       .withColumn("analysis_files", transform(col("output"), col => struct(col("type")("coding")(0)("code") as "data_type", col("valueReference")("reference") as "file_id")))

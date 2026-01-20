@@ -9,7 +9,7 @@ case class SEQUENCING_EXPERIMENT_SINGLE(
                                   `protocol`: String = "protocol2",
                                   `target_capture_kit`: String = "targetCaptureKit2",
                                   `target_loci`: String = "targetedLoci2",
-                                  `pipeline`: String = "testPipeline",
+                                  `pipelines`: Seq[String] = Seq("testPipeline1", "testPipeline2"),
                                   `run_ids`: Seq[String] = Seq("runNameExample"),
                                   `run_dates`: Seq[String] = Seq("2007-04-14"),
 //                                  `is_paired_end`: Boolean = false,
@@ -27,4 +27,3 @@ case class TASK_SAMPLE(
                         `lab_aliquot_ids`: Seq[String] = Seq("nanuq_sample_id"),
                         `ldm_sample_id`: String = "S16523",
                       )
-
