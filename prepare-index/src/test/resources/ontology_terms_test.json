@@ -1,9 +1,147 @@
-{"id":"HP:G","name":"G Name","parents":["B Name (HP:B)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true, "alt_ids": ["HP:D"]}
-{"id":"HP:E","name":"E Name","parents":["B Name (HP:B)", "C Name (HP:C)"],"ancestors":[{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]},{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]}],"is_leaf":true, "alt_ids": []}
-{"id":"HP:F","name":"F Name","parents":["C Name (HP:C)"],"ancestors":[{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"]},{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":true, "alt_ids": []}
-{"id":"HP:B","name":"B Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false, "alt_ids": []}
-{"id":"HP:C","name":"C Name","parents":["A Name (HP:A)"],"ancestors":[{"id":"HP:A","name":"A Name","parents":[]}],"is_leaf":false, "alt_ids": []}
-{"id":"HP:A","name":"A Name","parents":[],"ancestors":[],"is_leaf":false, "alt_ids": []}
+{
+    "id": "HP:G",
+    "name": "G Name",
+    "parents": [
+        "B Name (HP:B)"
+    ],
+    "ancestors": [
+        {
+            "id": "HP:B",
+            "name": "B Name",
+            "parents": [
+                "A Name (HP:A)"
+            ]
+        },
+        {
+            "id": "HP:A",
+            "name": "A Name",
+            "parents": []
+        }
+    ],
+    "is_leaf": true,
+    "alt_ids": [
+        "HP:D"
+    ]
+}
+{
+    "id": "HP:E",
+    "name": "E Name",
+    "parents": [
+        "B Name (HP:B)",
+        "C Name (HP:C)"
+    ],
+    "ancestors": [
+        {
+            "id": "HP:B",
+            "name": "B Name",
+            "parents": [
+                "A Name (HP:A)"
+            ]
+        },
+        {
+            "id": "HP:A",
+            "name": "A Name",
+            "parents": []
+        },
+        {
+            "id": "HP:C",
+            "name": "C Name",
+            "parents": [
+                "A Name (HP:A)"
+            ]
+        }
+    ],
+    "is_leaf": true,
+    "alt_ids": []
+}
+{
+    "id": "HP:F",
+    "name": "F Name",
+    "parents": [
+        "C Name (HP:C)"
+    ],
+    "ancestors": [
+        {
+            "id": "HP:C",
+            "name": "C Name",
+            "parents": [
+                "A Name (HP:A)"
+            ]
+        },
+        {
+            "id": "HP:A",
+            "name": "A Name",
+            "parents": []
+        }
+    ],
+    "is_leaf": true,
+    "alt_ids": []
+}
+{
+    "id": "HP:B",
+    "name": "B Name",
+    "parents": [
+        "A Name (HP:A)"
+    ],
+    "ancestors": [
+        {
+            "id": "HP:A",
+            "name": "A Name",
+            "parents": []
+        }
+    ],
+    "is_leaf": false,
+    "alt_ids": []
+}
+{
+    "id": "HP:C",
+    "name": "C Name",
+    "parents": [
+        "A Name (HP:A)"
+    ],
+    "ancestors": [
+        {
+            "id": "HP:A",
+            "name": "A Name",
+            "parents": []
+        }
+    ],
+    "is_leaf": false,
+    "alt_ids": []
+}
+{
+    "id": "HP:A",
+    "name": "A Name",
+    "parents": [],
+    "ancestors": [],
+    "is_leaf": false,
+    "alt_ids": []
+}
 
-{"id":"A28.9|1","name":"ICD 1","parents":["Parent of ICD 1 (A28)"],"ancestors":[{"id":"A20-A28","name":"Grand Parent of ICD 1","parents":[]},{"id":"A28","name":"Parent of ICD 1","parents":[]}],"is_leaf":true}
-{"id":"A20-A28|1","name":"ICD 2","parents":[],"ancestors":[],"is_leaf":false}
+{
+    "id": "A28.9|1",
+    "name": "ICD 1",
+    "parents": [
+        "Parent of ICD 1 (A28)"
+    ],
+    "ancestors": [
+        {
+            "id": "A20-A28",
+            "name": "Grand Parent of ICD 1",
+            "parents": []
+        },
+        {
+            "id": "A28",
+            "name": "Parent of ICD 1",
+            "parents": []
+        }
+    ],
+    "is_leaf": true
+}
+{
+    "id": "A20-A28|1",
+    "name": "ICD 2",
+    "parents": [],
+    "ancestors": [],
+    "is_leaf": false
+}

@@ -16,7 +16,7 @@ class ProgramCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession
 
   "transform" should "prepare index program_centric" in {
     val data: Map[String, DataFrame] = Map(
-      "normalized_list" -> Seq(LIST_INPUT()).toDF(),
+      "normalized_list" -> Seq(LIST_INPUT()).toDF()
     )
 
     val output = new ProgramCentric(List("SD_Z6MWD3H0"))(conf).transform(data)
@@ -25,10 +25,19 @@ class ProgramCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession
 
     val program_centric = output("es_index_program_centric")
 
-    val programCentricOutput = PROGRAM_CENTRIC(`contacts` = Seq(
-      PROGRAM_CONTACT(`name` = null, `institution` = "RI-MUHC", `role_en` = null, `role_fr` = null,
-        `picture_url` = null, `email` = "info@rare.quebec", `website` = "https://rare.quebec")
-    ))
+    val programCentricOutput = PROGRAM_CENTRIC(`contacts` =
+      Seq(
+        PROGRAM_CONTACT(
+          `name` = null,
+          `institution` = "RI-MUHC",
+          `role_en` = null,
+          `role_fr` = null,
+          `picture_url` = null,
+          `email` = "info@rare.quebec",
+          `website` = "https://rare.quebec"
+        )
+      )
+    )
 
     program_centric.as[PROGRAM_CENTRIC].collect() should contain theSameElementsAs
       Seq(programCentricOutput)

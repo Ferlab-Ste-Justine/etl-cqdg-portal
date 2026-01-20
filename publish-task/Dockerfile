@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM eclipse-temurin:11
 
 COPY cqdg-qa-os-ca.crt /opt/ca_cqdg_juno_qa.crt
 COPY install_ca.sh /opt/install_ca.sh

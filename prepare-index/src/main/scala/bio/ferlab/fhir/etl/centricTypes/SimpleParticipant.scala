@@ -21,29 +21,38 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
   val normalized_family_relationship: DatasetConf = conf.getDataset("normalized_family_relationship")
   val normalized_researchstudy: DatasetConf = conf.getDataset("normalized_research_study")
 
-
   val hpo_terms: DatasetConf = conf.getDataset("hpo_terms")
   val mondo_terms: DatasetConf = conf.getDataset("mondo_terms")
   val icd_terms: DatasetConf = conf.getDataset("icd_terms")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     (Seq(
-      normalized_patient, normalized_phenotype, normalized_disease, normalized_disease_status, normalized_cause_of_death,
-      normalized_group, normalized_family_relationship, normalized_researchstudy)
-      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))
-      ) ++ Seq(
+      normalized_patient,
+      normalized_phenotype,
+      normalized_disease,
+      normalized_disease_status,
+      normalized_cause_of_death,
+      normalized_group,
+      normalized_family_relationship,
+      normalized_researchstudy
+    )
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))) ++ Seq(
       hpo_terms.id -> hpo_terms.read,
       mondo_terms.id -> mondo_terms.read,
-      icd_terms.id -> icd_terms.read,
+      icd_terms.id -> icd_terms.read
     )).toMap
 
   }
 
-  override def transform(data: Map[String, DataFrame],
-                         lastRunDateTime: LocalDateTime = minDateTime,
-                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def transform(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val patientDF = data(normalized_patient.id)
 
@@ -62,7 +71,7 @@ class SimpleParticipant(studyIds: List[String])(implicit configuration: Configur
         )(data(hpo_terms.id), data(mondo_terms.id), data(icd_terms.id))
         .addFamily(data(normalized_group.id), data(normalized_family_relationship.id))
         .join(shortStudyCode, Seq("study_id"), "left_outer")
-        .withColumn("participant_2_id", col("participant_id")) //Duplicate for UI purpose
+        .withColumn("participant_2_id", col("participant_id")) // Duplicate for UI purpose
 
     Map(mainDestination.id -> transformedParticipant)
   }

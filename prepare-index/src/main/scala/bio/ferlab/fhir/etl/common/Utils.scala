@@ -9,8 +9,8 @@ object Utils {
 
   implicit class DataFrameOperations(df: DataFrame) {
     def addStudy(studyDf: DataFrame): DataFrame = {
-      val requiredStudyCols = Seq("study_code", "name", "population", "domain", "data_access_codes",
-        "access_authority", "programs")
+      val requiredStudyCols =
+        Seq("study_code", "name", "population", "domain", "data_access_codes", "access_authority", "programs")
       val cols = studyDf.columns.filter(requiredStudyCols.contains(_))
 
       val refactorStudyDf = studyDf
@@ -21,17 +21,17 @@ object Utils {
     }
 
     def filterRestricted(): DataFrame = {
-      if(df.columns.contains("security")) {
+      if (df.columns.contains("security")) {
         df.where(col("security") =!= "R")
       } else df
     }
 
-    /**
-     * assume df is study, will add data Categories already on the study to the data category found on the files
-     * format have to be [(data_Category_type, count)]>
-     *
-     * @param dataCategoryCount : Data Categories and count based on DocumentReference
-     * */
+    /** assume df is study, will add data Categories already on the study to the data category found on the files format
+      * have to be [(data_Category_type, count)]>
+      *
+      * @param dataCategoryCount
+      *   : Data Categories and count based on DocumentReference
+      */
     def combineDataCategoryFromFilesAndStudy(dataCategoryCount: DataFrame): DataFrame = {
 
       val deltaDataCategory = df
@@ -39,25 +39,36 @@ object Utils {
         .withColumn("data_categories_exp", explode(col("data_categories")))
         .join(dataCategoryCount, Seq("study_id"), "left_outer")
         .filter(!array_contains(col("data_categories_from_files")("data_category"), col("data_categories_exp")))
-        .withColumn("data_categories", struct(col("data_categories_exp") as "data_category", lit(null).cast("integer") as "participant_count"))
+        .withColumn(
+          "data_categories",
+          struct(col("data_categories_exp") as "data_category", lit(null).cast("integer") as "participant_count")
+        )
         .groupBy("study_id")
         .agg(collect_set("data_categories") as "data_categories")
 
-      dataCategoryCount.join(deltaDataCategory, Seq("study_id"), "left")
-        .withColumn("data_categories",
+      dataCategoryCount
+        .join(deltaDataCategory, Seq("study_id"), "left")
+        .withColumn(
+          "data_categories",
           when(isnull(col("data_categories")), col("data_categories_from_files"))
-          .otherwise(concat(col("data_categories_from_files"), col("data_categories"))))
+            .otherwise(concat(col("data_categories_from_files"), col("data_categories")))
+        )
         .select("study_id", "data_categories")
     }
 
-    def addParticipantWithBiospecimen(participantDf: DataFrame, biospecimenDF: DataFrame, sampleRegistration: DataFrame): DataFrame = {
+    def addParticipantWithBiospecimen(
+        participantDf: DataFrame,
+        biospecimenDF: DataFrame,
+        sampleRegistration: DataFrame
+    ): DataFrame = {
       val biospecimenWithSamples = biospecimenDF
         .addSamplesToBiospecimen(sampleRegistration)
         .withColumnRenamed("fhir_id", "biospecimen_id")
 
       val biospecimenIdWithParticipant = biospecimenWithSamples.addParticipants(participantDf)
 
-      val biospecimenWithSamplesParticipant = biospecimenWithSamples.join(biospecimenIdWithParticipant, Seq("biospecimen_id"), "left_outer")
+      val biospecimenWithSamplesParticipant =
+        biospecimenWithSamples.join(biospecimenIdWithParticipant, Seq("biospecimen_id"), "left_outer")
 
       val participantsWithBiospecimen = participantDf
         .addBiospecimen(biospecimenWithSamplesParticipant)
@@ -78,7 +89,7 @@ object Utils {
     def addSamplesToBiospecimen(samplesDf: DataFrame): DataFrame = {
       val samplesGrouped = samplesDf
         .withColumnRenamed("fhir_id", "sample_id")
-        .withColumn("sample_2_id", col("sample_id")) //doubling sample_id portal use
+        .withColumn("sample_2_id", col("sample_id")) // doubling sample_id portal use
         .withColumnRenamed("parent", "fhir_id")
 
       df.join(samplesGrouped, Seq("fhir_id", "subject", "study_id"), "left_outer")
@@ -89,7 +100,9 @@ object Utils {
 
       val biospecimenGrouped = biospecimenDf
         .groupBy(groupColumns.head, groupColumns.tail: _*)
-        .agg(collect_list(struct(biospecimenDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "biospecimens")
+        .agg(
+          collect_list(struct(biospecimenDf.columns.filterNot(groupColumns.contains).map(col): _*)) as "biospecimens"
+        )
         .withColumnRenamed("subject", "participant_id")
 
       df.join(biospecimenGrouped, Seq("participant_id", "study_id"), "left_outer")
@@ -112,39 +125,52 @@ object Utils {
       val columns = df.columns
       val hasDisplay = df.schema(targetCol).dataType match {
         case s: StructType => s.fieldNames.contains("display")
-        case _ => false
+        case _             => false
       }
 
       val displayCol = if (hasDisplay) col(targetCol)("display") else lit(null)
 
       df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
-        .withColumn(targetCol,
-          when(col("id").isNotNull && col("name").isNotNull,
-            concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
+        .withColumn(
+          targetCol,
+          when(
+            col("id").isNotNull && col("name").isNotNull,
+            concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")")))
+          )
             .otherwise(
               when(displayCol.isNotNull, displayCol)
                 .otherwise(col(targetCol)("code"))
             )
-        ).select(columns.map(col): _*)
+        )
+        .select(columns.map(col): _*)
     }
 
     def joinNcitTermsReplaceDisplay(ncitTerms: DataFrame, targetCol: String): DataFrame = {
       val columns = df.columns
 
       df.join(ncitTerms, col(s"$targetCol.code") === col("id"), "left_outer")
-        .withColumn(targetCol, struct(
-          col(targetCol)("code") as "code",
-          col(targetCol)("text") as "text",
-          when(col("id").isNotNull && col("name").isNotNull,
-            concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")"))))
-            .otherwise(
-              when(col(targetCol)("display").isNotNull, col(targetCol)("display"))
-                .otherwise(col(targetCol)("code"))
-            ) as "display"
-        )).select(columns.map(col): _*)
+        .withColumn(
+          targetCol,
+          struct(
+            col(targetCol)("code") as "code",
+            col(targetCol)("text") as "text",
+            when(
+              col("id").isNotNull && col("name").isNotNull,
+              concat_ws(" ", col("name"), concat(lit("("), col("id"), lit(")")))
+            )
+              .otherwise(
+                when(col(targetCol)("display").isNotNull, col(targetCol)("display"))
+                  .otherwise(col(targetCol)("code"))
+              ) as "display"
+          )
+        )
+        .select(columns.map(col): _*)
     }
 
-    def addDiagnosisPhenotypes(phenotypeDF: DataFrame, diagnosesDF: DataFrame)(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {
+    def addDiagnosisPhenotypes(
+        phenotypeDF: DataFrame,
+        diagnosesDF: DataFrame
+    )(hpoTerms: DataFrame, mondoTerms: DataFrame, icdTerms: DataFrame): DataFrame = {
       val (observedPhenotypes, observedPhenotypesWithAncestors, phenotypes) = getTaggedPhenotypes(phenotypeDF, hpoTerms)
 
       val (diagnosis, mondoWithAncestors) = getDiagnosis(diagnosesDF, mondoTerms, icdTerms)
@@ -173,7 +199,10 @@ object Utils {
       val sequencingExperimentClean = sequencingExperiment
         .withColumnRenamed("_for", "participant_id")
         .withColumnRenamed("fhir_id", "analysis_id")
-        .withColumn("type_of_sequencing", when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads")))
+        .withColumn(
+          "type_of_sequencing",
+          when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads"))
+        )
         .drop("study_id", "is_paired_end")
 
       val seqExperimentByFile = sequencingExperimentClean
@@ -188,7 +217,9 @@ object Utils {
               ).as("sample"),
               struct(
                 sequencingExperimentClean.columns
-                  .filterNot(Seq("participant_id", "all_files", "all_files_exp", "lab_aliquot_ids", "ldm_sample_id").contains)
+                  .filterNot(
+                    Seq("participant_id", "all_files", "all_files_exp", "lab_aliquot_ids", "ldm_sample_id").contains
+                  )
                   .map(e => col(e)): _*
               ).as("sequencing_experiment")
             )
@@ -212,36 +243,47 @@ object Utils {
         .drop("subject")
     }
 
-    def fieldCount(field: String, countField: String): DataFrame = df.withColumn("files_exp", explode(col("files")))
-      .na.drop(Seq(s"files_exp.$field"))
+    def fieldCount(field: String, countField: String): DataFrame = df
+      .withColumn("files_exp", explode(col("files")))
+      .na
+      .drop(Seq(s"files_exp.$field"))
       .groupBy("study_id", s"files_exp.$field")
       .agg(size(collect_set(col("subject"))) as "participant_count")
       .groupBy("study_id")
       .agg(collect_list(struct(col(field), col("participant_count"))) as countField)
 
-    def addFilesWithBiospecimen(filesDf: DataFrame, biospecimensDf: DataFrame, seqExperiment: DataFrame, sampleRegistrationDF: DataFrame): DataFrame = {
+    def addFilesWithBiospecimen(
+        filesDf: DataFrame,
+        biospecimensDf: DataFrame,
+        seqExperiment: DataFrame,
+        sampleRegistrationDF: DataFrame
+    ): DataFrame = {
       val biospecimenGrouped = biospecimensDf.addSamplesGroupedToBiospecimen(sampleRegistrationDF)
 
-      val filesWithSeqExp = filesDf
-        .explodeFilesAndRemoveRalatedTo
+      val filesWithSeqExp = filesDf.explodeFilesAndRemoveRalatedTo
         .addSequencingExperiment(seqExperiment)
         .withColumnRenamed("fhir_id", "file_id")
-        .withColumn("file_2_id", col("file_id")) //Duplicate for UI use
+        .withColumn("file_2_id", col("file_id")) // Duplicate for UI use
 
       val filesWithBiospecimen = filesWithSeqExp
         .join(biospecimenGrouped, Seq("participant_id", "study_id"), "left_outer")
 
       val filesGroupedPerParticipant = filesWithBiospecimen
-        .groupBy("participant_id",  "study_id")
-        .agg(collect_list(struct(
-          filesWithBiospecimen.columns.filterNot(Seq("participant_id",  "study_id").contains).map(col): _*
-        )) as "files")
+        .groupBy("participant_id", "study_id")
+        .agg(
+          collect_list(
+            struct(
+              filesWithBiospecimen.columns.filterNot(Seq("participant_id", "study_id").contains).map(col): _*
+            )
+          ) as "files"
+        )
 
       df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id"), "inner")
     }
 
     def explodeFilesAndRemoveRalatedTo: DataFrame = df
-      .filter(!col("relates_to").isNotNull).drop("relates_to")
+      .filter(!col("relates_to").isNotNull)
+      .drop("relates_to")
       .withColumn("files_exp", explode(col("files")))
       .select("*", "files_exp.*")
       .drop("files_exp", "files")
@@ -251,10 +293,10 @@ object Utils {
         .withColumn("files_exp", explode(col("files")))
         .withColumnRenamed("fhir_id", "file_id")
 
-      //Filter out files like CRAI and TBI
+      // Filter out files like CRAI and TBI
       val filesParent = filesExp.filter(!col("relates_to").isNotNull).drop("relates_to")
 
-      //CRAI and TBI files
+      // CRAI and TBI files
       val filesRef = filesExp
         .filter(col("relates_to").isNotNull)
         .withColumn("related_file", struct(Seq("file_id", "files_exp.*").map(col): _*))
@@ -265,12 +307,12 @@ object Utils {
       val filesWithRef = filesParent
         .join(filesRef, Seq("file_id"), "left_outer")
 
-      val fileColumns =  filesWithRef.select("files_exp.*").columns
+      val fileColumns = filesWithRef.select("files_exp.*").columns
 
-      filesWithRef.select((filesWithRef.columns ++ fileColumns.map(c => s"files_exp.$c")).map(col): _*)
+      filesWithRef
+        .select((filesWithRef.columns ++ fileColumns.map(c => s"files_exp.$c")).map(col): _*)
         .drop("files_exp", "files")
     }
-
 
     def addSamplesGroupedToBiospecimen(sampleRegistrationDF: DataFrame) = {
       val biospecimenWithSample = df
@@ -278,9 +320,9 @@ object Utils {
         .withColumnRenamed("fhir_id", "biospecimen_id")
 
       biospecimenWithSample
-        .withColumn("biospecimen",
-          struct(
-            biospecimenWithSample.columns.filterNot(Seq("subject", "study_id").contains).map(col): _*)
+        .withColumn(
+          "biospecimen",
+          struct(biospecimenWithSample.columns.filterNot(Seq("subject", "study_id").contains).map(col): _*)
         )
         .withColumnRenamed("subject", "participant_id")
         .select("participant_id", "study_id", "biospecimen")
@@ -289,8 +331,7 @@ object Utils {
     }
 
     def addFiles(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
-      val filesWithSeqExp = filesDf
-        .explodeFilesAndRemoveRalatedTo
+      val filesWithSeqExp = filesDf.explodeFilesAndRemoveRalatedTo
         .addSequencingExperiment(seqExperiment)
         .withColumnRenamed("participant_id", "subject")
         .withColumnRenamed("fhir_id", "file_id")
@@ -298,7 +339,11 @@ object Utils {
 
       val filesWithSeqExpGrouped = filesWithSeqExp
         .groupBy("subject", "study_id")
-        .agg(collect_list(struct(filesWithSeqExp.columns.filterNot(Seq("subject", "study_id").contains) map col: _*)) as "files")
+        .agg(
+          collect_list(
+            struct(filesWithSeqExp.columns.filterNot(Seq("subject", "study_id").contains) map col: _*)
+          ) as "files"
+        )
 
       df.join(filesWithSeqExpGrouped, Seq("subject", "study_id"), "inner")
     }
@@ -324,14 +369,17 @@ object Utils {
 
       studyExpDS
         .join(filesWithTaskAndParticipants, Seq("study_id", "dataset"), "left_outer")
-        .withColumn("dataset", struct(
-          col("dataset") as "name",
-          col("dataset_desc") as "description",
-          col("data_types"),
-          col("experimental_strategies_1"),
-          col("file_count"),
-          col("participant_count"),
-        ))
+        .withColumn(
+          "dataset",
+          struct(
+            col("dataset") as "name",
+            col("dataset_desc") as "description",
+            col("data_types"),
+            col("experimental_strategies_1"),
+            col("file_count"),
+            col("participant_count")
+          )
+        )
         .select("study_id", "dataset")
         .groupBy("study_id")
         .agg(collect_list("dataset") as "datasets")
@@ -377,7 +425,6 @@ object Utils {
         .withColumnRenamed("internal_family_id", "family_id")
         .withColumnRenamed("submitter_participant_id", "participant_id")
 
-
       val participantIsAffectedDf = df.select("participant_id", "submitter_participant_id", "is_affected")
 
       val isProbandDf = familyRelationshipDf
@@ -388,17 +435,20 @@ object Utils {
       val familyWithGroup = wholeFamilyDf
         .join(participantIsAffectedDf, Seq("participant_id"), "left_outer")
         .groupBy("study_id", "family_id", "submitter_family_id")
-        .agg(collect_list(struct(
-          col("participant_id"),
-          col("submitter_participant_id"),
-          col("focus_participant_id"),
-          col("relationship_to_proband"),
-          col("family_id"),
-          col("family_type"),
-          col("submitter_family_id"),
-          col("is_affected"),
-        )) as "family_relationships",
-          first(col("family_members")) as "family_members",
+        .agg(
+          collect_list(
+            struct(
+              col("participant_id"),
+              col("submitter_participant_id"),
+              col("focus_participant_id"),
+              col("relationship_to_proband"),
+              col("family_id"),
+              col("family_type"),
+              col("submitter_family_id"),
+              col("is_affected")
+            )
+          ) as "family_relationships",
+          first(col("family_members")) as "family_members"
         )
         .withColumn("family_members_exp", explode(col("family_members")))
         .join(isProbandDf, col("submitter_participant_id") === col("family_members_exp"))
@@ -410,7 +460,7 @@ object Utils {
 
       df
         .join(familyWithGroup, col("participant_id") === col("family_members_exp"), "left_outer")
-        .join(participantFamilyRelDf, Seq("participant_id"),"left_outer")
+        .join(participantFamilyRelDf, Seq("participant_id"), "left_outer")
         .drop("family_members_exp")
     }
   }

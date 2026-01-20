@@ -12,7 +12,12 @@ spec:
   initContainers:
     - name: init-es-certificate
       image: amazoncorretto:11
-      command: ['sh', '-c', "keytool -importkeystore -noprompt -srckeystore /etc/pki/java/cacerts -destkeystore /opt/keystores/truststore.p12 -srcstoretype PKCS12 -deststoretype PKCS12 -srcstorepass changeit -storepass changeit && keytool -import -noprompt -keystore /opt/keystores/truststore.p12 -file /opt/es-ca/ca.crt -storepass changeit -alias es"]
+      command:
+        [
+          "sh",
+          "-c",
+          "keytool -importkeystore -noprompt -srckeystore /etc/pki/java/cacerts -destkeystore /opt/keystores/truststore.p12 -srcstoretype PKCS12 -deststoretype PKCS12 -srcstorepass changeit -storepass changeit && keytool -import -noprompt -keystore /opt/keystores/truststore.p12 -file /opt/es-ca/ca.crt -storepass changeit -alias es",
+        ]
       volumeMounts:
         - mountPath: /opt/keystores
           name: keystore-volume

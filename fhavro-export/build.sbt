@@ -1,4 +1,3 @@
-
 name := "fhavro-export"
 version := "0.0.1"
 
@@ -31,11 +30,11 @@ Test / envVars := Map("AWS_ACCESS_KEY" -> "access_key", "AWS_SECRET_KEY" -> "sec
 
 resolvers ++= Seq("Sonatype OSS Releases" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
 
-assembly / assemblyMergeStrategy:= {
+assembly / assemblyMergeStrategy := {
   case PathList("META-INF", _*) => MergeStrategy.discard
-  case _ => MergeStrategy.first
+  case _                        => MergeStrategy.first
 }
 
 assembly / test := {}
 assembly / mainClass := Some("bio.ferlab.fhir.etl.FhavroExport")
-assembly / assemblyJarName:= "fhavro-export.jar"
+assembly / assemblyJarName := "fhavro-export.jar"

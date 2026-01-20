@@ -8,6 +8,5 @@ object Enrich {
   @main
   def specimen(rc: RuntimeETLContext, studies: Studies): Unit = SpecimenEnricher(rc, studies.ids).run()
 
-
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
 }

@@ -17,9 +17,19 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
   "transform" should "prepare index biospecimen_centric" in {
     val data: Map[String, DataFrame] = Map(
       "simple_participant" -> Seq(
-        SIMPLE_PARTICIPANT(`participant_id` = "P1", `participant_2_id` = "P1"), //has file
-        SIMPLE_PARTICIPANT(`participant_id` = "P2", `participant_2_id` = "P2", `gender` = DEMOGRAPHICS(), `sex` = "Female"), //does not have files
-        SIMPLE_PARTICIPANT(`participant_id` = "P3", `participant_2_id` = "P3", `gender` = DEMOGRAPHICS(), `sex` = "Female"),
+        SIMPLE_PARTICIPANT(`participant_id` = "P1", `participant_2_id` = "P1"), // has file
+        SIMPLE_PARTICIPANT(
+          `participant_id` = "P2",
+          `participant_2_id` = "P2",
+          `gender` = DEMOGRAPHICS(),
+          `sex` = "Female"
+        ), // does not have files
+        SIMPLE_PARTICIPANT(
+          `participant_id` = "P3",
+          `participant_2_id` = "P3",
+          `gender` = DEMOGRAPHICS(),
+          `sex` = "Female"
+        )
       ).toDF(),
       "normalized_document_reference" -> Seq(
         DOCUMENTREFERENCE(
@@ -58,42 +68,57 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `relates_to` = Some("D4"),
           `data_type` = "SNV",
           `files` = Seq(FILE(`file_name` = "file5.tbi", `file_format` = "TBI"))
-        ),
+        )
       ).toDF(),
-
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(
           `fhir_id` = "B1",
           `subject` = "P1",
           `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "NCIT:C12434"),
           `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("location1")),
-          `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("histological_type5")),
-          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C164014", `display` = null)),
+          `tumor_histological_type` =
+            CODE_SYSTEM_INPUT_TEXT(`code` = "NCIT:C12434", `text` = Some("histological_type5")),
+          `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:C164014", `display` = null))
         ),
         BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P2"),
         BIOSPECIMEN_INPUT(`fhir_id` = "B3", `subject` = "NONE"),
         BIOSPECIMEN_INPUT(
           `fhir_id` = "B4",
           `subject` = "P3",
-          `biospecimen_tissue_source` = CODE_SYSTEM_DISPLAY_INPUT(`code` = "Missing - Not collected", `display` = Some("Missing - Not Collected")),
-          `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(display = Some("Missing - Restricted Access"), `system` = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes" , `code` = "Missing - Restricted access", `text` = Some("location2")),
-          `tumor_histological_type` = CODE_SYSTEM_INPUT_TEXT(`code` = "Missing - Not provided", `text` = Some("histological_type4")),
+          `biospecimen_tissue_source` =
+            CODE_SYSTEM_DISPLAY_INPUT(`code` = "Missing - Not collected", `display` = Some("Missing - Not Collected")),
+          `cancer_anatomic_location` = CODE_SYSTEM_INPUT_TEXT(
+            display = Some("Missing - Restricted Access"),
+            `system` = "https://fhir.cqdg.ca/CodeSystem/cqdg-specimen-missing-codes",
+            `code` = "Missing - Restricted access",
+            `text` = Some("location2")
+          ),
+          `tumor_histological_type` =
+            CODE_SYSTEM_INPUT_TEXT(`code` = "Missing - Not provided", `text` = Some("histological_type4")),
           `cancer_biospecimen_type` = Some(CODEABLE(`code` = "NCIT:XXXXX", `display` = null)),
           `tumor_normal_designation` = "Normal"
-        ),
+        )
       ).toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
-      "normalized_task" -> Seq(TASK(`fhir_id` = "SXP0029366", `_for` = "P1", `analysis_files` = Seq(ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-        ANALYSIS_FILE("Aligned-reads", "D1"),
-        ANALYSIS_FILE("SNV", "D4"),
-        ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
-        ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-        ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")))).toDF(),
+      "normalized_task" -> Seq(
+        TASK(
+          `fhir_id` = "SXP0029366",
+          `_for` = "P1",
+          `analysis_files` = Seq(
+            ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
+            ANALYSIS_FILE("Aligned-reads", "D1"),
+            ANALYSIS_FILE("SNV", "D4"),
+            ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
+            ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
+            ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
+          )
+        )
+      ).toDF(),
       "normalized_sample_registration" -> Seq(
         SAMPLE_INPUT(`subject` = "P1", `parent` = "B1", `fhir_id` = "sam1"),
-        SAMPLE_INPUT(`subject` = "P3", `parent` = "B4", `fhir_id` = "sam2"),
+        SAMPLE_INPUT(`subject` = "P3", `parent` = "B4", `fhir_id` = "sam2")
       ).toDF(),
-      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None),
+      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None)
     )
 
     val output = new BiospecimenCentric(List("STU0000001"))(conf).transform(data)
@@ -104,10 +129,10 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
 
     val biospecimenIds = biospecimen_centric.select("biospecimen_id").as[String].collect()
 
-    //B2 has a participant (P2) that does not have files
+    // B2 has a participant (P2) that does not have files
     biospecimenIds should not contain "B2"
 
-    //B3 has a participant (NONE) that does exist
+    // B3 has a participant (NONE) that does exist
     biospecimenIds should not contain "B3"
 
     val biospecimen_centricCollect = output("es_index_biospecimen_centric").as[BIOSPECIMEN_CENTRIC].collect()
@@ -118,10 +143,15 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         `submitter_biospecimen_id` = "cag_sp_20832",
         `participant` = SIMPLE_PARTICIPANT(
           `participant_id` = "P1",
-          `participant_2_id` = "P1",
+          `participant_2_id` = "P1"
         ),
-        `cancer_anatomic_location` = CODE_SYSTEM_TEXT(display = "Blood (NCIT:C12434)", `code` = "NCIT:C12434", `text` = Some("location1")),
-        `tumor_histological_type` = CODE_SYSTEM_TEXT(display = "Blood (NCIT:C12434)", `code` = "NCIT:C12434", `text` = Some("histological_type5")),
+        `cancer_anatomic_location` =
+          CODE_SYSTEM_TEXT(display = "Blood (NCIT:C12434)", `code` = "NCIT:C12434", `text` = Some("location1")),
+        `tumor_histological_type` = CODE_SYSTEM_TEXT(
+          display = "Blood (NCIT:C12434)",
+          `code` = "NCIT:C12434",
+          `text` = Some("histological_type5")
+        ),
         `cancer_biospecimen_type` = Some("Solid Tissue Specimen (NCIT:C164014)"),
         `files` = Seq(
           FILE_WITH_SEQ_EXPERIMENT(
@@ -140,13 +170,13 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
                 ANALYSIS_FILE("SNV", "D4"),
                 ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
                 ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222"),
+                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
               )
             ),
             `sample` = Some(TASK_SAMPLE())
           )
         ),
-        `sample_id`= "sam1",
+        `sample_id` = "sam1",
         `submitter_sample_id` = "35849414972"
       )
     )
@@ -162,8 +192,16 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `sex` = "Female"
         ),
         `biospecimen_tissue_source` = "Missing - Not Collected",
-        `cancer_anatomic_location` = CODE_SYSTEM_TEXT(display = "Missing - Restricted Access", `code` = "Missing - Restricted access", `text` = Some("location2")),
-        `tumor_histological_type` = CODE_SYSTEM_TEXT(display = "Missing - Not provided", `code` = "Missing - Not provided", `text` = Some("histological_type4")),
+        `cancer_anatomic_location` = CODE_SYSTEM_TEXT(
+          display = "Missing - Restricted Access",
+          `code` = "Missing - Restricted access",
+          `text` = Some("location2")
+        ),
+        `tumor_histological_type` = CODE_SYSTEM_TEXT(
+          display = "Missing - Not provided",
+          `code` = "Missing - Not provided",
+          `text` = Some("histological_type4")
+        ),
         `tumor_normal_designation` = "Normal",
         `cancer_biospecimen_type` = Some("NCIT:XXXXX"),
         `files` = Seq(
@@ -183,7 +221,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
                 ANALYSIS_FILE("SNV", "D4"),
                 ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
                 ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222"),
+                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
               )
             ),
             `sample` = Some(TASK_SAMPLE())
@@ -195,4 +233,3 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
     )
   }
 }
-

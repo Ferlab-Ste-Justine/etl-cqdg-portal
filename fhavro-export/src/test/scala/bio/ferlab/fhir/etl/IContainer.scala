@@ -19,7 +19,8 @@ trait IContainer {
     if (isStarted) {
       publicPort
     } else {
-      val runningContainer = container.dockerClient.listContainersCmd().withLabelFilter(Map("name" -> name).asJava).exec().asScala
+      val runningContainer =
+        container.dockerClient.listContainersCmd().withLabelFilter(Map("name" -> name).asJava).exec().asScala
 
       runningContainer.toList match {
         case Nil =>

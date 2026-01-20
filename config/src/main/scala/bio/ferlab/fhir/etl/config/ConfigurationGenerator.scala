@@ -62,22 +62,56 @@ object ConfigurationGenerator extends App {
     )
   })
 
-  val sources = (
-    PublicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
-      GenomicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
-      rawsAndNormalized ++ Seq(
-      DatasetConf(id = "hpo_terms", storageid = storage, path = s"/hpo_terms", table = Some(TableConf("database", "hpo_terms")), format = PARQUET, loadtype = OverWrite),
-      DatasetConf(id = "mondo_terms", storageid = storage, path = s"/mondo_terms", table = Some(TableConf("database", "mondo_terms")), format = PARQUET, loadtype = OverWrite),
-      DatasetConf(id = "ncit_terms", storageid = storage, path = s"/ncit_terms", table = Some(TableConf("database", "ncit_terms")), format = PARQUET, loadtype = OverWrite),
-      DatasetConf(id = "icd_terms", storageid = storage, path = s"/icd_terms", table = Some(TableConf("database", "icd_terms")), format = PARQUET, loadtype = OverWrite)
+  val sources = (PublicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
+    GenomicDatasets(storage, tableDatabase = Some("database"), viewDatabase = None).sources ++
+    rawsAndNormalized ++ Seq(
+      DatasetConf(
+        id = "hpo_terms",
+        storageid = storage,
+        path = s"/hpo_terms",
+        table = Some(TableConf("database", "hpo_terms")),
+        format = PARQUET,
+        loadtype = OverWrite
+      ),
+      DatasetConf(
+        id = "mondo_terms",
+        storageid = storage,
+        path = s"/mondo_terms",
+        table = Some(TableConf("database", "mondo_terms")),
+        format = PARQUET,
+        loadtype = OverWrite
+      ),
+      DatasetConf(
+        id = "ncit_terms",
+        storageid = storage,
+        path = s"/ncit_terms",
+        table = Some(TableConf("database", "ncit_terms")),
+        format = PARQUET,
+        loadtype = OverWrite
+      ),
+      DatasetConf(
+        id = "icd_terms",
+        storageid = storage,
+        path = s"/icd_terms",
+        table = Some(TableConf("database", "icd_terms")),
+        format = PARQUET,
+        loadtype = OverWrite
+      )
     ) ++ Seq(
-      DatasetConf(id = "simple_participant", storageid = storage, path = s"/es_index/fhir/simple_participant", format = PARQUET, loadtype = OverWrite, partitionby = partitionByStudyIdAndReleaseId)
+      DatasetConf(
+        id = "simple_participant",
+        storageid = storage,
+        path = s"/es_index/fhir/simple_participant",
+        format = PARQUET,
+        loadtype = OverWrite,
+        partitionby = partitionByStudyIdAndReleaseId
+      )
     ) ++ Seq(
       Index("study_centric", partitionByStudyIdAndReleaseId),
       Index("participant_centric", partitionByStudyIdAndReleaseId),
       Index("file_centric", partitionByStudyIdAndReleaseId),
       Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
-      Index("program_centric", partitionByStudyIdAndReleaseId),
+      Index("program_centric", partitionByStudyIdAndReleaseId)
     ).flatMap(index => {
       Seq(
         DatasetConf(
@@ -155,7 +189,7 @@ object ConfigurationGenerator extends App {
     "spark.sql.extensions" -> "io.delta.sql.DeltaSparkSessionExtension",
     "spark.sql.legacy.parquet.datetimeRebaseModeInWrite" -> "CORRECTED",
     "spark.sql.legacy.timeParserPolicy" -> "CORRECTED",
-    "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN",
+    "spark.sql.mapKeyDedupPolicy" -> "LAST_WIN"
   )
 
   val es_conf = Map(
@@ -177,34 +211,52 @@ object ConfigurationGenerator extends App {
   )
 
   conf.foreach { case (project, _) =>
-    ConfigurationWriter.writeTo(s"config/output/config/dev-${project}.conf", ETLConfiguration(es_conf ++ es_conf_local, DatalakeConf(
-      storages = List(
-        StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3),
-        StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
-      ),
-      sources = populateTable(sources, conf(project)("localDbName")),
-      args = args.toList,
-      sparkconf = spark_conf + ("spark.master" -> "local") + ("spark.fhir.server.url" -> conf(project)("fhir"))
-    )))
+    ConfigurationWriter.writeTo(
+      s"config/output/config/dev-${project}.conf",
+      ETLConfiguration(
+        es_conf ++ es_conf_local,
+        DatalakeConf(
+          storages = List(
+            StorageConf(storage, "s3a://cqdg-qa-app-clinical-data-service", S3),
+            StorageConf(storage_vcf, "s3a://cqdg-ops-app-fhir-import-file-data", S3)
+          ),
+          sources = populateTable(sources, conf(project)("localDbName")),
+          args = args.toList,
+          sparkconf = spark_conf + ("spark.master" -> "local") + ("spark.fhir.server.url" -> conf(project)("fhir"))
+        )
+      )
+    )
 
-    ConfigurationWriter.writeTo(s"config/output/config/qa-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
-      storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "qa")}", S3),
-        StorageConf(storage_vcf, "s3a://cqdg-qa-file-import", S3)
-      ),
-      sources = populateTable(sources, conf(project)("qaDbName")),
-      args = args.toList,
-      sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
-    )))
+    ConfigurationWriter.writeTo(
+      s"config/output/config/qa-${project}.conf",
+      ETLConfiguration(
+        es_conf,
+        DatalakeConf(
+          storages = List(
+            StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "qa")}", S3),
+            StorageConf(storage_vcf, "s3a://cqdg-qa-file-import", S3)
+          ),
+          sources = populateTable(sources, conf(project)("qaDbName")),
+          args = args.toList,
+          sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
+        )
+      )
+    )
 
-    ConfigurationWriter.writeTo(s"config/output/config/prod-${project}.conf", ETLConfiguration(es_conf, DatalakeConf(
-      storages = List(
-        StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "prod")}", S3),
-        StorageConf(storage_vcf, "s3a://cqdg-prod-file-import", S3)
-      ),
-      sources = populateTable(sources, conf(project)("prdDbName")),
-      args = args.toList,
-      sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
-    )))
+    ConfigurationWriter.writeTo(
+      s"config/output/config/prod-${project}.conf",
+      ETLConfiguration(
+        es_conf,
+        DatalakeConf(
+          storages = List(
+            StorageConf(storage, s"s3a://${conf(project)("bucketNamePrefix").replace("{ENV}", "prod")}", S3),
+            StorageConf(storage_vcf, "s3a://cqdg-prod-file-import", S3)
+          ),
+          sources = populateTable(sources, conf(project)("prdDbName")),
+          args = args.toList,
+          sparkconf = spark_conf + ("spark.fhir.server.url" -> conf(project)("fhir"))
+        )
+      )
+    )
   }
 }

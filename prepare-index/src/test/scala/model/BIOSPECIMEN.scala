@@ -1,26 +1,30 @@
 package model
 
 case class BIOSPECIMEN(
-                        `biospecimen_id`: String = "BIO0041635",
-                        `cancer_anatomic_location`: CODE_SYSTEM_TEXT = CODE_SYSTEM_TEXT(`text` = Some("location")),
-                        `tumor_histological_type`: CODE_SYSTEM_TEXT = CODE_SYSTEM_TEXT(`display`= "Missing - Not Provided", `code` = "Missing - Not provided", `text` = Some("histological_type5")),
-                        `cancer_biospecimen_type`: Option[String] = Some("Blood (NCIT:C12434)"),
-                        `tumor_normal_designation`: String = "Not applicable",
-                        `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
-                        `age_biospecimen_collection`: String = "Young",
-                        `submitter_biospecimen_id`: String = "cag_sp_20832",
-                        `sample_id`: String = "sam1",
-                        `sample_2_id`: String = "sam1",
-                        `sample_type`: String = "DNA (NCIT:C449)",
+    `biospecimen_id`: String = "BIO0041635",
+    `cancer_anatomic_location`: CODE_SYSTEM_TEXT = CODE_SYSTEM_TEXT(`text` = Some("location")),
+    `tumor_histological_type`: CODE_SYSTEM_TEXT = CODE_SYSTEM_TEXT(
+      `display` = "Missing - Not Provided",
+      `code` = "Missing - Not provided",
+      `text` = Some("histological_type5")
+    ),
+    `cancer_biospecimen_type`: Option[String] = Some("Blood (NCIT:C12434)"),
+    `tumor_normal_designation`: String = "Not applicable",
+    `biospecimen_tissue_source`: String = "Blood (NCIT:C12434)",
+    `age_biospecimen_collection`: String = "Young",
+    `submitter_biospecimen_id`: String = "cag_sp_20832",
+    `sample_id`: String = "sam1",
+    `sample_2_id`: String = "sam1",
+    `sample_type`: String = "DNA (NCIT:C449)"
 //                        `submitter_participant_id`: String = "35849414972"
-                      )
+)
 
 case class BIOSPECIMEN_FACET_IDS(
-                                  biospecimen_fhir_id_1: String = "336842",
-                                  biospecimen_fhir_id_2: String = "336842"
-                                )
+    biospecimen_fhir_id_1: String = "336842",
+    biospecimen_fhir_id_2: String = "336842"
+)
 case class SAMPLE(
-                   fhir_id: String = "sam1",
-                   sample_type: String = "NCIT:C449",
-                   submitter_participant_id: String = "35849414972"
-                 )
+    fhir_id: String = "sam1",
+    sample_type: String = "NCIT:C449",
+    submitter_participant_id: String = "35849414972"
+)

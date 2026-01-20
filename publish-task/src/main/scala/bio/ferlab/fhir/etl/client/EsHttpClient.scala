@@ -8,8 +8,9 @@ import org.apache.http.util.EntityUtils
 class EsHttpClient(esConfig: Map[String, String]) {
 
   val httpBuilder: HttpClientBuilder =
-    HttpClientBuilder.create()
-    .addInterceptorFirst(new PublishRequestInterceptor(esConfig))
+    HttpClientBuilder
+      .create()
+      .addInterceptorFirst(new PublishRequestInterceptor(esConfig))
 
   val http: CloseableHttpClient = httpBuilder.build()
   val charsetUTF8 = "UTF-8"

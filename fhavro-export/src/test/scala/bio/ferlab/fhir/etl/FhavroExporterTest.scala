@@ -20,8 +20,20 @@ class FhavroExporterTest extends AnyFlatSpec with FhirServerSuite with MinioServ
     loadCondition(code = "1", tag = "study:SD_001")
     loadCondition(code = "2", tag = "study:SD_001")
     loadCondition(code = "3", tag = "study:SD_001")
-    loadCondition(system = "https://nih-ncpi.github.io/ncpi-fhir-ig/data-dictionary/SD_7YDC1W4H/condition_code", code = "4", tag = "study:SD_001")
-    val fhirRequest = FhirRequest("Condition", "cqdg-condition", None, None, None, None, Some(Map("code" -> List("http://purl.obolibrary.org/obo/mondo.owl|"))))
+    loadCondition(
+      system = "https://nih-ncpi.github.io/ncpi-fhir-ig/data-dictionary/SD_7YDC1W4H/condition_code",
+      code = "4",
+      tag = "study:SD_001"
+    )
+    val fhirRequest = FhirRequest(
+      "Condition",
+      "cqdg-condition",
+      None,
+      None,
+      None,
+      None,
+      Some(Map("code" -> List("http://purl.obolibrary.org/obo/mondo.owl|")))
+    )
     val resources = new FhavroExporter("input", "SD_001").requestExportFor(fhirRequest)
     resources.length shouldBe 3
   }

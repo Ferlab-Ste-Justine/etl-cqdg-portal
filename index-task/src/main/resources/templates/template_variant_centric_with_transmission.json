@@ -7,7 +7,7 @@
     "settings": {
       "number_of_shards": 6,
       "index": {
-        "max_result_window" : 12000
+        "max_result_window": 12000
       }
     },
     "mappings": {

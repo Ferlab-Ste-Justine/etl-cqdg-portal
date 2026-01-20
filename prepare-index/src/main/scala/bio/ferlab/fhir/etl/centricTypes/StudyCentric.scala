@@ -24,19 +24,33 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
   val normalized_sequencing_experiment: DatasetConf = conf.getDataset("normalized_task")
   val normalized_sample_registration: DatasetConf = conf.getDataset("normalized_sample_registration")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
     Seq(
-      normalized_researchstudy, normalized_drs_document_reference, normalized_patient, normalized_group,
-      normalized_diagnosis, normalized_task, normalized_phenotype, normalized_sequencing_experiment, normalized_biospecimen,
-      normalized_sample_registration, normalized_list)
-      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))).toMap
+      normalized_researchstudy,
+      normalized_drs_document_reference,
+      normalized_patient,
+      normalized_group,
+      normalized_diagnosis,
+      normalized_task,
+      normalized_phenotype,
+      normalized_sequencing_experiment,
+      normalized_biospecimen,
+      normalized_sample_registration,
+      normalized_list
+    )
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*)))
+      .toMap
 
   }
 
-  override def transform(data: Map[String, DataFrame],
-                         lastRunDateTime: LocalDateTime = minDateTime,
-                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def transform(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val studyDF = data(normalized_researchstudy.id)
 
@@ -48,12 +62,13 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
           data(normalized_drs_document_reference.id),
           data(normalized_biospecimen.id),
           data(normalized_sequencing_experiment.id),
-          data(normalized_sample_registration.id),
+          data(normalized_sample_registration.id)
         )
         .withColumn("file_exp", explode(col("files")))
         .withColumn("bio_exp", explode(col("file_exp.biospecimens")))
         .select("study_id", "bio_exp.sample_id")
-        .distinct().filter(col("sample_id").isNotNull)
+        .distinct()
+        .filter(col("sample_id").isNotNull)
         .groupBy("study_id")
         .agg(size(collect_list("sample_id")) as "sample_count")
 
@@ -78,12 +93,12 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       .groupBy("study_id")
       .agg(
         collect_set(
-          struct (
+          struct(
             col("program_id"),
             col("name_en"),
-            col("name_fr"),
+            col("name_fr")
           )
-        ) as "programs",
+        ) as "programs"
       )
 
     val participantsRenamed = data(normalized_patient.id).withColumnRenamed("fhir_id", "participant_id")
@@ -91,20 +106,19 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
     val fileCount =
       data(normalized_drs_document_reference.id)
 //        .addAssociatedDocumentRef()
-        .filter(!col("relates_to").isNotNull).drop("relates_to")
+        .filter(!col("relates_to").isNotNull)
+        .drop("relates_to")
         .withColumn("files_exp", explode(col("files")))
         .select("*", "files_exp.*")
         .drop("files_exp", "files")
-
         .join(participantsRenamed, Seq("participant_id", "study_id"), "inner")
         .groupBy("study_id")
         .agg(
-          size(collect_set(
-            struct(
-              col("file_name"),
-              col("file_format"),
-              col("fhir_id"))
-          )) as "file_count",
+          size(
+            collect_set(
+              struct(col("file_name"), col("file_format"), col("fhir_id"))
+            )
+          ) as "file_count",
           collect_set(col("data_category")) as "data_category"
         )
 
@@ -118,7 +132,11 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       .agg(size(collect_set(col("internal_family_id"))) as "family_count")
 
     val studyDatasets = studyDF
-      .addDataSetToStudy(data(normalized_drs_document_reference.id), participantsRenamed, data(normalized_sequencing_experiment.id))
+      .addDataSetToStudy(
+        data(normalized_drs_document_reference.id),
+        participantsRenamed,
+        data(normalized_sequencing_experiment.id)
+      )
 
     val combinedDataCategories = studyDF.combineDataCategoryFromFilesAndStudy(dataCategoryCount)
 
@@ -133,45 +151,55 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       .join(familyCount, Seq("study_id"), "left_outer")
       .expStrategiesCountPerStudy(data(normalized_task.id), data(normalized_drs_document_reference.id))
       .withColumn("family_data", col("family_count").gt(0))
-      .withColumn("access_limitations", sparkTransform(filter(col("access_limitations"), col => col("display").isNotNull),
-        col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
-      ))
-      .withColumn("access_requirements", sparkTransform(filter(col("access_requirements"), col => col("display").isNotNull),
-        col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
-      ))
+      .withColumn(
+        "access_limitations",
+        sparkTransform(
+          filter(col("access_limitations"), col => col("display").isNotNull),
+          col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
+        )
+      )
+      .withColumn(
+        "access_requirements",
+        sparkTransform(
+          filter(col("access_requirements"), col => col("display").isNotNull),
+          col => concat_ws(" ", col("display"), concat(lit("("), col("code"), lit(")")))
+        )
+      )
       .withColumn("data_access_codes", struct(col("access_requirements"), col("access_limitations")))
       .withColumnRenamed("title", "name")
       .join(programDf, Seq("study_id"), "left_outer")
       .drop("fhir_id", "access_requirements", "access_limitations", "data_sets")
 
     // TODO these column are temporary and will be removed in the future -
-    val updateTempDF= transformedStudyDf
+    val updateTempDF = transformedStudyDf
       .withColumn(
         "experimental_strategies",
         sparkTransform(
           col("experimental_strategies_1"),
-          element => struct(
-            element("experimental_strategy_1")("code") as "experimental_strategy",
-            element("file_count") as "file_count"
-          )
+          element =>
+            struct(
+              element("experimental_strategy_1")("code") as "experimental_strategy",
+              element("file_count") as "file_count"
+            )
         )
       )
       .withColumn(
         "datasets",
         sparkTransform(
           col("datasets"),
-          element => struct(
-            element("name") as "name",
-            element("description") as "description",
-            element("data_types") as "data_types",
-            element("experimental_strategies_1") as "experimental_strategies_1",
-            sparkTransform(
-              element("experimental_strategies_1"),
-              exp => exp("code")
-            ) as "experimental_strategies",
-            element("file_count") as "file_count",
-            element("participant_count") as "participant_count"
-          )
+          element =>
+            struct(
+              element("name") as "name",
+              element("description") as "description",
+              element("data_types") as "data_types",
+              element("experimental_strategies_1") as "experimental_strategies_1",
+              sparkTransform(
+                element("experimental_strategies_1"),
+                exp => exp("code")
+              ) as "experimental_strategies",
+              element("file_count") as "file_count",
+              element("participant_count") as "participant_count"
+            )
         )
       )
 

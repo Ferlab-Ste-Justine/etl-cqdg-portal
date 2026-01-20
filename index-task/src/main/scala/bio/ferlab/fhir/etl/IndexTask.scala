@@ -14,13 +14,13 @@ object IndexTask extends App {
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
   val Array(
-  release_id,       // release id
-  study_ids,        // study ids separated by ;
-  jobType,          // study_centric or participant_centric or file_centric or biospecimen_centric or program_centric
-  env,            // qa/dev/prd
-  project,        // cqdg
-  esUrl,
-  esPort
+    release_id, // release id
+    study_ids, // study ids separated by ;
+    jobType, // study_centric or participant_centric or file_centric or biospecimen_centric or program_centric
+    env, // qa/dev/prd
+    project, // cqdg
+    esUrl,
+    esPort
   ) = args
 
   private val esUsername = sys.env.get("ES_USERNAME")
@@ -34,32 +34,35 @@ object IndexTask extends App {
     "opensearch.net.ssl" -> "true",
     "es.net.ssl.cert.allow.self.signed" -> "true",
     "opensearch.net.ssl.cert.allow.self.signed" -> "true",
-    "es.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
-    "opensearch.nodes" -> s"$esUrl", //https://elasticsearch-workers:9200
+    "es.nodes" -> s"$esUrl", // https://elasticsearch-workers:9200
+    "opensearch.nodes" -> s"$esUrl", // https://elasticsearch-workers:9200
     "es.nodes.wan.only" -> "true",
     "opensearch.nodes.wan.only" -> "true",
     "es.wan.only" -> "true",
     "opensearch.wan.only" -> "true",
     "spark.es.nodes.wan.only" -> "true",
     "es.port" -> esPort,
-    "opensearch.port" -> esPort) //9200
+    "opensearch.port" -> esPort
+  ) // 9200
 
   private val esConfigs = (esUsername, esPassword) match {
-    case (Some(u), Some(p)) => defaultEsConfigs ++
-      Map(
-        "es.net.http.auth.user" -> u,
-        "es.net.http.auth.pass" -> p,
-        "opensearch.net.http.auth.user" -> u,
-        "opensearch.net.http.auth.pass" -> p
-      )
+    case (Some(u), Some(p)) =>
+      defaultEsConfigs ++
+        Map(
+          "es.net.http.auth.user" -> u,
+          "es.net.http.auth.pass" -> p,
+          "opensearch.net.http.auth.user" -> u,
+          "opensearch.net.http.auth.pass" -> p
+        )
     case _ => defaultEsConfigs
   }
 
-  implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
+  implicit val conf: Configuration =
+    ConfigurationLoader.loadFromResources[SimpleConfiguration](s"config/$env-$project.conf")
 
   val sparkConfigs: SparkConf =
     (conf.sparkconf ++ esConfigs)
-      .foldLeft(new SparkConf()){ case (c, (k, v)) => c.set(k, v) }
+      .foldLeft(new SparkConf()) { case (c, (k, v)) => c.set(k, v) }
 
   implicit val spark: SparkSession = SparkSession.builder
     .config(sparkConfigs)

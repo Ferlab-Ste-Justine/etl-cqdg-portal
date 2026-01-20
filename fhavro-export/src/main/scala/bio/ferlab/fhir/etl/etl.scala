@@ -11,7 +11,7 @@ package object etl {
 
   type ValidationResult[A] = Validated[NonEmptyList[String], A]
 
-  def withConfiguration[T](env:String)(configuration: Config => ValidationResult[T]): ValidationResult[T] = {
+  def withConfiguration[T](env: String)(configuration: Config => ValidationResult[T]): ValidationResult[T] = {
     Config.readConfiguration(env).andThen(configuration)
   }
 
@@ -35,7 +35,7 @@ package object etl {
     try {
       validationResult match {
         case Invalid(_) => System.exit(-1)
-        case _ => ()
+        case _          => ()
       }
     } catch {
       case _: Exception =>

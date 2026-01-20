@@ -20,17 +20,27 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
   val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
   val ncit_terms: DatasetConf = conf.getDataset("ncit_terms")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    (Seq(simple_participant, normalized_drs_document_reference, normalized_biospecimen, normalized_sequencing_experiment,
-      normalized_sample_registration, es_index_study_centric)
+  override def extract(
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    (Seq(
+      simple_participant,
+      normalized_drs_document_reference,
+      normalized_biospecimen,
+      normalized_sequencing_experiment,
+      normalized_sample_registration,
+      es_index_study_centric
+    )
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))) ++
       Seq(ncit_terms.id -> ncit_terms.read)).toMap
   }
 
-  override def transform(data: Map[String, DataFrame],
-                         lastRunDateTime: LocalDateTime = minDateTime,
-                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def transform(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
     val patientDF = data(simple_participant.id).drop("study")
 
     val biospecimenDF = data(normalized_biospecimen.id)
@@ -42,14 +52,14 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
     val transformedParticipant =
       patientDF
         .addStudy(data(es_index_study_centric.id))
-        .addFilesWithBiospecimen (
+        .addFilesWithBiospecimen(
           data(normalized_drs_document_reference.id),
           biospecimenDF,
           data(normalized_sequencing_experiment.id),
-          data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type"),
+          data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
         )
         .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
-        .withColumn("participant_2_id", col("participant_id")) //copy column/ front-end requirements
+        .withColumn("participant_2_id", col("participant_id")) // copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedParticipant)
   }

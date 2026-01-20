@@ -20,17 +20,27 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
   val es_index_study_centric: DatasetConf = conf.getDataset("es_index_study_centric")
   val ncit_terms: DatasetConf = conf.getDataset("ncit_terms")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
-    (Seq(normalized_drs_document_reference, normalized_biospecimen, simple_participant, es_index_study_centric,
-      normalized_sequencing_experiment, normalized_sample_registration)
+  override def extract(
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    (Seq(
+      normalized_drs_document_reference,
+      normalized_biospecimen,
+      simple_participant,
+      es_index_study_centric,
+      normalized_sequencing_experiment,
+      normalized_sample_registration
+    )
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))) ++
       Seq(ncit_terms.id -> ncit_terms.read)).toMap
   }
 
-  override def transform(data: Map[String, DataFrame],
-                         lastRunDateTime: LocalDateTime = minDateTime,
-                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def transform(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
     val fileDF = data(normalized_drs_document_reference.id)
 
     val biospeciemDF = data(normalized_biospecimen.id)
@@ -52,7 +62,7 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
         .withColumnRenamed("fhir_id", "file_id")
         .withColumn("study_code", col("study.study_code"))
         .withColumn("biospecimens", array_distinct(flatten(col("participants.biospecimens"))))
-        .withColumn("file_2_id", col("file_id")) //copy column/ front-end requirements
+        .withColumn("file_2_id", col("file_id")) // copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedFile)
   }

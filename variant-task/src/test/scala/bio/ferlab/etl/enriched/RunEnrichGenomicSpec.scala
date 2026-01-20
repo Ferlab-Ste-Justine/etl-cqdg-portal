@@ -39,10 +39,23 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     NORMALIZED_SNV(`participant_id` = "PA0008", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
     NORMALIZED_SNV(`participant_id` = "PA0009", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
     NORMALIZED_SNV(`participant_id` = "PA0010", study_id = "S1", study_code = "study_code1", `source` = "WGS"),
-    NORMALIZED_SNV(`participant_id` = "PA0011", study_id = "S1", study_code = "study_code1", `source` = "WXS", `zygosity` = "HOM"),
+    NORMALIZED_SNV(
+      `participant_id` = "PA0011",
+      study_id = "S1",
+      study_code = "study_code1",
+      `source` = "WXS",
+      `zygosity` = "HOM"
+    ),
 
     // WXS occurrence should be added to the source and studies lists
-    NORMALIZED_SNV(`participant_id` = "PA0012", study_id = "S2", `study_code` = "study_code2", `source` = "WXS", `zygosity` = "HOM", `calls` = List(0, 0)),
+    NORMALIZED_SNV(
+      `participant_id` = "PA0012",
+      study_id = "S2",
+      `study_code` = "study_code2",
+      `source` = "WXS",
+      `zygosity` = "HOM",
+      `calls` = List(0, 0)
+    ),
 
     // Study is CAG so participant_ids won't be included in frequencies
     NORMALIZED_SNV(`participant_id` = "PA0013", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
@@ -54,7 +67,7 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     NORMALIZED_SNV(`participant_id` = "PA0019", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
     NORMALIZED_SNV(`participant_id` = "PA0020", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
     NORMALIZED_SNV(`participant_id` = "PA0021", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
-    NORMALIZED_SNV(`participant_id` = "PA0022", study_id = "S3", `study_code` = "CAG", `source` = "WGS"),
+    NORMALIZED_SNV(`participant_id` = "PA0022", study_id = "S3", `study_code` = "CAG", `source` = "WGS")
   ).toDF
   val genomesDf: DataFrame = Seq(NormalizedOneKGenomes()).toDF
   val topmed_bravoDf: DataFrame = Seq(NormalizedTopmed()).toDF
@@ -62,10 +75,23 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
   val gnomad_exomes_2_1_1Df: DataFrame = Seq(NormalizedGnomadExomes211()).toDF
   val gnomad_genomes_3Df: DataFrame = Seq(NormalizedGnomadGenomes3()).toDF
   val dbsnpDf: DataFrame = Seq(NormalizedDbsnp()).toDF
-  val clinvarDf: DataFrame = Seq(NormalizedClinvar(chromosome = "1", start = 69897, reference = "T", alternate = "C")).toDF
+  val clinvarDf: DataFrame = Seq(
+    NormalizedClinvar(chromosome = "1", start = 69897, reference = "T", alternate = "C")
+  ).toDF
   val genesDf: DataFrame = Seq(EnrichedGenes()).toDF()
-  val spliceaiDf: DataFrame = Seq(EnrichedSpliceAi(chromosome = "1", start = 69897, reference = "T", alternate = "C", symbol = "OR4F5", ds_ag = 0.01, `max_score` = MAX_SCORE(ds = 0.01, `type` = Seq("AG")))).toDF()
-  val cosmicDf: DataFrame = Seq(NormalizedCosmicMutationSet(chromosome = "1", start = 69897, reference = "T", alternate = "C")).toDF()
+  val spliceaiDf: DataFrame = Seq(
+    EnrichedSpliceAi(
+      chromosome = "1",
+      start = 69897,
+      reference = "T",
+      alternate = "C",
+      symbol = "OR4F5",
+      ds_ag = 0.01,
+      `max_score` = MAX_SCORE(ds = 0.01, `type` = Seq("AG"))
+    )
+  ).toDF()
+  val cosmicDf: DataFrame =
+    Seq(NormalizedCosmicMutationSet(chromosome = "1", start = 69897, reference = "T", alternate = "C")).toDF()
 
   val variantsETL: Variants = RunEnrichGenomic.runVariants(TestETLContext())
 
@@ -92,7 +118,8 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
   }
 
   it should "collect all studies" in {
-    val result = variantsETL.transformSingle(data)
+    val result = variantsETL
+      .transformSingle(data)
       .select(explode($"studies") as "studies")
       .select("studies.*")
       .as[STUDY]
@@ -101,7 +128,7 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
     val expected = Seq(
       STUDY(`study_id` = "S1", `study_code` = "study_code1", `zygosity` = Set("HET", "HOM")),
       STUDY(`study_id` = "S2", `study_code` = "study_code2", `zygosity` = Set("HOM")),
-      STUDY(`study_id` = "S3", `study_code` = "CAG", `zygosity` = Set("HET")),
+      STUDY(`study_id` = "S3", `study_code` = "CAG", `zygosity` = Set("HET"))
     )
 
     result should contain theSameElementsAs expected
@@ -122,12 +149,14 @@ class RunEnrichGenomicSpec extends SparkSpec with WithTestConfig {
       .collect()
 
     studyFreqWgs should contain theSameElementsAs Seq(
-      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(study_id = "S1",
+      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(
+        study_id = "S1",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
         //        transmission = Set("autosomal_dominant"),
         study_code = "study_code1"
       ),
-      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(study_id = "S3",
+      STUDY_FREQUENCIES_WGS_WITHOUT_TRANSMISSION(
+        study_id = "S3",
         total = TOTAL(ac = 10, an = 20, pc = 10, pn = 10, hom = 0, af = 0.5, pf = 1.0),
         //        transmission = Set("autosomal_dominant"),
         study_code = "CAG"

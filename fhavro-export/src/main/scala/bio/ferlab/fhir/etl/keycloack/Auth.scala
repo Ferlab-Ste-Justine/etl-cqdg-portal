@@ -34,5 +34,4 @@ class Auth(conf: KeycloakConf) {
     f(accessToken, rpt)
   }
 
-
 }

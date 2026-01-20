@@ -20,7 +20,8 @@ trait OurContainer {
     if (isStarted) {
       (publicPort, ipAddress, false)
     } else {
-      val runningContainer = container.dockerClient.listContainersCmd().withLabelFilter(Map("name" -> name).asJava).exec().asScala
+      val runningContainer =
+        container.dockerClient.listContainersCmd().withLabelFilter(Map("name" -> name).asJava).exec().asScala
 
       val isNew = runningContainer.toList match {
         case Nil =>
@@ -37,6 +38,5 @@ trait OurContainer {
       (publicPort, ipAddress, isNew)
     }
   }
-
 
 }

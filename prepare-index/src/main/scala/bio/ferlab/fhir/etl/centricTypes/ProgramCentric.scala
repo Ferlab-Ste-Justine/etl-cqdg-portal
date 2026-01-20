@@ -13,16 +13,21 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
   override val mainDestination: DatasetConf = conf.getDataset("es_index_program_centric")
   val normalized_list: DatasetConf = conf.getDataset("normalized_list")
 
-  override def extract(lastRunDateTime: LocalDateTime = minDateTime,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def extract(
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
     Seq(normalized_list)
-      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*))).toMap // Read all lists, as we don't filter by study_id for program centric
+      .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*)))
+      .toMap // Read all lists, as we don't filter by study_id for program centric
 
   }
 
-  override def transform(data: Map[String, DataFrame],
-                         lastRunDateTime: LocalDateTime = minDateTime,
-                         currentRunDateTime: LocalDateTime = LocalDateTime.now())(implicit spark: SparkSession): Map[String, DataFrame] = {
+  override def transform(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime = minDateTime,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  )(implicit spark: SparkSession): Map[String, DataFrame] = {
 
     val isManager = (contact: org.apache.spark.sql.Column) =>
       contact.getField("role_en").isNotNull || contact.getField("role_fr").isNotNull
@@ -32,21 +37,35 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
       .withColumn("website", col("research_program_related_artifact")("website"))
       .withColumn("citation_statement", col("research_program_related_artifact")("citation_statement"))
       .withColumn("logo_url", col("research_program_related_artifact")("logo_url"))
-      .withColumn("partners", sparkTransform(col("research_program_partners"), partner =>  struct(
-        partner("name"),
-        partner("logo") as "logo_url",
-        partner("rank"),
-      )))
-      .withColumn("research_program_contacts_telecom", sparkTransform(col("research_program_contacts"), contact => struct(
-        contact("name"),
-        contact("institution"),
-        contact("role_en"),
-        contact("role_fr"),
-        contact("picture_url"),
-        //other telecom systems can be added here if needed. for possible values see https://build.fhir.org/valueset-contact-point-system.html
-        filter(contact("telecom"), telecom => telecom("system") === "email")(0)("value") as "email",
-        filter(contact("telecom"), telecom => telecom("system") === "url")(0)("value") as "website",
-      )))
+      .withColumn(
+        "partners",
+        sparkTransform(
+          col("research_program_partners"),
+          partner =>
+            struct(
+              partner("name"),
+              partner("logo") as "logo_url",
+              partner("rank")
+            )
+        )
+      )
+      .withColumn(
+        "research_program_contacts_telecom",
+        sparkTransform(
+          col("research_program_contacts"),
+          contact =>
+            struct(
+              contact("name"),
+              contact("institution"),
+              contact("role_en"),
+              contact("role_fr"),
+              contact("picture_url"),
+              // other telecom systems can be added here if needed. for possible values see https://build.fhir.org/valueset-contact-point-system.html
+              filter(contact("telecom"), telecom => telecom("system") === "email")(0)("value") as "email",
+              filter(contact("telecom"), telecom => telecom("system") === "url")(0)("value") as "website"
+            )
+        )
+      )
       .withColumn(
         "managers",
         filter(col("research_program_contacts_telecom"), isManager)
@@ -55,8 +74,12 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
         "contacts",
         filter(col("research_program_contacts_telecom"), contact => !isManager(contact))
       )
-      .drop("research_program_related_artifact", "research_program_partners", "research_program_contacts_telecom",
-        "research_program_contacts")
+      .drop(
+        "research_program_related_artifact",
+        "research_program_partners",
+        "research_program_contacts_telecom",
+        "research_program_contacts"
+      )
 
     Map(mainDestination.id -> transformedProgramDf)
   }

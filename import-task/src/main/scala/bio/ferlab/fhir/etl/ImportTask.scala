@@ -4,7 +4,6 @@ import bio.ferlab.datalake.spark3.SparkApp
 import bio.ferlab.fhir.etl.fhavro.FhavroToNormalizedMappings
 
 object ImportTask extends SparkApp {
-
   println(s"ARGS: " + args.mkString("[", ", ", "]"))
 
   val Array(_, _, studyIds) = args

@@ -14,16 +14,18 @@ object S3Utils {
 
   def buildS3Client(config: Config): S3Client = {
 
-    val confBuilder: S3Configuration = S3Configuration.builder()
+    val confBuilder: S3Configuration = S3Configuration
+      .builder()
       .pathStyleAccessEnabled(config.awsConfig.pathStyleAccess)
       .build()
 
-    val s3Builder = S3Client.builder()
+    val s3Builder = S3Client
+      .builder()
       .credentialsProvider(DefaultCredentialsProvider.create())
       .httpClient(ApacheHttpClient.create())
       .serviceConfiguration(confBuilder)
 
-    if(config.awsConfig.endpoint.isDefined) {
+    if (config.awsConfig.endpoint.isDefined) {
       val endpointUri = new URI(config.awsConfig.endpoint.get)
       s3Builder.endpointOverride(endpointUri)
     }
@@ -33,7 +35,8 @@ object S3Utils {
   }
 
   def writeFile(bucket: String, key: String, file: File)(implicit s3Client: S3Client): Unit = {
-    val objectRequest = PutObjectRequest.builder()
+    val objectRequest = PutObjectRequest
+      .builder()
       .bucket(bucket)
       .key(key)
       .build()
@@ -43,10 +46,12 @@ object S3Utils {
 
   def exists(bucket: String, key: String)(implicit s3Client: S3Client): Boolean = {
     try {
-      s3Client.headObject(HeadObjectRequest.builder
-        .bucket(bucket)
-        .key(key)
-        .build)
+      s3Client.headObject(
+        HeadObjectRequest.builder
+          .bucket(bucket)
+          .key(key)
+          .build
+      )
       true
     } catch {
       case _: NoSuchKeyException =>

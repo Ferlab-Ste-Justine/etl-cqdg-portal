@@ -1,11 +1,13 @@
 {
-  "index_patterns" : ["program_centric*"],
-  "priority" : 1,
+  "index_patterns": [
+    "program_centric*"
+  ],
+  "priority": 1,
   "template": {
-    "settings" : {
-      "number_of_shards" : 5,
+    "settings": {
+      "number_of_shards": 5,
       "index": {
-        "max_result_window" : 10000
+        "max_result_window": 10000
       },
       "analysis": {
         "normalizer": {

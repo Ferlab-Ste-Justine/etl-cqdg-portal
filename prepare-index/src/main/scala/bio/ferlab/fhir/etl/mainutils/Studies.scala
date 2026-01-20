@@ -6,6 +6,6 @@ case class Studies(@arg(name = "study-id", short = 'i', doc = "Study Id") privat
   val ids: List[String] = id.flatMap(_.split(",")).toList
 }
 
-object Studies{
+object Studies {
   implicit def configParser: ParserForClass[Studies] = ParserForClass[Studies]
 }
