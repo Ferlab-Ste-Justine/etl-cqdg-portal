@@ -10,6 +10,5 @@ trait FhirServerSuite extends FhirServer with TestSuite with BeforeAndAfterAll w
     loadPatient("Jonathan", "Davis", "PT-00003", "study:SD_002")
   }
 
-  after {
-  }
+  after {}
 }

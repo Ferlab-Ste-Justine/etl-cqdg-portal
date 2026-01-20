@@ -9,11 +9,12 @@ import org.apache.spark.sql.functions._
 object RunEnrichGenomic {
 
   @main
-  def snv(rc: RuntimeETLContext,
-          @arg(name = "study-code", short = 's', doc = "Study Code") studyCode: String,
-          @arg(name = "dataset", short = 'd', doc = "Dataset") dataset: String,
-          @arg(name = "batch", short = 'b', doc = "Batch") batch: String,
-         ): Unit = SNV(rc, studyCode, dataset, batch).run()
+  def snv(
+      rc: RuntimeETLContext,
+      @arg(name = "study-code", short = 's', doc = "Study Code") studyCode: String,
+      @arg(name = "dataset", short = 'd', doc = "Dataset") dataset: String,
+      @arg(name = "batch", short = 'b', doc = "Batch") batch: String
+  ): Unit = SNV(rc, studyCode, dataset, batch).run()
 
   @main
   def variants(rc: RuntimeETLContext): Unit = runVariants(rc).run()
@@ -46,7 +47,7 @@ object RunEnrichGenomic {
         extraSplitBy = Some(col("study_id")),
         byAffected = false,
         extraAggregations = Seq(
-          FirstElement("study_code", col("study_code")),
+          FirstElement("study_code", col("study_code"))
           //          SimpleAggregation(name = TRANSMISSIONS, c = col(TRANSMISSION_MODE)), ----> Removed in SNV for performance
         )
       ),
@@ -54,9 +55,10 @@ object RunEnrichGenomic {
         "internal_frequencies_wgs",
         filter = Some(col("source") === "WGS"),
         byAffected = false
-      )))
+      )
+    )
+  )
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrThrow(args, allowPositional = true)
-
 
 }

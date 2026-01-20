@@ -9,6 +9,9 @@ object LoggerUtils {
   }
 
   def logProgressAtomic(verb: String, progress: AtomicInteger, total: Int): Unit = {
-    print(s"[main] INFO ${getClass.getName} - %s%% ${verb}ed.\r".format((progress.incrementAndGet().floatValue() / total) * 100))
+    print(
+      s"[main] INFO ${getClass.getName} - %s%% ${verb}ed.\r"
+        .format((progress.incrementAndGet().floatValue() / total) * 100)
+    )
   }
 }

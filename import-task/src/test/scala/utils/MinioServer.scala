@@ -1,13 +1,17 @@
 package utils
 
-
 import conf.AWSConf
 import s3.S3Utils
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, TestSuite}
 import org.slf4j.{Logger, LoggerFactory}
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.{CreateBucketRequest, DeleteObjectRequest, ListObjectsRequest, PutObjectRequest}
+import software.amazon.awssdk.services.s3.model.{
+  CreateBucketRequest,
+  DeleteObjectRequest,
+  ListObjectsRequest,
+  PutObjectRequest
+}
 
 import java.io.File
 import scala.jdk.CollectionConverters._
@@ -20,24 +24,35 @@ trait MinioServer {
   val BUCKET_FHIR_IMPORT = "cqdg-ops-app-fhir-import-file-data"
   val outputBucket = "cqdg-qa-app-file-download"
 
-
   protected val minioEndpoint = s"http://localhost:$minioPort"
   protected val apiAddress: String = ipAddress
   println(minioPort)
-  implicit val s3: S3Client = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = BUCKETNAME, pathStyleAccess = true, "", "", ""))
+  implicit val s3: S3Client = S3Utils.buildS3Client(
+    AWSConf(
+      MinioContainer.accessKey,
+      MinioContainer.secretKey,
+      minioEndpoint,
+      bucketName = BUCKETNAME,
+      pathStyleAccess = true,
+      "",
+      "",
+      ""
+    )
+  )
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
   createBuckets()
 
   private def createBuckets(): Unit = {
-    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect { case b if b.name() == BUCKETNAME || b.name() == outputBucket || b.name() == BUCKET_FHIR_IMPORT => b.name() }
+    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect {
+      case b if b.name() == BUCKETNAME || b.name() == outputBucket || b.name() == BUCKET_FHIR_IMPORT => b.name()
+    }
     val bucketsToCreate = Seq(BUCKETNAME, outputBucket, BUCKET_FHIR_IMPORT).diff(alreadyExistingBuckets)
     bucketsToCreate.foreach { b =>
       val buketRequest = CreateBucketRequest.builder().bucket(b).build()
       s3.createBucket(buketRequest)
     }
   }
-
 
   def withS3Objects[T](block: (String, String) => T): Unit = {
     val inputPrefix = s"run_${Random.nextInt(10000)}"
@@ -101,15 +116,10 @@ trait MinioServer {
   }
 }
 
-
-trait MinioServerSuite extends MinioServer with TestSuite with BeforeAndAfterAll with BeforeAndAfter {
-
-}
+trait MinioServerSuite extends MinioServer with TestSuite with BeforeAndAfterAll with BeforeAndAfter {}
 
 object StartMinioServer extends App with MinioServer {
   LOGGER.info(s"Minio is started : $minioEndpoint")
-  while (true) {
-
-  }
+  while (true) {}
 
 }

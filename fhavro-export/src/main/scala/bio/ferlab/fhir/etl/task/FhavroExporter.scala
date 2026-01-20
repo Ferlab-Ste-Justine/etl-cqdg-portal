@@ -19,8 +19,10 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
-class FhavroExporter(bucketName: String, studyId: String)
-                    (implicit val s3Client: S3Client, val fhirClient: IGenericClient) {
+class FhavroExporter(bucketName: String, studyId: String)(implicit
+    val s3Client: S3Client,
+    val fhirClient: IGenericClient
+) {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
@@ -28,26 +30,30 @@ class FhavroExporter(bucketName: String, studyId: String)
     LOGGER.info(s"Requesting Export for ${request.`type`}")
     val resources: ListBuffer[DomainResource] = new ListBuffer[DomainResource]()
 
-    val bundle = fhirClient.search()
+    val bundle = fhirClient
+      .search()
       .forResource(request.`type`)
       .returnBundle(classOf[Bundle])
 
-    val fhirStudyBundle = fhirClient.search()
+    val fhirStudyBundle = fhirClient
+      .search()
       .forResource("ResearchStudy")
       .where(ResearchStudy.IDENTIFIER.exactly().code(studyId))
       .returnBundle(classOf[Bundle])
       .execute()
 
-    //should only be one matched
+    // should only be one matched
     val fhirStudy = fhirStudyBundle.getEntry.asScala.toList.headOption.map(_.getResource.asInstanceOf[ResearchStudy])
 
     val bundleEnriched = request.`type` match {
       case "Organization" | "List" =>
-        fhirClient.search()
+        fhirClient
+          .search()
           .forResource(request.`type`)
           .returnBundle(classOf[Bundle])
       case _ =>
-        val bundleWithStudy = fhirClient.search()
+        val bundleWithStudy = fhirClient
+          .search()
           .forResource(request.`type`)
           .returnBundle(classOf[Bundle])
           .withTag(null, s"study:$studyId")
@@ -74,7 +80,7 @@ class FhavroExporter(bucketName: String, studyId: String)
 
     while (query.getLink("next") != null) {
       LoggerUtils.logProgress("export", resources.length)
-      //Update next link in case server base url changed, that happens if fhir client is configured to use ip address of fhir instance
+      // Update next link in case server base url changed, that happens if fhir client is configured to use ip address of fhir instance
       query.getLink("next").setUrl(FhirUtils.replaceBaseUrl(query.getLink("next").getUrl, fhirClient.getServerBase))
       query = fhirClient.loadPage().next(query).execute()
       resources.addAll(getResourcesFromBundle(query))
@@ -124,8 +130,7 @@ class FhavroExporter(bucketName: String, studyId: String)
   }
 
   private def getResourcesFromBundle(bundle: Bundle): mutable.Buffer[DomainResource] = {
-    bundle.getEntry
-      .asScala
+    bundle.getEntry.asScala
       .map(entry => entry.getResource.asInstanceOf[DomainResource])
   }
 }

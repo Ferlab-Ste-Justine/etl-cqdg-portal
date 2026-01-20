@@ -12,40 +12,70 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
 
-case class SNV(rc: RuntimeETLContext, studyCode: String, owner: String, dataset: String, batch: String, referenceGenomePath: Option[String]) extends SimpleSingleETL(rc) {
+case class SNV(
+    rc: RuntimeETLContext,
+    studyCode: String,
+    owner: String,
+    dataset: String,
+    batch: String,
+    referenceGenomePath: Option[String]
+) extends SimpleSingleETL(rc) {
 
   private val enriched_specimen: DatasetConf = conf.getDataset("enriched_specimen")
   private val raw_variant_calling: DatasetConf = conf.getDataset("raw_vcf")
   private val normalized_task: DatasetConf = conf.getDataset("normalized_task")
   override val mainDestination: DatasetConf = conf.getDataset("normalized_snv")
 
-  override def extract(lastRunDateTime: LocalDateTime = minValue,
-                       currentRunDateTime: LocalDateTime = LocalDateTime.now()): Map[String, DataFrame] = {
+  override def extract(
+      lastRunDateTime: LocalDateTime = minValue,
+      currentRunDateTime: LocalDateTime = LocalDateTime.now()
+  ): Map[String, DataFrame] = {
 
     Map(
-      "raw_vcf" -> vcf(raw_variant_calling.location
-        .replace("{{STUDY_CODE}}", s"$studyCode")
-        .replace("{{DATASET}}", s"$dataset")
-        .replace("{{BATCH}}", s"$batch")
-        .replace("{{OWNER}}", s"$owner"), referenceGenomePath = None)
+      "raw_vcf" -> vcf(
+        raw_variant_calling.location
+          .replace("{{STUDY_CODE}}", s"$studyCode")
+          .replace("{{DATASET}}", s"$dataset")
+          .replace("{{BATCH}}", s"$batch")
+          .replace("{{OWNER}}", s"$owner"),
+        referenceGenomePath = None
+      )
         .where(col("contigName").isin(validContigNames: _*)),
       enriched_specimen.id -> enriched_specimen.read.where(col("study_id") === studyCode),
-      normalized_task.id -> normalized_task.read.where(col("study_id") === studyCode),
+      normalized_task.id -> normalized_task.read.where(col("study_id") === studyCode)
     )
 
   }
 
-  override def transformSingle(data: Map[String, DataFrame], lastRunDateTime: LocalDateTime, currentRunDateTime: LocalDateTime): DataFrame = {
-    val enrichedSpecimenDF = data(enriched_specimen.id).select("sample_id", "is_affected", "participant_id", "family_id", "sex", "mother_id", "father_id", "study_id", "study_code")
+  override def transformSingle(
+      data: Map[String, DataFrame],
+      lastRunDateTime: LocalDateTime,
+      currentRunDateTime: LocalDateTime
+  ): DataFrame = {
+    val enrichedSpecimenDF = data(enriched_specimen.id)
+      .select(
+        "sample_id",
+        "is_affected",
+        "participant_id",
+        "family_id",
+        "sex",
+        "mother_id",
+        "father_id",
+        "study_id",
+        "study_code"
+      )
       .withColumnRenamed("is_affected", "affected_status")
 
     val occurrences = selectOccurrences(data("raw_vcf"), dataset, batch)
-    occurrences.join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
+    occurrences
+      .join(broadcast(enrichedSpecimenDF), Seq("sample_id"))
       .withAlleleDepths()
       .withSource(data(normalized_task.id))
   }
 
-  override def replaceWhere: Option[String] = Some(s"study_id = '$studyCode' and dataset='$dataset' and batch='$batch' ")
+  override def replaceWhere: Option[String] = Some(
+    s"study_id = '$studyCode' and dataset='$dataset' and batch='$batch' "
+  )
 
 }
 
@@ -56,8 +86,7 @@ object SNV {
     def withSource(task: DataFrame)(implicit spark: SparkSession): DataFrame = {
       import spark.implicits._
       val taskDf = task
-        .select($"ldm_sample_id" as "sample_id",
-          $"experimental_strategy" as "source")
+        .select($"ldm_sample_id" as "sample_id", $"experimental_strategy" as "source")
 
       df.join(broadcast(taskDf), Seq("sample_id"), "left")
     }
@@ -88,8 +117,7 @@ object SNV {
           col("genotype.phredLikelihoods"),
           col("genotype.depth"),
           optional_info(inputDfExpGenotypes, "genotype.RGQ", "RGQ", "int"),
-          optional_info(inputDfExpGenotypes, "genotype.PGT", "PGT", "string"),
-
+          optional_info(inputDfExpGenotypes, "genotype.PGT", "PGT", "string")
         )
       )
 
@@ -138,9 +166,15 @@ object SNV {
         lit(dataset) as "dataset",
         lit(batch) as "batch"
       )
-      .withColumn("is_normalized",col("info_old_record").isNotNull)
-      .withColumn("is_multi_allelic", lit(false)) //we dont split multi allelics with glow anymore. In the future we should try to infer this field from info_old_record
-      .withColumn("old_multi_allelic", lit(null).cast(StringType)) //Should be deleted in the future, replace by info_old_record
+      .withColumn("is_normalized", col("info_old_record").isNotNull)
+      .withColumn(
+        "is_multi_allelic",
+        lit(false)
+      ) // we dont split multi allelics with glow anymore. In the future we should try to infer this field from info_old_record
+      .withColumn(
+        "old_multi_allelic",
+        lit(null).cast(StringType)
+      ) // Should be deleted in the future, replace by info_old_record
       .drop("annotation")
       .withColumn("zygosity", zygosity(col("calls")))
     occurrences

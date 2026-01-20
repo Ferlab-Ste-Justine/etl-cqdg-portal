@@ -14,16 +14,15 @@ object FhavroToNormalizedMappings {
   val idFromUrlRegex = "^http[s]?:\\/\\/.*\\/([A-Za-z0-9\\-\\.]{1,64})\\/_history"
 
   def defaultTransformations(): List[Transformation] = {
-    List(Custom(_
-      .withColumn("fhir_id", regexp_extract(col("id"), idFromUrlRegex, 1))
-    ))
+    List(Custom(_.withColumn("fhir_id", regexp_extract(col("id"), idFromUrlRegex, 1))))
   }
 
   def mappings()(implicit c: Configuration): List[(DatasetConf, DatasetConf, List[Transformation])] = {
-    c.sources.filter(s => s.format == Format.AVRO).map(s => {
-      val pattern(table) = s.id
-      (s, c.getDataset(s"normalized_$table"), defaultTransformations() ++ extractionMappings(table))
-    }
-    )
+    c.sources
+      .filter(s => s.format == Format.AVRO)
+      .map(s => {
+        val pattern(table) = s.id
+        (s, c.getDataset(s"normalized_$table"), defaultTransformations() ++ extractionMappings(table))
+      })
   }
 }

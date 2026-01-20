@@ -1,4 +1,10 @@
-import bio.ferlab.datalake.commons.config.{Configuration, ConfigurationLoader, ConfigurationWrapper, DatalakeConf, SimpleConfiguration}
+import bio.ferlab.datalake.commons.config.{
+  Configuration,
+  ConfigurationLoader,
+  ConfigurationWrapper,
+  DatalakeConf,
+  SimpleConfiguration
+}
 import bio.ferlab.fhir.etl.ImportRawToNormalizedETL
 import bio.ferlab.fhir.etl.fhavro.FhavroToNormalizedMappings
 import models._
@@ -7,18 +13,19 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import utils.MinioServer
 
-case class ETLConfiguration(`es-config`: Map[String, String], datalake: DatalakeConf) extends ConfigurationWrapper(datalake)
+case class ETLConfiguration(`es-config`: Map[String, String], datalake: DatalakeConf)
+    extends ConfigurationWrapper(datalake)
 
 class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
-
 
   val study = "study1"
 
   private def addObjectToBucket(objects: Seq[(String, String)]): Unit = {
-    objects.foreach({ case (path, fileName) => transferFromResource(s"fhir/$path/study_id=$study", s"$fileName.avro")})
+    objects.foreach({ case (path, fileName) => transferFromResource(s"fhir/$path/study_id=$study", s"$fileName.avro") })
   }
 
-  implicit val spark: SparkSession = SparkSession.builder()
+  implicit val spark: SparkSession = SparkSession
+    .builder()
     .config("spark.ui.enabled", value = false)
     .config("fs.s3a.endpoint", s"http://$apiAddress:9000")
     .config("spark.databricks.delta.merge.repartitionBeforeWrite.enabled", "true")
@@ -57,7 +64,8 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
 
     addObjectToBucket(objects)
 
-    implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
+    implicit val conf: Configuration =
+      ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
     val jobs = FhavroToNormalizedMappings
       .mappings()
@@ -75,13 +83,28 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     val dfs = jobs.map(_.run())
 
     val patients = dfs.flatMap(p => p.find(q => q._1 == "normalized_patient")).head._2.as[NORMALIZED_PATIENT].collect()
-    val normalizedDiagnosis = dfs.flatMap(p => p.find(q => q._1 == "normalized_diagnosis")).head._2.as[NORMALIZED_DIAGNOSIS].collect()
-    val normalizedDisease_status = dfs.flatMap(p => p.find(q => q._1 == "normalized_disease_status")).head._2.as[NORMALIZED_DISEASE_STATUS].collect()
-    val normalizedPhenotype = dfs.flatMap(p => p.find(q => q._1 == "normalized_phenotype")).head._2.as[NORMALIZED_PHENOTYPE].collect()
-    val normalizedBiospecimen = dfs.flatMap(p => p.find(q => q._1 == "normalized_biospecimen")).head._2.as[NORMALIZED_BIOSPECIMEN].collect()
-    val normalizedSampleRegistration = dfs.flatMap(p => p.find(q => q._1 == "normalized_sample_registration")).head._2.as[NORMALIZED_SAMPLE_REGISTRATION].collect()
-    val normalizedResearchStudy = dfs.flatMap(p => p.find(q => q._1 == "normalized_research_study")).head._2.as[NORMALIZED_RESEARCH_STUDY].collect()
-    val normalizedDocumentReference = dfs.flatMap(p => p.find(q => q._1 == "normalized_document_reference")).head._2.as[NORMALIZED_DOCUMENT_REFERENCE].collect()
+    val normalizedDiagnosis =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_diagnosis")).head._2.as[NORMALIZED_DIAGNOSIS].collect()
+    val normalizedDisease_status =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_disease_status")).head._2.as[NORMALIZED_DISEASE_STATUS].collect()
+    val normalizedPhenotype =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_phenotype")).head._2.as[NORMALIZED_PHENOTYPE].collect()
+    val normalizedBiospecimen =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_biospecimen")).head._2.as[NORMALIZED_BIOSPECIMEN].collect()
+    val normalizedSampleRegistration = dfs
+      .flatMap(p => p.find(q => q._1 == "normalized_sample_registration"))
+      .head
+      ._2
+      .as[NORMALIZED_SAMPLE_REGISTRATION]
+      .collect()
+    val normalizedResearchStudy =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_research_study")).head._2.as[NORMALIZED_RESEARCH_STUDY].collect()
+    val normalizedDocumentReference = dfs
+      .flatMap(p => p.find(q => q._1 == "normalized_document_reference"))
+      .head
+      ._2
+      .as[NORMALIZED_DOCUMENT_REFERENCE]
+      .collect()
     val group = dfs.flatMap(p => p.find(q => q._1 == "normalized_group")).head._2.as[NORMALIZED_GROUP].collect()
     val task = dfs.flatMap(p => p.find(q => q._1 == "normalized_task")).head._2.as[NORMALIZED_TASK].collect()
     val list = dfs.flatMap(p => p.find(q => q._1 == "normalized_list")).head._2.as[NORMALIZED_LIST].collect()
@@ -99,13 +122,19 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     list.head shouldEqual NORMALIZED_LIST(
       research_program_contacts = Seq(
         RESEARCH_PROGRAM_CONTACTS(`telecom` = Seq.empty[TELECOM]),
-        RESEARCH_PROGRAM_CONTACTS(`name` = null, `institution` = "RI-MUHC", `role_en` = null, `role_fr` = null,
-          `picture_url` = null, `telecom` = Seq(TELECOM(), TELECOM(`value` = "info@rare.quebec", `system` = "email"))),
+        RESEARCH_PROGRAM_CONTACTS(
+          `name` = null,
+          `institution` = "RI-MUHC",
+          `role_en` = null,
+          `role_fr` = null,
+          `picture_url` = null,
+          `telecom` = Seq(TELECOM(), TELECOM(`value` = "info@rare.quebec", `system` = "email"))
+        )
       ),
       research_program_partners = Seq(
         RESEARCH_PROGRAM_PARTNERS(),
-        RESEARCH_PROGRAM_PARTNERS(`name` = "Genome Quebec", `logo` = "/partners_logos/genome_qc.svg", `rank` = 1),
-      ),
+        RESEARCH_PROGRAM_PARTNERS(`name` = "Genome Quebec", `logo` = "/partners_logos/genome_qc.svg", `rank` = 1)
+      )
     )
   }
 }

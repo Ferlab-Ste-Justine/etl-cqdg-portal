@@ -5,7 +5,12 @@ import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCrede
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.http.apache.ApacheHttpClient
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.s3.model.{CreateBucketRequest, DeleteObjectRequest, ListObjectsRequest, PutObjectRequest}
+import software.amazon.awssdk.services.s3.model.{
+  CreateBucketRequest,
+  DeleteObjectRequest,
+  ListObjectsRequest,
+  PutObjectRequest
+}
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
 
 import java.io.File
@@ -19,16 +24,19 @@ trait MinioServer {
   val minioEndpoint = s"http://localhost:$minioPort"
 
   implicit val s3Client: S3Client =
-    S3Client.builder()
+    S3Client
+      .builder()
       .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create("access_key", "secret_key")))
       .endpointOverride(URI.create(minioEndpoint))
       .region(Region.US_EAST_1)
-      .serviceConfiguration(S3Configuration.builder()
-        .pathStyleAccessEnabled(true)
-        .build())
+      .serviceConfiguration(
+        S3Configuration
+          .builder()
+          .pathStyleAccessEnabled(true)
+          .build()
+      )
       .httpClient(ApacheHttpClient.create())
       .build()
-
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
@@ -48,7 +56,8 @@ trait MinioServer {
 
   def uploadFileResource(resource: String): Unit = {
     val file = new File(getClass.getResource(s"/$resource").toURI)
-    val put = PutObjectRequest.builder()
+    val put = PutObjectRequest
+      .builder()
       .bucket(inputBucket)
       .key(file.getName)
       .build()
@@ -56,10 +65,12 @@ trait MinioServer {
   }
 
   private def createBuckets(): Unit = {
-    val alreadyExistingBuckets = s3Client.listBuckets().buckets().asScala.collect { case b if b.name() == inputBucket => b.name() }
+    val alreadyExistingBuckets =
+      s3Client.listBuckets().buckets().asScala.collect { case b if b.name() == inputBucket => b.name() }
     val bucketsToCreate = Seq(inputBucket).diff(alreadyExistingBuckets)
     bucketsToCreate.foreach { b =>
-      val bucketRequest = CreateBucketRequest.builder()
+      val bucketRequest = CreateBucketRequest
+        .builder()
         .bucket(b)
         .build()
       s3Client.createBucket(bucketRequest)

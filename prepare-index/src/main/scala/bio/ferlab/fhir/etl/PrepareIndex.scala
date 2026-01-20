@@ -1,7 +1,14 @@
 package bio.ferlab.fhir.etl
 
 import bio.ferlab.datalake.spark3.SparkApp
-import bio.ferlab.fhir.etl.centricTypes.{BiospecimenCentric, FileCentric, ParticipantCentric, ProgramCentric, SimpleParticipant, StudyCentric}
+import bio.ferlab.fhir.etl.centricTypes.{
+  BiospecimenCentric,
+  FileCentric,
+  ParticipantCentric,
+  ProgramCentric,
+  SimpleParticipant,
+  StudyCentric
+}
 import org.apache.spark.sql.functions.col
 
 object PrepareIndex extends SparkApp {
@@ -17,18 +24,19 @@ object PrepareIndex extends SparkApp {
 
   val studyCentric = new StudyCentric(studyList).run()
 
-
-  //Remove studies that are restricted
+  // Remove studies that are restricted
   val filteredStudies =
     studyCentric("es_index_study_centric")
       .where(col("security") =!= "R")
-      .select("study_id").collect().map(r => r.getString(0)).toList
+      .select("study_id")
+      .collect()
+      .map(r => r.getString(0))
+      .toList
 
   new SimpleParticipant(filteredStudies).run()
 
-
   jobName match {
-    case "study_centric" =>
+    case "study_centric"       =>
     case "participant_centric" =>
       if (filteredStudies.nonEmpty) new ParticipantCentric(filteredStudies).run()
     case "file_centric" =>

@@ -28,13 +28,15 @@ trait FhirServer {
 
   fhirClient.registerInterceptor(new CookieInterceptor("cookie"))
 
-  def loadPatient(lastName: String = "Doe",
-                   firstName: String = "John",
-                   identifier: String = "PT-000001",
-                    tag: String = "SD_ABC")
-                  (implicit fhirClient: IGenericClient): Unit = {
+  def loadPatient(
+      lastName: String = "Doe",
+      firstName: String = "John",
+      identifier: String = "PT-000001",
+      tag: String = "SD_ABC"
+  )(implicit fhirClient: IGenericClient): Unit = {
     val patient: Patient = new Patient()
-    patient.addIdentifier()
+    patient
+      .addIdentifier()
       .setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
       .setValue(identifier)
     patient.setBirthDate(Date.from(LocalDate.of(2000, 12, 21).atStartOfDay(ZoneId.of("UTC")).toInstant))
@@ -42,20 +44,28 @@ trait FhirServer {
     patient.addName().setFamily(lastName).addGiven(firstName)
     patient.setIdElement(IdType.of(patient.setId(identifier)))
     patient.setGender(Enumerations.AdministrativeGender.MALE)
-    patient.setMeta(new Meta().setTag(List(new Coding(null, tag, null), new Coding(null, "study_version:1", null)).asJava))
+    patient.setMeta(
+      new Meta().setTag(List(new Coding(null, tag, null), new Coding(null, "study_version:1", null)).asJava)
+    )
 
-    fhirClient.create()
+    fhirClient
+      .create()
       .resource(patient)
       .execute()
       .getId
   }
 
-  def loadCondition(system:String = "http://purl.obolibrary.org/obo/mondo.owl", code: String = "0007186", tag: String = "SD_ABC") ={
+  def loadCondition(
+      system: String = "http://purl.obolibrary.org/obo/mondo.owl",
+      code: String = "0007186",
+      tag: String = "SD_ABC"
+  ) = {
     val cond = new Condition()
     cond.setSubject(new Reference("Patient/1"))
     cond.setMeta(new Meta().setTag(List(new Coding(null, tag, null), new Coding(null, "study_version:1", null)).asJava))
     cond.setCode(new CodeableConcept().addCoding(new Coding(system, code, "")))
-    fhirClient.create()
+    fhirClient
+      .create()
       .resource(cond)
       .execute()
       .getId

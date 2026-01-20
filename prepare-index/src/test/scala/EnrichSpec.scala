@@ -7,4 +7,3 @@ class EnrichSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     1 equals 1
   }
 }
-

@@ -22,7 +22,7 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
         PATIENT_INPUT(fhir_id = "P3")
       ).toDF(),
       "normalized_family_relationship" -> Seq(
-        FAMILY_RELATIONSHIP(),
+        FAMILY_RELATIONSHIP()
       ).toDF(),
       "normalized_phenotype" -> Seq(
         PHENOTYPE(fhir_id = "CP1", cqdg_participant_id = "P1"),
@@ -31,7 +31,7 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
       "normalized_diagnosis" -> Seq(
         DIAGNOSIS_INPUT(fhir_id = "D1", `subject` = "P1"),
         DIAGNOSIS_INPUT(fhir_id = "D2", `subject` = "P2"),
-        DIAGNOSIS_INPUT(fhir_id = "D3", `subject` = "P1"),
+        DIAGNOSIS_INPUT(fhir_id = "D3", `subject` = "P1")
       ).toDF(),
       "normalized_group" -> Seq.empty[GROUP].toDF(),
       "normalized_cause_of_death" -> Seq.empty[CAUSE_OF_DEATH].toDF(),
@@ -53,4 +53,3 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
   }
 
 }
-

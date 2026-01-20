@@ -6,7 +6,8 @@ import org.apache.spark.sql.SparkSession
 trait WithSparkSession {
   UserGroupInformation.setLoginUser(UserGroupInformation.createRemoteUser("test"))
 
-  implicit lazy val spark: SparkSession = SparkSession.builder()
+  implicit lazy val spark: SparkSession = SparkSession
+    .builder()
     .config("spark.ui.enabled", value = false)
     .config("spark.fhir.server.url", "http://localhost:8080")
     .master("local")

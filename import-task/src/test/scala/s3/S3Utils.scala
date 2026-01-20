@@ -11,16 +11,17 @@ import java.net.URI
 
 object S3Utils {
 
-
   def buildS3Client(conf: AWSConf): S3Client = {
-    val confBuilder: S3Configuration = software.amazon.awssdk.services.s3.S3Configuration.builder()
+    val confBuilder: S3Configuration = software.amazon.awssdk.services.s3.S3Configuration
+      .builder()
       .pathStyleAccessEnabled(conf.pathStyleAccess)
       .build()
     val staticCredentialsProvider: StaticCredentialsProvider = StaticCredentialsProvider.create(
       AwsBasicCredentials.create(conf.accessKey, conf.secretKey)
     )
     val endpoint = URI.create(conf.endpoint)
-    val s3: S3Client = S3Client.builder()
+    val s3: S3Client = S3Client
+      .builder()
       .credentialsProvider(staticCredentialsProvider)
       .endpointOverride(endpoint)
       .region(Region.US_EAST_1)
@@ -39,7 +40,5 @@ object S3Utils {
 
     new String(s3Client.getObject(objectRequest).readAllBytes())
   }
-
-
 
 }

@@ -6,17 +6,16 @@ import pureconfig.ConfigReader.Result
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 
-
 case class AWSConf(
-                    accessKey: String,
-                    secretKey: String,
-                    endpoint: String,
-                    bucketName: String,
-                    pathStyleAccess: Boolean,
-                    outputBucketName: String,
-                    outputPrefix: String,
-                    outputNarvalBucket: String
-                  )
+    accessKey: String,
+    secretKey: String,
+    endpoint: String,
+    bucketName: String,
+    pathStyleAccess: Boolean,
+    outputBucketName: String,
+    outputPrefix: String,
+    outputNarvalBucket: String
+)
 
 case class Conf(aws: AWSConf)
 
