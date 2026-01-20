@@ -7,7 +7,7 @@
     "settings": {
       "number_of_shards": 1,
       "index": {
-        "max_result_window": 12000
+        "max_result_window" : 12000
       },
       "analysis": {
         "normalizer": {
@@ -117,7 +117,7 @@
         },
         "search_text": {
           "type": "keyword",
-          "normalizer": "custom_normalizer"
+          "normalizer" : "custom_normalizer"
         }
       }
     }

@@ -3,37 +3,37 @@
     "gene_suggestions*"
   ],
   "priority": 1,
-  "template": {
-    "settings": {
-      "number_of_shards": "1",
+  "template" : {
+    "settings" : {
+      "number_of_shards" : "1",
       "index": {
-        "max_result_window": 12000
+        "max_result_window" : 12000
       }
     },
-    "mappings": {
-      "properties": {
-        "symbol": {
-          "index": false,
-          "type": "keyword"
+    "mappings" : {
+      "properties" : {
+        "symbol" : {
+          "index" : false,
+          "type" : "keyword"
         },
-        "suggestion_id": {
-          "index": false,
-          "type": "keyword"
+        "suggestion_id" : {
+          "index" : false,
+          "type" : "keyword"
         },
-        "ensembl_gene_id": {
-          "index": false,
-          "type": "keyword"
+        "ensembl_gene_id" : {
+          "index" : false,
+          "type" : "keyword"
         },
-        "suggest": {
-          "max_input_length": 50,
-          "analyzer": "standard",
-          "preserve_position_increments": true,
-          "type": "completion",
-          "preserve_separators": true
+        "suggest" : {
+          "max_input_length" : 50,
+          "analyzer" : "standard",
+          "preserve_position_increments" : true,
+          "type" : "completion",
+          "preserve_separators" : true
         },
-        "type": {
-          "index": false,
-          "type": "keyword"
+        "type" : {
+          "index" : false,
+          "type" : "keyword"
         }
       }
     }

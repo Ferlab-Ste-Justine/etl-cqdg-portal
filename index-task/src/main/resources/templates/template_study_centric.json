@@ -1,13 +1,11 @@
 {
-  "index_patterns": [
-    "study_centric*"
-  ],
-  "priority": 1,
+  "index_patterns" : ["study_centric*"],
+  "priority" : 1,
   "template": {
-    "settings": {
-      "number_of_shards": 5,
+    "settings" : {
+      "number_of_shards" : 5,
       "index": {
-        "max_result_window": 12000
+        "max_result_window" : 12000
       },
       "analysis": {
         "normalizer": {
@@ -23,11 +21,11 @@
       "properties": {
         "keyword": {
           "type": "keyword",
-          "normalizer": "custom_normalizer"
+          "normalizer" : "custom_normalizer"
         },
         "description": {
           "type": "keyword",
-          "normalizer": "custom_normalizer"
+          "normalizer" : "custom_normalizer"
         },
         "access_authority": {
           "properties": {
@@ -75,31 +73,31 @@
         "restricted_number_files": {
           "type": "integer"
         },
-        "study_designs": {
-          "type": "keyword"
+        "study_designs" : {
+          "type" : "keyword"
         },
-        "data_collection_methods": {
-          "type": "keyword"
+        "data_collection_methods" : {
+          "type" : "keyword"
         },
         "status": {
           "type": "keyword"
         },
         "name": {
           "type": "keyword",
-          "normalizer": "custom_normalizer"
+          "normalizer" : "custom_normalizer"
         },
         "security": {
           "type": "keyword"
         },
         "domain": {
           "type": "keyword",
-          "normalizer": "custom_normalizer"
+          "normalizer" : "custom_normalizer"
         },
-        "population": {
-          "type": "keyword"
+        "population" : {
+          "type" : "keyword"
         },
-        "study_version": {
-          "type": "keyword"
+        "study_version" : {
+          "type" : "keyword"
         },
         "programs": {
           "type": "nested",
@@ -155,7 +153,7 @@
             "experimental_strategies_1": {
               "properties": {
                 "code": {
-                  "type": "keyword"
+                    "type": "keyword"
                 },
                 "display": {
                   "type": "keyword"
@@ -170,17 +168,17 @@
             }
           }
         },
-        "participant_count": {
-          "type": "integer"
+        "participant_count" : {
+          "type" : "integer"
         },
-        "file_count": {
-          "type": "integer"
+        "file_count" : {
+          "type" : "integer"
         },
-        "data_category": {
-          "type": "keyword"
+        "data_category" : {
+          "type" : "keyword"
         },
-        "family_count": {
-          "type": "integer"
+        "family_count" : {
+          "type" : "integer"
         },
         "experimental_strategies": {
           "type": "nested",
@@ -211,17 +209,17 @@
             }
           }
         },
-        "hpo_terms": {
-          "type": "keyword"
+        "hpo_terms" : {
+          "type" : "keyword"
         },
-        "mondo_terms": {
-          "type": "keyword"
+        "mondo_terms" : {
+          "type" : "keyword"
         },
-        "icd_terms": {
-          "type": "keyword"
+        "icd_terms" : {
+          "type" : "keyword"
         },
-        "family_data": {
-          "type": "boolean"
+        "family_data" : {
+          "type" : "boolean"
         },
         "data_access_codes": {
           "properties": {
@@ -233,16 +231,16 @@
             }
           }
         },
-        "internal_study_id": {
-          "type": "keyword"
+        "internal_study_id" : {
+          "type" : "keyword"
         },
-        "study_code": {
-          "type": "keyword",
-          "normalizer": "custom_normalizer"
+        "study_code" : {
+          "type" : "keyword",
+          "normalizer" : "custom_normalizer"
         },
-        "study_id": {
-          "type": "keyword",
-          "normalizer": "custom_normalizer"
+        "study_id" : {
+          "type" : "keyword",
+          "normalizer" : "custom_normalizer"
         }
       }
     }
