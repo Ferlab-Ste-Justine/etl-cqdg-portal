@@ -14,7 +14,7 @@ case class NORMALIZED_TASK(
     `run_alias`: Option[String] = None,
     //                           `run_date`: String = "1969-12-31 19:19:36.5088",
     `capture_kit`: Option[String] = None,
-    `platform`: String = "Illumina HiSeq 2000 PE100",
+    `platform`: String = "Illumina",
     `experimental_strategy`: String = "WGS",
     `sequencer_id`: Option[String] = None,
     `workflow_name`: String = "Dragen",
