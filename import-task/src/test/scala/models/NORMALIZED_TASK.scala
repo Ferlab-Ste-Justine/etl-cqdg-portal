@@ -19,7 +19,7 @@ case class NORMALIZED_TASK(
     `read_length`: Option[String] = Some("151"),
     `is_paired_end`: Boolean = true,
     `capture_kit`: Option[String] = None,
-    `platform`: String = "Illumina HiSeq 2000 PE100",
+    `platform`: String = "Illumina",
     `experimental_strategy_1`: CODEABLE = CODEABLE("WGS"),
     `experimental_strategy`: String = "WGS",
     `sequencer_id`: Option[String] = None,
