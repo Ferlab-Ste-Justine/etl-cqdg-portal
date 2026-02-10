@@ -616,27 +616,29 @@ object Transformations {
             .otherwise(col("data_category_cs")("display"))
         )
         .withColumn("content_exp", explode(col("content")))
-        .withColumn(
-          "file_size",
-          retrieveSize(
-            firstNonNull(
-              filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D)
-            )("fileSize")
-          )
-        )
+        .withColumn("file_size", col("content_exp")("attachment")("size"))
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
         .withColumn("file_hash", col("content_exp")("attachment")("hash"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn(
           "dataset",
-          regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1)
+          transform(
+            filter(col("meta")("tag"), col => col("system") === DATASETS_CS),
+            tag => regexp_extract(tag("code"), datasetExtract, 1)
+          )
         )
         .withColumn(
           "security",
           filter(col("meta")("security"), col => col("system") === SYSTEM_CONFIDENTIALITY)(0)("code")
         )
-        .withColumn("relates_to", substring_index(col("relatesTo")("target")("reference")(0), "/", -1))
+        .withColumn(
+          "relates_to",
+          when(
+            col("relatesTo").isNotNull,
+            substring_index(col("relatesTo")("target")("reference")(0), "/", -1)
+          )
+        )
         .groupBy(
           columns.head,
           columns.tail ++ Array(
