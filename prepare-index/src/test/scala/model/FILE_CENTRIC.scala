@@ -5,7 +5,7 @@ case class FILE_CENTRIC(
     study_id: String = "STU0000001",
     `security`: String = "U",
     biospecimen_reference: Seq[String] = Seq("SAM0247817"),
-    data_type: String = "Germline Structural Variant",
+    data_type: String = "Structural Variations (SVs)",
     dataset: Option[String] = Some("Dataset1"),
     `relates_to`: Option[RELATES_TO] = None,
     data_category: String = "Genomics",

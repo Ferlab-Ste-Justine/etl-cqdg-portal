@@ -4,7 +4,7 @@ case class FILE_WITH_BIOSPECIMEN(
     `file_id`: Option[String] = Some("FIL0086557"),
     `file_2_id`: Option[String] = Some("FIL0086557"),
     `biospecimen_reference`: Seq[String] = Seq("SAM0247817"),
-    `data_type`: Option[String] = Some("Germline Structural Variant"),
+    `data_type`: Option[String] = Some("Structural Variations (SVs)"),
     `data_category`: Option[String] = Some("Genomics"),
     `dataset`: Option[String] = Some("Dataset1"),
     `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT_SINGLE] = Some(SEQUENCING_EXPERIMENT_SINGLE()),

@@ -15,11 +15,11 @@ case class SEQUENCING_EXPERIMENT_SINGLE(
 //                                  `is_paired_end`: Boolean = false,
     `analysis_files`: Seq[ANALYSIS_FILE] = Seq(
       ANALYSIS_FILE("Annotated-SNV", "12"),
-      ANALYSIS_FILE("Aligned-reads", "1"),
+      ANALYSIS_FILE("Aligned-Reads", "1"),
       ANALYSIS_FILE("SNV", "2"),
-      ANALYSIS_FILE("Germline-CNV", "3"),
-      ANALYSIS_FILE("Germline-structural-variant", "4"),
-      ANALYSIS_FILE("Sequencing-data-supplement", "5")
+      ANALYSIS_FILE("CNV", "3"),
+      ANALYSIS_FILE("SV", "4"),
+      ANALYSIS_FILE("Sequencing-Data-Supplement", "5")
     )
 )
 

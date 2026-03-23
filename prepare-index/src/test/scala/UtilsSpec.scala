@@ -169,7 +169,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     val seqExperiment = Seq(
       SEQUENCING_EXPERIMENT_SINGLE(`analysis_files` =
         Seq(
-          ANALYSIS_FILE("Aligned-reads", "F1")
+          ANALYSIS_FILE("Aligned-Reads", "F1")
         )
       ),
       SEQUENCING_EXPERIMENT_SINGLE(`analysis_files` =
@@ -182,7 +182,7 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       .withColumn("lab_aliquot_ids", array().cast(ArrayType(StringType)))
       .withColumn(
         "is_paired_end",
-        functions.when(col("analysis_files")(0)("data_type") === "Aligned-reads", lit(true)).otherwise(lit(false))
+        functions.when(col("analysis_files")(0)("data_type") === "Aligned-Reads", lit(true)).otherwise(lit(false))
       )
 
     val output = filesDf.addSequencingExperiment(seqExperiment)
