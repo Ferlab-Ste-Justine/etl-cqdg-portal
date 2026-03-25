@@ -106,11 +106,11 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           `_for` = "P1",
           `analysis_files` = Seq(
             ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-            ANALYSIS_FILE("Aligned-reads", "D1"),
+            ANALYSIS_FILE("Aligned-Reads", "D1"),
             ANALYSIS_FILE("SNV", "D4"),
-            ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
-            ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-            ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
+            ANALYSIS_FILE("CNV", "FIL0000228"),
+            ANALYSIS_FILE("SV", "FIL0000223"),
+            ANALYSIS_FILE("Sequencing-Data-Supplement", "FIL0000222")
           )
         )
       ).toDF(),
@@ -166,11 +166,11 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
               `analysis_files` = Seq(
                 ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-                ANALYSIS_FILE("Aligned-reads", "D1"),
+                ANALYSIS_FILE("Aligned-Reads", "D1"),
                 ANALYSIS_FILE("SNV", "D4"),
-                ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
-                ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
+                ANALYSIS_FILE("CNV", "FIL0000228"),
+                ANALYSIS_FILE("SV", "FIL0000223"),
+                ANALYSIS_FILE("Sequencing-Data-Supplement", "FIL0000222")
               )
             ),
             `sample` = Some(TASK_SAMPLE())
@@ -217,11 +217,11 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
               `analysis_files` = Seq(
                 ANALYSIS_FILE("Annotated-SNV", "FIL0000212"),
-                ANALYSIS_FILE("Aligned-reads", "D1"),
+                ANALYSIS_FILE("Aligned-Reads", "D1"),
                 ANALYSIS_FILE("SNV", "D4"),
-                ANALYSIS_FILE("Germline-CNV", "FIL0000228"),
-                ANALYSIS_FILE("Germline-structural-variant", "FIL0000223"),
-                ANALYSIS_FILE("Sequencing-data-supplement", "FIL0000222")
+                ANALYSIS_FILE("CNV", "FIL0000228"),
+                ANALYSIS_FILE("SV", "FIL0000223"),
+                ANALYSIS_FILE("Sequencing-Data-Supplement", "FIL0000222")
               )
             ),
             `sample` = Some(TASK_SAMPLE())

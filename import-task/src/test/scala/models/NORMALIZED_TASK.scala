@@ -27,13 +27,13 @@ case class NORMALIZED_TASK(
     `_for`: String = "PRT0000002",
     `analysis_files`: Seq[ANALYSIS_FILE] = Seq(
       ANALYSIS_FILE("Annotated-SNV", "FIL0000101"),
-      ANALYSIS_FILE("Aligned-reads", "FIL0000102"),
+      ANALYSIS_FILE("Aligned-Reads", "FIL0000102"),
       ANALYSIS_FILE("SNV", "FIL0000104"),
-      ANALYSIS_FILE("Germline-CNV", "FIL0000106"),
-      ANALYSIS_FILE("Germline-structural-variant", "FIL0000108"),
-      ANALYSIS_FILE("Metrics", "FIL0000605"),
-      ANALYSIS_FILE("Unaligned-Reads", "FIL0000515"),
-      ANALYSIS_FILE("Unaligned-Reads", "FIL0000516")
+      ANALYSIS_FILE("CNV", "FIL0000106"),
+      ANALYSIS_FILE("SV", "FIL0000108"),
+      ANALYSIS_FILE("Quality-Control-Metrics", "FIL0000605"),
+      ANALYSIS_FILE("Raw-Sequencing-Reads", "FIL0000515"),
+      ANALYSIS_FILE("Raw-Sequencing-Reads", "FIL0000516")
     ),
     `study_id`: String = "study1"
 )
