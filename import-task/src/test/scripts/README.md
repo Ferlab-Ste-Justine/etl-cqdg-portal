@@ -10,14 +10,16 @@ Python scripts for managing test data in Avro format.
 
 ## Setup
 
+Create and activate a virtual environment:
+```bash
+python3 -m venv venv
+
+source venv/bin/activate
+```
+
 Install dependencies:
 ```bash
 pip install -r requirements.txt
-```
-
-Or install globally:
-```bash
-pip3 install -r requirements.txt
 ```
 
 ## Scripts
@@ -44,19 +46,26 @@ This overwrites the existing `.avro` files with the data from the `.json` files.
 
 ## Workflow
 
-1. **Install dependencies** (first time only):
+1. **Create and activate virtual environment** (first time only):
    ```bash
-   pip3 install -r requirements.txt
+   python3 -m venv venv
+
+   source venv/bin/activate
    ```
 
-2. **Extract data:**
+2. **Install dependencies** (first time only):
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Extract data:**
    ```bash
    python3 avro_to_json.py
    ```
 
-3. **Edit the `.json` files** in the `json_data/` folder with your preferred editor
+4. **Edit the `.json` files** in the `json_data/` folder with your preferred editor
 
-4. **Convert back to Avro:**
+5. **Convert back to Avro:**
    ```bash
    python3 json_to_avro.py
    ```
