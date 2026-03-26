@@ -77,7 +77,17 @@ object Transformations {
           "capture_kit",
           filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString")
         )
-        .withColumn("platform", filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueString"))
+        .withColumn(
+          "platform",
+          transform(
+            filter(col("seq_exp")("extension"), col => col("url") === "platform")("valueCoding"),
+            coding =>
+              struct(
+                coding("code").as("code"),
+                coding("display").as("display")
+              )
+          )(0)
+        )
         .withColumn(
           "target_capture_kit",
           filter(col("seq_exp")("extension"), col => col("url") === "targetCaptureKit")(0)("valueString")
