@@ -5,7 +5,7 @@ case class SEQUENCING_EXPERIMENT_SINGLE(
     `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
     `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
     `selection`: CODEABLE = CODEABLE("RR", "RR_display"),
-    `platform`: CODEABLE = CODEABLE("Illumina", "Illumina"),
+    `platform`: String = "Illumina",
     `source`: CODEABLE = CODEABLE("TSC", "TSC_display"),
     `protocol`: String = "protocol2",
     `target_capture_kit`: String = "targetCaptureKit2",

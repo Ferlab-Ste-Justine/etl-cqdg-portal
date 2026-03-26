@@ -79,14 +79,7 @@ object Transformations {
         )
         .withColumn(
           "platform",
-          transform(
-            filter(col("seq_exp")("extension"), col => col("url") === "platform")("valueCoding"),
-            coding =>
-              struct(
-                coding("code").as("code"),
-                coding("display").as("display")
-              )
-          )(0)
+          filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueCoding")("display")
         )
         .withColumn(
           "target_capture_kit",

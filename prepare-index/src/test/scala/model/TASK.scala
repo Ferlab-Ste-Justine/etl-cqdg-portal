@@ -17,7 +17,7 @@ case class TASK(
     `pipelines`: Seq[String] = Seq("testPipeline1", "testPipeline2"),
     `is_paired_end`: Boolean = true,
     `capture_kit`: String = "RocheKapaHyperExome",
-    `platform`: CODEABLE = CODEABLE("Illumina", "Illumina"),
+    `platform`: String = "Illumina",
     `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
     `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
     `sequencer_id`: String = "NB552318",
