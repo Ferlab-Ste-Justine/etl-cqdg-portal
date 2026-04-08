@@ -627,6 +627,12 @@ object Transformations {
             )("fileSize")
           )
         )
+        .withColumn(
+          "file_md5sum",
+          firstNonNull(
+            filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_MD5SUM_S_D)
+          )("fileMd5Sum")
+        )
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
         .withColumn("file_hash", col("content_exp")("attachment")("hash"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
@@ -658,6 +664,7 @@ object Transformations {
               col("file_name"),
               col("file_format"),
               col("file_size"),
+              col("file_md5sum"),
               col("ferload_url"),
               col("file_hash")
             )

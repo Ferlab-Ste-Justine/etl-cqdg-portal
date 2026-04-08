@@ -19,6 +19,7 @@ case class FILES(
     `file_name`: String = "FIL0000101.variants_HSJ0140.vep.vcf.gz",
     `file_format`: String = "VCF",
     `file_size`: Float = 8.0f,
+    `file_md5sum`: String = "d41d8cd98f00b204e9800998ecf8427e",
     `ferload_url`: String =
       "s3://cqdg-dev-file-import/studies/study1/study_version_1/WGS/annotation/variants_HSJ0140.vep.vcf.gz",
     `file_hash`: Option[String] = None

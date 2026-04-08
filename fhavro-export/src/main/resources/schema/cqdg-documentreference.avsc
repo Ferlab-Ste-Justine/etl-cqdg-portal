@@ -647,6 +647,17 @@
                               "bytes"
                             ],
                             "default": null
+                          },
+                          {
+                            "name" : "fileMd5Sum",
+                            "aliases": [
+                              "ext:https://fhir.cqdg.ca/StructureDefinition/FileMd5SumExtension"
+                            ],
+                            "type": [
+                              "null",
+                              "string"
+                            ],
+                            "default": null
                           }
                         ],
                         "default": {}

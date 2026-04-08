@@ -479,6 +479,9 @@
             "file_size": {
               "type": "float"
             },
+            "file_md5sum": {
+              "type": "keyword"
+            },
             "relates_to": {
               "type": "keyword"
             },
