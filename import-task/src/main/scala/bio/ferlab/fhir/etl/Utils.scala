@@ -63,11 +63,6 @@ object Utils {
   def extractDisplayOrCode(codingCol: Column): Column =
     transform(codingCol, col => when(isnull(col("display")), col("code")).otherwise(col("display")))(0)
 
-  val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
-
-  val extractKeywords: UserDefinedFunction =
-    udf((arr: Seq[(Option[String], Seq[Coding], Option[String])]) => arr.map(_._3))
-
   val ageFromExtension: (Column, String) => Column = (extension, url) =>
     transformAgeSortable(
       firstNonNull(
