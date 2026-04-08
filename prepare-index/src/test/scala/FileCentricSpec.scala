@@ -113,6 +113,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `file_name` = "file5.json",
         `file_format` = "TGZ",
         `file_size` = 56,
+        `file_md5sum` = "d41d8cd98f00b204e9800998ecf8427e",
         `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
         `biospecimens` = Set(
           BIOSPECIMEN(
@@ -207,6 +208,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         `file_name` = "file.1",
         `file_format` = "CRAM",
         `file_size` = 56,
+        `file_md5sum` = "d41d8cd98f00b204e9800998ecf8427e",
         `relates_to` = Some(RELATES_TO()),
         `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
         `biospecimens` = Set(

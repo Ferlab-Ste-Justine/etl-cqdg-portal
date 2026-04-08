@@ -160,6 +160,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `file_name` = "file1.cram",
             `file_format` = "CRAM",
             `file_size` = "56",
+            `file_md5sum` = "d41d8cd98f00b204e9800998ecf8427e",
 //            `relates_to` = Some("D2"),  //CRAI
             `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
             `biospecimen_reference` = Seq("B1"),
@@ -211,6 +212,7 @@ class BiospecimenCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `file_name` = "file4.gvcf",
             `file_format` = "gVCF",
             `file_size` = "56",
+            `file_md5sum` = "d41d8cd98f00b204e9800998ecf8427e",
 //            `relates_to` = Some("D5"), //CRAI
             `ferload_url` = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
             `biospecimen_reference` = Seq("B4"),
