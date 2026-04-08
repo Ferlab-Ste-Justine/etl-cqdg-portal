@@ -65,6 +65,8 @@ object Utils {
 
   val retrieveSize: UserDefinedFunction = udf((d: Option[String]) => d.map(BigInt(_).toLong))
 
+  val retrieveMd5Sum: UserDefinedFunction = udf((s: Option[String]) => s)
+
   val extractKeywords: UserDefinedFunction =
     udf((arr: Seq[(Option[String], Seq[Coding], Option[String])]) => arr.map(_._3))
 

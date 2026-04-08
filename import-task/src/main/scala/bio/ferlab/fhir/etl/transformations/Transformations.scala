@@ -620,18 +620,22 @@ object Transformations {
         )
         .withColumn("content_exp", explode(col("content")))
         .withColumn(
+          "file_size_ext",
+          filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D)
+        )
+        .withColumn(
           "file_size",
-          retrieveSize(
-            firstNonNull(
-              filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_SIZE_S_D)
-            )("fileSize")
-          )
+          when(size(col("file_size_ext")) > 0, retrieveSize(col("file_size_ext")(0)("fileSize"))).otherwise(lit(null))
+        )
+        .withColumn(
+          "file_md5sum_ext",
+          filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_MD5SUM_S_D)
         )
         .withColumn(
           "file_md5sum",
-          firstNonNull(
-            filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_MD5SUM_S_D)
-          )("fileMd5Sum")
+          when(size(col("file_md5sum_ext")) > 0, retrieveMd5Sum(col("file_md5sum_ext")(0)("fileMd5Sum"))).otherwise(
+            lit(null)
+          )
         )
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
         .withColumn("file_hash", col("content_exp")("attachment")("hash"))
@@ -672,7 +676,18 @@ object Transformations {
         )
       df
     },
-    Drop("id", "type", "category", "subject", "content", "context", "meta", "relatesTo")
+    Drop(
+      "id",
+      "type",
+      "category",
+      "subject",
+      "content",
+      "context",
+      "meta",
+      "relatesTo",
+      "file_size_ext",
+      "file_md5sum_ext"
+    )
   )
 
   val groupMappings: List[Transformation] = List(
