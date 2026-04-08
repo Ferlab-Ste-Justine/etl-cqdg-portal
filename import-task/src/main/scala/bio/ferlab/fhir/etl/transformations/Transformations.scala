@@ -411,7 +411,7 @@ object Transformations {
         "identifier",
         "relatedArtifact"
       )
-        .withColumn("keyword", extractKeywords(col("keyword")))
+        .withColumn("keyword", transform(col("keyword"), kw => kw("text")))
         .withColumn("telecom", firstNonNull(transform(col("contact"), col => col("telecom")(0))))
         .withColumn("access_authority", struct(col("telecom")("system") as "type", col("telecom")("value")))
         .withColumn(
@@ -625,7 +625,8 @@ object Transformations {
         )
         .withColumn(
           "file_size",
-          when(size(col("file_size_ext")) > 0, retrieveSize(col("file_size_ext")(0)("fileSize"))).otherwise(lit(null))
+          when(size(col("file_size_ext")) > 0, col("file_size_ext")(0)("fileSize").cast("string").cast("long"))
+            .otherwise(lit(null))
         )
         .withColumn(
           "file_md5sum_ext",
@@ -633,7 +634,7 @@ object Transformations {
         )
         .withColumn(
           "file_md5sum",
-          when(size(col("file_md5sum_ext")) > 0, retrieveMd5Sum(col("file_md5sum_ext")(0)("fileMd5Sum"))).otherwise(
+          when(size(col("file_md5sum_ext")) > 0, col("file_md5sum_ext")(0)("fileMd5Sum")).otherwise(
             lit(null)
           )
         )
