@@ -21,7 +21,7 @@ package object etl {
   val WORKFLOW_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/WorkflowExtension"
   val TASK_SAMPLE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/SampleExtension"
   val DOCUMENT_SIZE_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/FullSizeExtension"
-  val DOCUMENT_MD5SUM_S_D = "https://ferlab.bio/StructureDefinition/FileMd5SumExtension"
+  val DOCUMENT_MD5SUM_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/FileMd5SumExtension"
   val AGE_AT_RECRUITMENT_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/AgeAtRecruitment"
   // Patient
   val ETHNICITY_S_D = s"$SYSTEM_URL_CQDG/StructureDefinition/QCEthnicity"
