@@ -484,9 +484,6 @@
             "file_size": {
               "type": "keyword"
             },
-            "file_md5sum": {
-              "type": "keyword"
-            },
             "ferload_url": {
               "type": "keyword"
             },
