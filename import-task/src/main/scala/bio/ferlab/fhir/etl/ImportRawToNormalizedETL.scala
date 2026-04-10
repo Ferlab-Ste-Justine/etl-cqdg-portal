@@ -20,15 +20,10 @@ class ImportRawToNormalizedETL(
       spark: SparkSession
   ): Map[String, DataFrame] = {
     log.info(s"extracting: ${source.location}")
-    
-    // Read with mergeSchema option to handle schema inconsistencies across study partitions
-    val df = spark.read
-      .format(source.format.sparkFormat)
-      .option("mergeSchema", "true")
-      .load(source.location)
-      .where(col("study_id").isin(studyIds: _*))
-    
-    Map(source.id -> df)
+    Map(
+      source.id -> source.read
+        .where(col("study_id").isin(studyIds: _*))
+    )
   }
 
   override def replaceWhere: Option[String] = Some(s"study_id in (${studyIds.map(s => s"'$s'").mkString(", ")})")

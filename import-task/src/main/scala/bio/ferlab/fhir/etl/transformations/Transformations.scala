@@ -628,16 +628,7 @@ object Transformations {
           when(size(col("file_size_ext")) > 0, col("file_size_ext")(0)("fileSize").cast("string").cast("long"))
             .otherwise(lit(null))
         )
-        .withColumn(
-          "file_md5sum_ext",
-          filter(col("content_exp")("attachment")("extension"), col => col("url") === DOCUMENT_MD5SUM_S_D)
-        )
-        .withColumn(
-          "file_md5sum",
-          when(size(col("file_md5sum_ext")) > 0, col("file_md5sum_ext")(0)("fileMd5Sum")).otherwise(
-            lit(null)
-          )
-        )
+        .withColumn("file_md5sum", col("content_exp")("attachment")("fileMd5Sum"))
         .withColumn("ferload_url", col("content_exp")("attachment")("url"))
         .withColumn("file_hash", col("content_exp")("attachment")("hash"))
         .withColumn("file_name", col("content_exp")("attachment")("title"))
@@ -686,8 +677,7 @@ object Transformations {
       "context",
       "meta",
       "relatesTo",
-      "file_size_ext",
-      "file_md5sum_ext"
+      "file_size_ext"
     )
   )
 
