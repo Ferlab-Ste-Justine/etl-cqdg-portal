@@ -53,9 +53,6 @@
         "file_size": {
           "type": "float"
         },
-        "file_md5sum": {
-          "type": "keyword"
-        },
         "ferload_url": {
           "type": "keyword"
         },
@@ -74,10 +71,6 @@
             },
             "file_size": {
               "type": "float",
-              "index": false
-            },
-            "file_md5sum": {
-              "type": "keyword",
               "index": false
             },
             "ferload_url": {

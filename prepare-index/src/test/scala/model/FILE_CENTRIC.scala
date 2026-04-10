@@ -12,7 +12,7 @@ case class FILE_CENTRIC(
     file_name: String = "NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz",
     file_format: String = "VCF",
     file_size: Double = 1118934.0,
-    file_md5sum: String = "d41d8cd98f00b204e9800998ecf8427e",
+    file_hash: String = "d41d8cd98f00b204e9800998ecf8427e",
     ferload_url: String =
       "https://ferload.qa.cqdg.ferlab.bio/e24d78edeff9e033dac8445d32835c46c480d8a4|NWQ3MDA3NGY2YzAwMmFiOWE1YzdiZDVmNTFlZmU5YTcgIE5TLjE4ODUuSURUX2k3Xzg3LS0tSURUX2k1Xzg3LjExMTM3MjMwLnN2LnZjZi5neg==",
     `biospecimens`: Set[BIOSPECIMEN] = Set.empty,

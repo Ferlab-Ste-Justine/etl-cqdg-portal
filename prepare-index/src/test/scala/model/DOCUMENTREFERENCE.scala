@@ -17,6 +17,6 @@ case class FILE(
     `file_name`: String = "file5.json",
     `file_format`: String = "TGZ",
     `file_size`: Long = 56,
-    `file_md5sum`: String = "d41d8cd98f00b204e9800998ecf8427e",
-    `ferload_url`: String = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a"
+    `ferload_url`: String = "http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a",
+    `file_hash`: String = "d41d8cd98f00b204e9800998ecf8427e"
 )
