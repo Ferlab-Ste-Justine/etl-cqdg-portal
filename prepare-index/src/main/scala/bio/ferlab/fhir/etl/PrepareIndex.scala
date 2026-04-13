@@ -33,7 +33,7 @@ object PrepareIndex extends SparkApp {
       .map(r => r.getString(0))
       .toList
 
-  new SimpleParticipant(filteredStudies).run()
+  if (filteredStudies.nonEmpty) new SimpleParticipant(filteredStudies).run()
 
   jobName match {
     case "study_centric"       =>
