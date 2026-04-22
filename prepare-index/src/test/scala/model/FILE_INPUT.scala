@@ -29,7 +29,7 @@ case class FILE_WITH_SEQ_EXPERIMENT(
     `file_2_id`: String = "FIL0081238",
     `biospecimen_reference`: Seq[String] = Seq("SAM0234037"),
     `data_category`: String = "Genomics",
-    `dataset`: Option[String] = Some("Dataset1"),
+    `dataset`: Seq[String] = Seq("Dataset1"),
     `sequencing_experiment`: SEQUENCING_EXPERIMENT_SINGLE = SEQUENCING_EXPERIMENT_SINGLE(),
     `sample`: Option[TASK_SAMPLE] = Some(TASK_SAMPLE())
 )

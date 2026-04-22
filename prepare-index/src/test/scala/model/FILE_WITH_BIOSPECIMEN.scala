@@ -6,7 +6,7 @@ case class FILE_WITH_BIOSPECIMEN(
     `biospecimen_reference`: Seq[String] = Seq("SAM0247817"),
     `data_type`: Option[String] = Some("Structural Variations (SVs)"),
     `data_category`: Option[String] = Some("Genomics"),
-    `dataset`: Option[String] = Some("Dataset1"),
+    `dataset`: Seq[String] = Seq("Dataset1"),
     `sequencing_experiment`: Option[SEQUENCING_EXPERIMENT_SINGLE] = Some(SEQUENCING_EXPERIMENT_SINGLE()),
     `sample`: Option[TASK_SAMPLE] = Some(TASK_SAMPLE()),
     `file_name`: Option[String] = Some("NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz"),

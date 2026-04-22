@@ -353,6 +353,7 @@ object Utils {
         .addSequencingExperiment(tasks)
         .explodeFilesAndRemoveRalatedTo
         .join(participants, Seq("participant_id", "study_id"), "inner")
+        .withColumn("dataset", explode(col("dataset")))
         .groupBy("study_id", "dataset")
         .agg(
           collect_set("data_type") as "data_types",
