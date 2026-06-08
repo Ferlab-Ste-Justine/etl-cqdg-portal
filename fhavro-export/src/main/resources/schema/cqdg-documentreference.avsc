@@ -707,6 +707,17 @@
                     "default":null
                   },
                   {
+                    "name":"stableFileId",
+                    "aliases": [
+                      "ext:https://fhir.cqdg.ca/StructureDefinition/StableFileIdExtension"
+                    ],
+                    "type":[
+                      "null",
+                      "string"
+                    ],
+                    "default":null
+                  },
+                  {
                     "name":"title",
                     "type":[
                       "null",
