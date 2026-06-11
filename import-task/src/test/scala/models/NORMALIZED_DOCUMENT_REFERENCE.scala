@@ -21,5 +21,6 @@ case class FILES(
     `file_size`: Float = 8.0f,
     `ferload_url`: String =
       "s3://cqdg-dev-file-import/studies/study1/study_version_1/WGS/annotation/variants_HSJ0140.vep.vcf.gz",
-    `file_hash`: String = "d41d8cd98f00b204e9800998ecf8427e"
+    `file_hash`: String = "d41d8cd98f00b204e9800998ecf8427e",
+    `stable_file_id`: String = "FH0000101"
 )
