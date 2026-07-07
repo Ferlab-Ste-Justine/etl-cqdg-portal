@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "file_centric*"
-  ],
+  "index_patterns": ["file_centric*"],
   "priority": 1,
   "template": {
     "settings": {
@@ -81,6 +79,10 @@
         },
         "file_hash": {
           "type": "keyword"
+        },
+        "stable_file_id": {
+          "type": "keyword",
+          "normalizer": "custom_normalizer"
         },
         "biospecimens": {
           "type": "nested",
