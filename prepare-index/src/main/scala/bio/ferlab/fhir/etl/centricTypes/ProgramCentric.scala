@@ -19,7 +19,8 @@ class ProgramCentric(studyIds: List[String])(implicit configuration: Configurati
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
     Seq(normalized_list)
       .map(ds => ds.id -> ds.read.where(col("study_id").isin(studyIds: _*)))
-      .toMap // Read all lists, as we don't filter by study_id for program centric
+      .toMap // Only the current run's studies; other studies persist because the destination
+             // writes with partitionOverwriteMode=dynamic (overwrites only these study_id partitions).
 
   }
 

@@ -10,7 +10,11 @@ import pureconfig.generic.auto._
 
 case class SourceConfig(fhirResource: String, entityType: Option[String], partitionBy: List[String])
 
-case class Index(name: String, partitionBy: List[String])
+case class Index(
+    name: String,
+    partitionBy: List[String],
+    writeoptions: Map[String, String] = WriteOptions.DEFAULT_OPTIONS
+)
 
 object ConfigurationGenerator extends App {
   def populateTable(sources: List[DatasetConf], tableName: String): List[DatasetConf] = {
@@ -111,7 +115,11 @@ object ConfigurationGenerator extends App {
       Index("participant_centric", partitionByStudyIdAndReleaseId),
       Index("file_centric", partitionByStudyIdAndReleaseId),
       Index("biospecimen_centric", partitionByStudyIdAndReleaseId),
-      Index("program_centric", partitionByStudyIdAndReleaseId)
+      Index(
+        "program_centric",
+        partitionByStudyIdAndReleaseId,
+        writeoptions = WriteOptions.DEFAULT_OPTIONS ++ Map("partitionOverwriteMode" -> "dynamic")
+      )
     ).flatMap(index => {
       Seq(
         DatasetConf(
@@ -121,7 +129,8 @@ object ConfigurationGenerator extends App {
           format = PARQUET,
           loadtype = OverWrite,
           table = Some(TableConf("database", s"es_index_${index.name}")),
-          partitionby = index.partitionBy
+          partitionby = index.partitionBy,
+          writeoptions = index.writeoptions
         )
       )
     }) ++ Seq(
