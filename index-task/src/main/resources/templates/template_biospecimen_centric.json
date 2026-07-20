@@ -455,6 +455,10 @@
             "file_id": {
               "type": "keyword"
             },
+            "stable_file_id": {
+              "type": "keyword",
+              "normalizer": "custom_normalizer"
+            },
             "file_2_id": {
               "type": "keyword"
             },
