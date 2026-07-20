@@ -26,6 +26,7 @@ case class FILE_WITH_SEQ_EXPERIMENT(
     `file_hash`: String = "d41d8cd98f00b204e9800998ecf8427e",
     `ferload_url`: String = "https://ferload.qa.cqdg.ferlab.bio/7b21b84d6034cff9ee187c242fa21ae5be2164ef",
     `file_id`: String = "FIL0081238",
+    `stable_file_id`: String = "FH0000101",
     `file_2_id`: String = "FIL0081238",
     `biospecimen_reference`: Seq[String] = Seq("SAM0234037"),
     `data_category`: String = "Genomics",
