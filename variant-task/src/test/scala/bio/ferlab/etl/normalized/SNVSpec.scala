@@ -45,9 +45,9 @@ class SNVSpec extends AnyFlatSpec with Matchers with WithSparkSession with WithT
       ).toDF(),
       specimenEnriched.id -> specimenEnrichedDf,
       normalized_task.id -> Seq(
-        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S1", `experimental_strategy` = "WGS"),
-        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S2", `experimental_strategy` = "WGS"),
-        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S3", `experimental_strategy` = "WXS")
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S1", `experimental_strategy` = Seq("WGS")),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S2", `experimental_strategy` = Seq("WGS")),
+        NORMALIZED_TASK(`study_id` = "STU0000001", `ldm_sample_id` = "S3", `experimental_strategy` = Seq("WXS"))
       ).toDF()
     )
 

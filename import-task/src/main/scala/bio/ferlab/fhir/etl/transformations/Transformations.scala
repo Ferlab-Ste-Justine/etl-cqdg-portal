@@ -79,7 +79,22 @@ object Transformations {
         )
         .withColumn(
           "platform",
-          filter(col("seq_exp")("extension"), col => col("url") === "platform")(0)("valueCoding")("display")
+          transform(
+            filter(col("seq_exp")("extension"), col => col("url") === "platform")("valueCoding"),
+            coding => coalesce(coding("display"), coding("code"))
+          )
+        )
+        .withColumn(
+          "instrument_model",
+          filter(col("seq_exp")("extension"), col => col("url") === "instrumentModel")("valueString")
+        )
+        .withColumn(
+          "pore_type",
+          filter(col("seq_exp")("extension"), col => col("url") === "poreType")(0)("valueString")
+        )
+        .withColumn(
+          "is_imputed",
+          filter(col("seq_exp")("extension"), col => col("url") === "isImputed")(0)("valueBoolean")
         )
         .withColumn(
           "target_capture_kit",
@@ -92,17 +107,28 @@ object Transformations {
         )
         .withColumn(
           "experimental_strategy_1",
-          struct(
-            filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code")
-              .as("code"),
-            filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")(
-              "display"
-            ).as("display")
+          transform(
+            filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")("valueCoding"),
+            coding =>
+              struct(
+                coding("code").as("code"),
+                coding("display").as("display")
+              )
           )
         )
         .withColumn( // FIXME remove this field after all studies are updated (replace _1)
           "experimental_strategy",
-          filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")(0)("valueCoding")("code")
+          transform(
+            filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")("valueCoding"),
+            coding => coding("code")
+          )
+        )
+        .withColumn(
+          "profiling_resolution",
+          transform(
+            filter(col("seq_exp")("extension"), col => col("url") === "profilingResolution")("valueCoding"),
+            coding => coalesce(coding("display"), coding("code"))
+          )
         )
         .withColumn(
           "sequencer_id",
@@ -134,7 +160,13 @@ object Transformations {
           "genome_build",
           filter(col("workflow")("extension"), col => col("url") === "genomeBuild")(0)("valueCoding")("code")
         )
-        .withColumn("pipelines", filter(col("workflow")("extension"), col => col("url") === "pipeline")("valueString"))
+        .withColumn(
+          "pipelines",
+          coalesce(
+            filter(col("workflow")("extension"), col => col("url") === "pipeline")("valueString"),
+            typedLit(Seq.empty[String])
+          )
+        )
         .withColumn("_for", regexp_extract(col("for")("reference"), patientExtract, 1))
         .withColumn("owner", regexp_extract(col("owner")("reference"), organizationExtract, 1))
         .withColumn(

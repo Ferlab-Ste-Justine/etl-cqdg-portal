@@ -199,9 +199,14 @@ object Utils {
       val sequencingExperimentClean = sequencingExperiment
         .withColumnRenamed("_for", "participant_id")
         .withColumnRenamed("fhir_id", "analysis_id")
+        // is_paired_end is conditional, not required when analysis_type is Multi-omic or Other.
+        // A null must stay null rather than falling through to "Unpaired Reads",
+        // which would assert something untrue about the experiment.
         .withColumn(
           "type_of_sequencing",
-          when(col("is_paired_end"), lit("Paired Reads")).otherwise(lit("Unpaired Reads"))
+          when(col("is_paired_end").isNull, lit(null).cast("string"))
+            .when(col("is_paired_end"), lit("Paired Reads"))
+            .otherwise(lit("Unpaired Reads"))
         )
         .drop("study_id", "is_paired_end")
 
@@ -356,7 +361,9 @@ object Utils {
         .groupBy("study_id", "dataset")
         .agg(
           collect_set("data_type") as "data_types",
-          collect_set("sequencing_experiment.experimental_strategy_1") as "experimental_strategies_1",
+          array_distinct(
+            flatten(collect_set("sequencing_experiment.experimental_strategy_1"))
+          ) as "experimental_strategies_1",
           size(collect_set("fhir_id")) as "file_count",
           size(collect_set("participant_id")) as "participant_count"
         )
@@ -407,6 +414,7 @@ object Utils {
 
       val experimentalStrategiesCount = cleanTask
         .join(cleanFilesDF, Seq("pivot", "study_id"), "inner")
+        .withColumn("experimental_strategy_1", explode(col("experimental_strategy_1")))
         .groupBy("study_id", "experimental_strategy_1")
         .agg(size(collect_set(col("file")("file_name"))) as "file_count")
         .groupBy("study_id")

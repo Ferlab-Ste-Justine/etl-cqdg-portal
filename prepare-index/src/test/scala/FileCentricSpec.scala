@@ -190,7 +190,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           )
         ),
         `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
-          `experimental_strategy_1` = CODEABLE("WXS"),
+          `experimental_strategy_1` = Seq(CODEABLE("WXS")),
           `analysis_files` = Seq(
             ANALYSIS_FILE("Aligned-Reads", "12"),
             ANALYSIS_FILE("Sequencing-Data-Supplement", "11")
@@ -285,7 +285,7 @@ class FileCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
           )
         ),
         `sequencing_experiment` = SEQUENCING_EXPERIMENT_SINGLE(
-          `experimental_strategy_1` = CODEABLE("WXS"),
+          `experimental_strategy_1` = Seq(CODEABLE("WXS")),
           `analysis_files` = Seq(
             ANALYSIS_FILE("Aligned-Reads", "12"),
             ANALYSIS_FILE("Sequencing-Data-Supplement", "11")
