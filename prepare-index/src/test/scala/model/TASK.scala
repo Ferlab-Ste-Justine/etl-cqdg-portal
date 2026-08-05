@@ -15,11 +15,17 @@ case class TASK(
     `target_capture_kit`: String = "targetCaptureKit2",
     `target_loci`: String = "targetedLoci2",
     `pipelines`: Seq[String] = Seq("testPipeline1", "testPipeline2"),
-    `is_paired_end`: Boolean = true,
+    `is_paired_end`: Option[Boolean] = Some(true),
     `capture_kit`: String = "RocheKapaHyperExome",
-    `platform`: String = "Illumina",
-    `experimental_strategy`: String = "WXS", // FIXME remove this field after all studies are updated (replace _1)
-    `experimental_strategy_1`: CODEABLE = CODEABLE("WXS", "wxs_display"),
+    `platform`: Seq[String] = Seq("Illumina"),
+    `instrument_model`: Seq[String] = Seq("NovaSeq 6000"),
+    `pore_type`: Option[String] = None,
+    `is_imputed`: Option[Boolean] = None,
+    `experimental_strategy`: Seq[String] = Seq(
+      "WXS"
+    ), // FIXME remove this field after all studies are updated (replace _1)
+    `experimental_strategy_1`: Seq[CODEABLE] = Seq(CODEABLE("WXS", "wxs_display")),
+    `profiling_resolution`: Seq[String] = Seq("Bulk"),
     `sequencer_id`: String = "NB552318",
     `genome_build`: String = "GRCh38",
     `_for`: String = "PRT0000001",

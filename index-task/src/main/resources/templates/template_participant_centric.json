@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "participant_centric*"
-  ],
+  "index_patterns": ["participant_centric*"],
   "priority": 1,
   "template": {
     "settings": {
@@ -638,6 +636,18 @@
                       "type": "keyword"
                     }
                   }
+                },
+                "profiling_resolution": {
+                  "type": "keyword"
+                },
+                "instrument_model": {
+                  "type": "keyword"
+                },
+                "pore_type": {
+                  "type": "keyword"
+                },
+                "is_imputed": {
+                  "type": "boolean"
                 }
               }
             },

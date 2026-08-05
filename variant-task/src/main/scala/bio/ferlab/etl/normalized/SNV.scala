@@ -86,7 +86,7 @@ object SNV {
     def withSource(task: DataFrame)(implicit spark: SparkSession): DataFrame = {
       import spark.implicits._
       val taskDf = task
-        .select($"ldm_sample_id" as "sample_id", $"experimental_strategy" as "source")
+        .select($"ldm_sample_id" as "sample_id", element_at($"experimental_strategy", 1) as "source")
 
       df.join(broadcast(taskDf), Seq("sample_id"), "left")
     }

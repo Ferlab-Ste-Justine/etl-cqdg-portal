@@ -193,6 +193,23 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     )
   }
 
+  it should " leave type_of_sequencing null when is_paired_end is absent" in {
+    // is_paired_end is not required for Multi-omic / Other analyses.
+    // An absent value must not be reported as "Unpaired Reads".
+    val filesDf = Seq(FILE_INPUT(`participant_id` = "P1", `fhir_id` = "F1")).toDF()
+
+    val seqExperiment = Seq(
+      SEQUENCING_EXPERIMENT_SINGLE(`analysis_files` = Seq(ANALYSIS_FILE("Aligned-Reads", "F1")))
+    ).toDF()
+      .withColumn("ldm_sample_id", lit("").cast(StringType))
+      .withColumn("lab_aliquot_ids", array().cast(ArrayType(StringType)))
+      .withColumn("is_paired_end", lit(null).cast(BooleanType))
+
+    val output = filesDf.addSequencingExperiment(seqExperiment)
+
+    output.select("sequencing_experiment.type_of_sequencing").as[String].collect() shouldBe Array(null)
+  }
+
   val schema: StructType = StructType(
     Array(
       StructField("study_id", StringType, true),
