@@ -523,13 +523,13 @@
                 "capture_kit": {
                   "type": "keyword"
                 },
-                "platform": {
+                "platforms": {
                   "type": "keyword"
                 },
-                "experimental_strategy": {
+                "experimental_strategies": {
                   "type": "keyword"
                 },
-                "experimental_strategy_1": {
+                "experimental_strategies_1": {
                   "properties": {
                     "code": {
                       "type": "keyword"
@@ -596,10 +596,10 @@
                     }
                   }
                 },
-                "profiling_resolution": {
+                "profiling_resolutions": {
                   "type": "keyword"
                 },
-                "instrument_model": {
+                "instrument_models": {
                   "type": "keyword"
                 },
                 "pore_type": {

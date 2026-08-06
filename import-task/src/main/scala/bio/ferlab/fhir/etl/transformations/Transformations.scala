@@ -78,14 +78,14 @@ object Transformations {
           filter(col("seq_exp")("extension"), col => col("url") === "captureKit")(0)("valueString")
         )
         .withColumn(
-          "platform",
+          "platforms",
           transform(
             filter(col("seq_exp")("extension"), col => col("url") === "platform")("valueCoding"),
             coding => coalesce(coding("display"), coding("code"))
           )
         )
         .withColumn(
-          "instrument_model",
+          "instrument_models",
           filter(col("seq_exp")("extension"), col => col("url") === "instrumentModel")("valueString")
         )
         .withColumn(
@@ -106,7 +106,7 @@ object Transformations {
           filter(col("seq_exp")("extension"), col => col("url") === "targetLoci")(0)("valueString")
         )
         .withColumn(
-          "experimental_strategy_1",
+          "experimental_strategies_1",
           transform(
             filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")("valueCoding"),
             coding =>
@@ -117,14 +117,14 @@ object Transformations {
           )
         )
         .withColumn( // FIXME remove this field after all studies are updated (replace _1)
-          "experimental_strategy",
+          "experimental_strategies",
           transform(
             filter(col("seq_exp")("extension"), col => col("url") === "experimentalStrategy")("valueCoding"),
             coding => coding("code")
           )
         )
         .withColumn(
-          "profiling_resolution",
+          "profiling_resolutions",
           transform(
             filter(col("seq_exp")("extension"), col => col("url") === "profilingResolution")("valueCoding"),
             coding => coalesce(coding("display"), coding("code"))

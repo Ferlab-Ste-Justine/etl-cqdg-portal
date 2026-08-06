@@ -362,7 +362,7 @@ object Utils {
         .agg(
           collect_set("data_type") as "data_types",
           array_distinct(
-            flatten(collect_set("sequencing_experiment.experimental_strategy_1"))
+            flatten(collect_set("sequencing_experiment.experimental_strategies_1"))
           ) as "experimental_strategies_1",
           size(collect_set("fhir_id")) as "file_count",
           size(collect_set("participant_id")) as "participant_count"
@@ -414,7 +414,7 @@ object Utils {
 
       val experimentalStrategiesCount = cleanTask
         .join(cleanFilesDF, Seq("pivot", "study_id"), "inner")
-        .withColumn("experimental_strategy_1", explode(col("experimental_strategy_1")))
+        .withColumn("experimental_strategy_1", explode(col("experimental_strategies_1")))
         .groupBy("study_id", "experimental_strategy_1")
         .agg(size(collect_set(col("file")("file_name"))) as "file_count")
         .groupBy("study_id")
