@@ -2,14 +2,14 @@ package model
 
 case class SEQUENCING_EXPERIMENT_SINGLE(
     `owner`: String = "CQDG",
-    `experimental_strategy_1`: Seq[CODEABLE] = Seq(CODEABLE("WXS", "wxs_display")),
-    `experimental_strategy`: Seq[String] = Seq(
+    `experimental_strategies_1`: Seq[CODEABLE] = Seq(CODEABLE("WXS", "wxs_display")),
+    `experimental_strategies`: Seq[String] = Seq(
       "WXS"
     ), // FIXME remove this field after all studies are updated (replace _1)
-    `profiling_resolution`: Seq[String] = Seq("Bulk"),
+    `profiling_resolutions`: Seq[String] = Seq("Bulk"),
     `selection`: CODEABLE = CODEABLE("RR", "RR_display"),
-    `platform`: Seq[String] = Seq("Illumina"),
-    `instrument_model`: Seq[String] = Seq("NovaSeq 6000"),
+    `platforms`: Seq[String] = Seq("Illumina"),
+    `instrument_models`: Seq[String] = Seq("NovaSeq 6000"),
     `pore_type`: Option[String] = None,
     `is_imputed`: Option[Boolean] = None,
     `source`: CODEABLE = CODEABLE("TSC", "TSC_display"),
