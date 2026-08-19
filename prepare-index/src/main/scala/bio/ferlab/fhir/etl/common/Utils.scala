@@ -27,7 +27,7 @@ object Utils {
     }
 
     /** assume df is study, will add data Categories already on the study to the data category found on the files format
-      * have to be [(data_Category_type, count)]>
+      * have to be [(data_Category_type, participant_count, file_count)]>
       *
       * @param dataCategoryCount
       *   : Data Categories and count based on DocumentReference
@@ -41,7 +41,12 @@ object Utils {
         .filter(!array_contains(col("data_categories_from_files")("data_category"), col("data_categories_exp")))
         .withColumn(
           "data_categories",
-          struct(col("data_categories_exp") as "data_category", lit(null).cast("integer") as "participant_count")
+          // must stay structurally identical to what fieldCount produces, both arrays are concatenated below
+          struct(
+            col("data_categories_exp") as "data_category",
+            lit(null).cast("integer") as "participant_count",
+            lit(null).cast("integer") as "file_count"
+          )
         )
         .groupBy("study_id")
         .agg(collect_set("data_categories") as "data_categories")
@@ -248,14 +253,24 @@ object Utils {
         .drop("subject")
     }
 
+    /** Counts participants and files per value of `field`. A file is identified the same way as in the study
+      * file_count, so that the file counts of all the values of `field` add up to the file_count of the study.
+      */
     def fieldCount(field: String, countField: String): DataFrame = df
       .withColumn("files_exp", explode(col("files")))
       .na
       .drop(Seq(s"files_exp.$field"))
       .groupBy("study_id", s"files_exp.$field")
-      .agg(size(collect_set(col("subject"))) as "participant_count")
+      .agg(
+        size(collect_set(col("subject"))) as "participant_count",
+        size(
+          collect_set(
+            struct(col("files_exp.file_name"), col("files_exp.file_format"), col("files_exp.file_id"))
+          )
+        ) as "file_count"
+      )
       .groupBy("study_id")
-      .agg(collect_list(struct(col(field), col("participant_count"))) as countField)
+      .agg(collect_list(struct(col(field), col("participant_count"), col("file_count"))) as countField)
 
     def addFilesWithBiospecimen(
         filesDf: DataFrame,

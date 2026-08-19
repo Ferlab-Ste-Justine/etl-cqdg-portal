@@ -25,8 +25,10 @@ case class STUDY_CENTRIC(
     `restricted_number_participants`: String = "2",
     `restricted_number_biospecimens`: String = "3",
     `restricted_number_files`: String = "3",
-    `data_types`: Seq[(String, String)] = Seq(("SSUP", "1"), ("SNV", "1"), ("GCNV", "1"), ("ALIR", "1"), ("GSV", "1")),
-    `data_categories`: Seq[(String, String)] = Seq(("Genomics", "2"), ("Proteomics", null), ("Transcriptomics", null)),
+    `data_types`: Seq[(String, String, String)] =
+      Seq(("SSUP", "1", "1"), ("SNV", "1", "1"), ("GCNV", "1", "1"), ("ALIR", "1", "1"), ("GSV", "1", "1")),
+    `data_categories`: Seq[(String, String, String)] =
+      Seq(("Genomics", "2", "7"), ("Transcriptomics", null, null), ("Proteomics", null, null)),
     `study_designs`: Seq[String] = Seq("case_only", "registry"),
     `data_collection_methods`: Seq[String] = Seq("medical_records", "investigator_assessment"),
     `participant_count`: Int = 1,
