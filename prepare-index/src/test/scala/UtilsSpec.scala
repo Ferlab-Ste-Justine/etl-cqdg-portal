@@ -218,7 +218,8 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
         ArrayType(
           StructType(
             StructField("data_category", StringType, true) ::
-              StructField("participant_count", IntegerType, false) :: Nil
+              StructField("participant_count", IntegerType, false) ::
+              StructField("file_count", IntegerType, false) :: Nil
           )
         ),
         true
@@ -235,21 +236,21 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       )
     ).toDF()
 
-    val data1 = Seq(Row("study1", Seq(Row("data_category1", 12), Row("data_category2", 2))))
+    val data1 = Seq(Row("study1", Seq(Row("data_category1", 12, 30), Row("data_category2", 2, 5))))
 
     val dataCategoriesFromFiles1 = spark.createDataFrame(spark.sparkContext.parallelize(data1), schema)
 
     val output1 = study1Df
       .combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles1)
       .select("data_categories")
-      .as[Seq[(String, Option[Int])]]
+      .as[Seq[(String, Option[Int], Option[Int])]]
       .collect()
       .head
 
     output1 should contain theSameElementsAs Seq(
-      ("data_category1", Some(12)),
-      ("data_category2", Some(2)),
-      ("data_category3", None)
+      ("data_category1", Some(12), Some(30)),
+      ("data_category2", Some(2), Some(5)),
+      ("data_category3", None, None)
     )
 
     // No extra Data categories from files
@@ -257,17 +258,17 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       RESEARCHSTUDY(`study_id` = "study1", `data_categories` = Seq("data_category2"))
     ).toDF()
 
-    val data2 = Seq(Row("study1", Seq(Row("data_category2", 12))))
+    val data2 = Seq(Row("study1", Seq(Row("data_category2", 12, 30))))
 
     val dataCategoriesFromFiles2 = spark.createDataFrame(spark.sparkContext.parallelize(data2), schema)
 
     val output2 = study2Df
       .combineDataCategoryFromFilesAndStudy(dataCategoriesFromFiles2)
       .select("data_categories")
-      .as[Seq[(String, Option[Int])]]
+      .as[Seq[(String, Option[Int], Option[Int])]]
       .collect()
       .head
 
-    output2 should contain theSameElementsAs Seq(("data_category2", Some(12)))
+    output2 should contain theSameElementsAs Seq(("data_category2", Some(12), Some(30)))
   }
 }

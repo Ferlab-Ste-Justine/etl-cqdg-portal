@@ -193,8 +193,15 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     val studyCentricOutput = STUDY_CENTRIC(
       `participant_count` = 2, // PRT0000001, PRT0000002
-      `data_types` =
-        Seq(("SSUP", "1"), ("Annotated-SNV", "1"), ("SNV", "1"), ("GCNV", "2"), ("ALIR", "1"), ("GSV", "1")),
+      // GCNV is the only data type with 2 files (file3.vcf and file6.vcf), all the file counts add up to file_count
+      `data_types` = Seq(
+        ("SSUP", "1", "1"),
+        ("Annotated-SNV", "1", "1"),
+        ("SNV", "1", "1"),
+        ("GCNV", "2", "2"),
+        ("ALIR", "1", "1"),
+        ("GSV", "1", "1")
+      ),
       `sample_count` = 4,
       `file_count` = 7,
       `datasets` = Seq(
