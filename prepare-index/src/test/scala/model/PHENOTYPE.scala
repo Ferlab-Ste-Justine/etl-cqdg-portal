@@ -23,6 +23,21 @@ case class PHENOTYPE_HPO_CODE(
     `code`: String = "HP:0003124"
 )
 
+case class HPO_ANCESTOR(
+    `id`: String = "HP:0000118",
+    `name`: String = "Phenotypic abnormality",
+    `parents`: Seq[String] = Nil
+)
+
+case class HPO_TERM(
+    `id`: String = "HP:0003124",
+    `name`: String = "Term Name",
+    `parents`: Seq[String] = Nil,
+    `ancestors`: Seq[HPO_ANCESTOR] = Nil,
+    `is_leaf`: Boolean = true,
+    `alt_ids`: Seq[String] = Nil
+)
+
 case class PHENOTYPE_TAGGED(
     `internal_phenotype_id`: String = "1",
     `is_tagged`: Boolean = true,

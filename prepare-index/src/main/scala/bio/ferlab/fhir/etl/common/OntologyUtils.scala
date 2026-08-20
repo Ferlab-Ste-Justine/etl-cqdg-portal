@@ -7,6 +7,16 @@ object OntologyUtils {
 
   val displayTerm: (Column, Column) => Column = (id, name) => concat(name, lit(" ("), id, lit(")"))
 
+  private def termsByCode(terms: DataFrame, codeCol: String): DataFrame = {
+    val current = terms.withColumn(codeCol, col("id"))
+    val obsolete = terms.withColumn(codeCol, explode(col("alt_ids")))
+
+    current
+      .unionByName(obsolete.join(current.select(codeCol), Seq(codeCol), "left_anti"))
+      .dropDuplicates(codeCol)
+      .drop("alt_ids")
+  }
+
   def generateTaggedPhenotypes(phenotypes: DataFrame, colName: String): DataFrame = {
     phenotypes
       .filter(col("phenotype_id").isNotNull)
@@ -15,12 +25,13 @@ object OntologyUtils {
         collect_list(
           struct(
             col("fhir_id") as "internal_phenotype_id",
-            lit(true) as "is_tagged",
-            col("is_leaf"),
-            col("parents"),
+            col("name").isNotNull as "is_tagged",
+            coalesce(col("is_leaf"), lit(false)) as "is_leaf",
+            coalesce(col("parents"), array().cast("array<string>")) as "parents",
             col("age_at_event"),
             col("source_text"),
-            displayTerm(col("phenotype_id"), col("name")) as "name"
+            when(col("name").isNotNull, displayTerm(col("phenotype_id"), col("name")))
+              .otherwise(col("phenotype_id")) as "name"
           )
         ) as colName
       )
@@ -70,21 +81,11 @@ object OntologyUtils {
   }
 
   def getTaggedPhenotypes(phenotypesDF: DataFrame, hpoTerms: DataFrame): (DataFrame, DataFrame, DataFrame) = {
-    val hpoExplodedAlt = hpoTerms
-      .withColumn("alt_id", explode(col("alt_ids")))
-
-    val phenotypesWithTermsAlternate = phenotypesDF
-      .withColumn("phenotype_id", col("phenotype_HPO_code")("code"))
-      .join(hpoExplodedAlt, col("phenotype_id") === col("alt_id"), "inner")
-      .drop("phenotype_id", "alt_id")
-      .withColumnRenamed("id", "phenotype_id")
-
-    val phenotypesWithTermsValid = phenotypesDF
-      .withColumn("phenotype_id", col("phenotype_HPO_code")("code"))
-      .join(hpoTerms, col("phenotype_id") === col("id"), "inner")
-      .drop(col("id"))
-
-    val phenotypesWithTerms = phenotypesWithTermsValid.unionByName(phenotypesWithTermsAlternate).drop("alt_ids")
+    val phenotypesWithTerms = phenotypesDF
+      .withColumn("hpo_code", col("phenotype_HPO_code")("code"))
+      .join(termsByCode(hpoTerms, "hpo_code"), Seq("hpo_code"), "left_outer")
+      .withColumn("phenotype_id", coalesce(col("id"), col("hpo_code")))
+      .drop("id", "hpo_code")
 
     val observedPhenotypes = phenotypesWithTerms
       .filter(col("phenotype_observed").equalTo("POS"))
