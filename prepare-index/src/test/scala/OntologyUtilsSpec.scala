@@ -2,6 +2,7 @@ import bio.ferlab.datalake.spark3.loader.GenericLoader.read
 import bio.ferlab.fhir.etl.common.OntologyUtils.{getDiagnosis, getTaggedPhenotypes}
 import model.{
   DIAGNOSIS_INPUT,
+  HPO_TERM,
   PHENOTYPE,
   PHENOTYPE_HPO_CODE,
   PHENOTYPE_TAGGED,
@@ -276,6 +277,60 @@ class OntologyUtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession 
         ),
         PHENOTYPE_TAGGED_WITH_ANCESTORS(`parents` = Nil, `age_at_event` = Seq("Young"), `name` = "A Name (HP:A)")
       )
+  }
+
+  it should "keep a phenotype whose HPO code is absent from the ontology" in {
+    val known = PHENOTYPE(
+      `fhir_id` = "1",
+      `phenotype_source_text` = "Intractable Seizures",
+      `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:G"),
+      `cqdg_participant_id` = "1"
+    )
+    val unknown = PHENOTYPE(
+      `fhir_id` = "2",
+      `phenotype_source_text` = "Hand polydactyly",
+      `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:NOT_IN_ONTOLOGY"),
+      `cqdg_participant_id` = "1"
+    )
+
+    val (_, withAncestors, t3) = getTaggedPhenotypes(Seq(known, unknown).toDF(), hpo_terms)
+
+    // the unmatched code keeps its source text, falls back to the code for a name, and admits
+    // via is_tagged that it never resolved
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect().head._2
+
+    taggedPhenotypes.map(p =>
+      (p.`source_text`, p.`name`, p.`is_tagged`)
+    ) should contain theSameElementsAs Seq(
+      ("Intractable Seizures", "G Name (HP:G)", true),
+      ("Hand polydactyly", "HP:NOT_IN_ONTOLOGY", false)
+    )
+
+    // but it stays out of the ancestor tree, which has nothing to hang it from
+    val treeNames =
+      withAncestors.as[(String, Seq[PHENOTYPE_TAGGED_WITH_ANCESTORS])].collect().head._2.map(_.`name`)
+
+    treeNames should contain theSameElementsAs Seq("G Name (HP:G)", "B Name (HP:B)", "A Name (HP:A)")
+  }
+
+  it should "match a code once when it is both a current id and another term's alt_id" in {
+    val terms = Seq(
+      HPO_TERM(`id` = "HP:1", `name` = "One", `alt_ids` = Seq("HP:2")),
+      HPO_TERM(`id` = "HP:2", `name` = "Two")
+    ).toDF()
+
+    val phenotype = PHENOTYPE(
+      `fhir_id` = "1",
+      `phenotype_source_text` = "text",
+      `phenotype_HPO_code` = PHENOTYPE_HPO_CODE(`code` = "HP:2"),
+      `cqdg_participant_id` = "1"
+    )
+
+    val (_, _, t3) = getTaggedPhenotypes(Seq(phenotype).toDF(), terms)
+    val taggedPhenotypes = t3.as[(String, Seq[PHENOTYPE_TAGGED_WITH_OBSERVED])].collect().head._2
+
+    // HP:2 is a current term, so it must not also resolve through HP:1's alt_ids
+    taggedPhenotypes.map(_.`name`) shouldBe Seq("Two (HP:2)")
   }
 
   "getDiagnosis" should "return diagnosis per participant" in {
