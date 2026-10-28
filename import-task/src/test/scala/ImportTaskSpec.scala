@@ -89,6 +89,8 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
       dfs.flatMap(p => p.find(q => q._1 == "normalized_disease_status")).head._2.as[NORMALIZED_DISEASE_STATUS].collect()
     val normalizedPhenotype =
       dfs.flatMap(p => p.find(q => q._1 == "normalized_phenotype")).head._2.as[NORMALIZED_PHENOTYPE].collect()
+    val normalizedCauseOfDeath =
+      dfs.flatMap(p => p.find(q => q._1 == "normalized_cause_of_death")).head._2.as[NORMALIZED_CAUSE_OF_DEATH].collect()
     val normalizedBiospecimen =
       dfs.flatMap(p => p.find(q => q._1 == "normalized_biospecimen")).head._2.as[NORMALIZED_BIOSPECIMEN].collect()
     val normalizedSampleRegistration = dfs
@@ -113,6 +115,13 @@ class ImportTaskSpec extends AnyFlatSpec with Matchers with MinioServer {
     normalizedDiagnosis.filter(_.`subject` == "PRT0000005").head shouldEqual NORMALIZED_DIAGNOSIS()
     normalizedDisease_status.filter(_.`fhir_id` == "FAM0000001DS").head shouldEqual NORMALIZED_DISEASE_STATUS()
     normalizedPhenotype.filter(_.`fhir_id` == "PHE0000002").head shouldEqual NORMALIZED_PHENOTYPE()
+    // Only the cause-of-death Observations are kept (phenotype, family relationship and disease status are filtered out)
+    normalizedCauseOfDeath.map(_.`submitter_participant_ids`) should contain theSameElementsAs Seq(
+      "PRT0000001",
+      "PRT0000002",
+      "PRT0000003"
+    )
+    normalizedCauseOfDeath.filter(_.`fhir_id` == "PRT0000001").head shouldEqual NORMALIZED_CAUSE_OF_DEATH()
     normalizedBiospecimen.filter(_.`fhir_id` == "BIO0000001").head shouldEqual NORMALIZED_BIOSPECIMEN()
     normalizedSampleRegistration.filter(_.`subject` == "PRT0000005").head shouldEqual NORMALIZED_SAMPLE_REGISTRATION()
     normalizedResearchStudy.head shouldEqual NORMALIZED_RESEARCH_STUDY()
