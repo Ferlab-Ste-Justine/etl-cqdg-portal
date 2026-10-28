@@ -13,7 +13,7 @@ case class PARTICIPANT_WITH_BIOSPECIMEN(
     `ethnicity`: String = "European",
     `submitter_participant_id`: String = "35849428444",
     `age_of_death`: String = "Old",
-    `cause_of_death`: String = null,
+    `cause_of_death`: String = "Cancer",
     `is_affected`: String = null,
 //                                         `diagnosis`: Seq[DIAGNOSIS] = Seq.empty,
 //                                         `icd_tagged`: Seq[PHENOTYPE_TAGGED] = Seq.empty,
