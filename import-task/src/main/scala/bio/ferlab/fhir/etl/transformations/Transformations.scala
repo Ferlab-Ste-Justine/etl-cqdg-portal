@@ -348,7 +348,7 @@ object Transformations {
     Custom(
       _.select("study_id", "fhir_id", "code", "subject")
         .filter(
-          array_contains(col("code")("coding")("system"), "https://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death")
+          array_contains(col("code")("coding")("system"), "https://fhir.cqdg.ca/CodeSystem/cause-of-death-codes")
         )
         .withColumn("submitter_participant_ids", regexp_extract(col("subject")("reference"), patientExtract, 1))
         .withColumn("cause_of_death", col("code")("coding")("code")(0))
