@@ -8,7 +8,7 @@ case object MinioContainer extends IContainer {
   val port = 9000
 
   val container: GenericContainer = GenericContainer(
-    "minio/minio",
+    "cgr.dev/chainguard/minio",
     command = Seq("server", "/data"),
     exposedPorts = Seq(port),
     labels = Map("name" -> name),

@@ -8,7 +8,7 @@ case object MinioContainer extends OurContainer {
   val accessKey = "access_key"
   val secretKey = "secret_key"
   val container: GenericContainer = GenericContainer(
-    "minio/minio",
+    "cgr.dev/chainguard/minio",
     command = Seq("server", "/data", "--console-address", ":9001"),
     // waitStrategy = Wait.forHttp("/").withStartupTimeout(Duration.ofSeconds(60)),
     exposedPorts = Seq(port, 9001),
