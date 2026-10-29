@@ -15,7 +15,7 @@ case class SIMPLE_PARTICIPANT(
     `ethnicity`: String = "European",
     `submitter_participant_id`: String = "35849428444",
     `age_of_death`: String = "Old",
-    `cause_of_death`: String = null,
+    `cause_of_death`: String = "Cancer",
     `is_affected`: String = null,
     `study_id`: String = "STU0000001",
     `security`: String = "U",

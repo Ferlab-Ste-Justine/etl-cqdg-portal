@@ -13,8 +13,8 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
 
   implicit val conf: Configuration = ConfigurationLoader.loadFromResources[SimpleConfiguration]("config/dev-cqdg.conf")
 
-  "transform" should "prepare simple_participant" in {
-    val data: Map[String, DataFrame] = Map(
+  private def inputData(causeOfDeath: Seq[CAUSE_OF_DEATH] = Seq.empty): Map[String, DataFrame] =
+    Map(
       "normalized_research_study" -> Seq(RESEARCHSTUDY()).toDF(),
       "normalized_patient" -> Seq(
         PATIENT_INPUT(fhir_id = "P1"),
@@ -34,7 +34,7 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
         DIAGNOSIS_INPUT(fhir_id = "D3", `subject` = "P1")
       ).toDF(),
       "normalized_group" -> Seq.empty[GROUP].toDF(),
-      "normalized_cause_of_death" -> Seq.empty[CAUSE_OF_DEATH].toDF(),
+      "normalized_cause_of_death" -> causeOfDeath.toDF(),
       "normalized_disease_status" -> Seq.empty[DISEASE_STATUS].toDF(),
       "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
       "hpo_terms" -> read(getClass.getResource("/hpo_terms.json").toString, "Json", Map(), None, None),
@@ -42,7 +42,8 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
       "icd_terms" -> read(getClass.getResource("/icd_terms.json").toString, "Json", Map(), None, None)
     )
 
-    val output = new SimpleParticipant(List("SD_Z6MWD3H0"))(conf).transform(data)
+  "transform" should "prepare simple_participant" in {
+    val output = new SimpleParticipant(List("SD_Z6MWD3H0"))(conf).transform(inputData())
 
     output.keys should contain("simple_participant")
 
@@ -50,6 +51,20 @@ class SimpleParticipantSpec extends AnyFlatSpec with Matchers with WithSparkSess
 
     simple_participant.length shouldBe 3
 
+  }
+
+  it should "add cause_of_death only to participants with a cause of death Observation" in {
+    val causeOfDeath = Seq(CAUSE_OF_DEATH(`fhir_id` = "P1", `submitter_participant_ids` = "P1", `cause_of_death` = "Cancer"))
+
+    val output = new SimpleParticipant(List("SD_Z6MWD3H0"))(conf).transform(inputData(causeOfDeath))
+
+    val simple_participant = output("simple_participant").as[SIMPLE_PARTICIPANT].collect()
+
+    simple_participant.map(p => p.`participant_id` -> p.`cause_of_death`) should contain theSameElementsAs Seq(
+      "P1" -> "Cancer",
+      "P2" -> null,
+      "P3" -> null
+    )
   }
 
 }
