@@ -10,7 +10,7 @@ case class DOCUMENTREFERENCE(
     `data_category`: String = "Genomics",
     `security`: String = "U",
     `files`: Seq[FILE] = Seq(FILE()),
-    `dataset`: Option[String] = Some("Dataset1")
+    `dataset`: Seq[String] = Seq("Dataset1")
 )
 
 case class FILE(

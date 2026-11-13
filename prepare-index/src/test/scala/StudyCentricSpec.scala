@@ -58,7 +58,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     `data_type` = "ALIR",
     `biospecimen_reference` = Seq("BIO1"),
     `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1")
   )
   val document7: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "7",
@@ -66,40 +66,40 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     `biospecimen_reference` = Seq("BIO1"),
     `relates_to` = Some("1"),
     `files` = Seq(FILE(`file_name` = "file1.crai", `file_format` = "CRAI")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1")
   )
-  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `dataset` = Some("dataset1"))
+  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `dataset` = Seq("dataset1"))
   val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "2",
     `data_type` = "SNV",
     `biospecimen_reference` = Seq("BIO1"),
     `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1", "dataset2")
   )
   val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "4",
     `data_type` = "GSV",
     `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1")
   )
   val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "3",
     `data_type` = "GCNV",
     `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1")
   )
   val document12: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "12",
     `data_type` = "Annotated-SNV",
     `files` = Seq(FILE(`file_name` = "file12.vep", `file_format` = "VCF")),
-    `dataset` = Some("dataset1")
+    `dataset` = Seq("dataset1")
   )
   val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "6",
     `participant_id` = "PRT0000002",
     `data_type` = "GCNV",
     `files` = Seq(FILE(`file_name` = "file6.vcf", `file_format` = "VCF")),
-    `dataset` = Some("dataset2")
+    `dataset` = Seq("dataset2")
   )
 
   val diagnosis1: DIAGNOSIS_INPUT = DIAGNOSIS_INPUT()
@@ -160,20 +160,14 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     DATASET_INPUT(`name` = "dataset2", `description` = Some("desc"))
   )
 
-  "transform" should "prepare index study_centric" in {
-    val data: Map[String, DataFrame] = Map(
+  val documents: Seq[DOCUMENTREFERENCE] =
+    Seq(document1, document2, document3, document4, document5, document6, document12, document7)
+
+  def inputData(documents: Seq[DOCUMENTREFERENCE]): Map[String, DataFrame] =
+    Map(
       "normalized_research_study" -> Seq(RESEARCHSTUDY(`data_sets` = studyDataset)).toDF(),
       "normalized_patient" -> Seq(patient1, patient2, patient3).toDF(),
-      "normalized_document_reference" -> Seq(
-        document1,
-        document2,
-        document3,
-        document4,
-        document5,
-        document6,
-        document12,
-        document7
-      ).toDF(),
+      "normalized_document_reference" -> documents.toDF(),
       "normalized_family_relationship" -> Seq(family1, family2, family3).toDF(),
       "normalized_group" -> Seq(group1, group2).toDF(),
       "normalized_diagnosis" -> Seq(diagnosis1, diagnosis2, diagnosis3).toDF(),
@@ -185,7 +179,30 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       "duo_terms" -> read(getClass.getResource("/duo_terms.csv").toString, "csv", Map("header" -> "true"), None, None)
     )
 
-    val output = new StudyCentric(List("STU0000001"))(conf).transform(data)
+  // document3 belongs to both datasets: it is counted under dataset1 and under dataset2
+  val expectedDatasets: Seq[DATASET] = Seq(
+    // Dataset file_count should be 6 as CRAI files should be excluded
+    DATASET(
+      `name` = "dataset1",
+      `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"),
+      `experimental_strategies` = Seq("WXS"),
+      `experimental_strategies_1` = Seq(CODEABLE("WXS")),
+      `participant_count` = 1,
+      `file_count` = 6
+    ),
+    DATASET(
+      `name` = "dataset2",
+      `description` = Some("desc"),
+      `data_types` = Seq("SNV", "GCNV"),
+      `experimental_strategies` = Seq("WXS"),
+      `experimental_strategies_1` = Seq(CODEABLE("WXS")),
+      `participant_count` = 2,
+      `file_count` = 2
+    )
+  )
+
+  "transform" should "prepare index study_centric" in {
+    val output = new StudyCentric(List("STU0000001"))(conf).transform(inputData(documents))
 
     output.keys should contain("es_index_study_centric")
 
@@ -204,30 +221,38 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       ),
       `sample_count` = 4,
       `file_count` = 7,
-      `datasets` = Seq(
-        // Dataset file_count should be 6 as CRAI files should be excluded
-        DATASET(
-          `name` = "dataset1",
-          `data_types` = Seq("SNV", "GSV", "ALIR", "SSUP", "GCNV", "Annotated-SNV"),
-          `experimental_strategies` = Seq("WXS"),
-          `experimental_strategies_1` = Seq(CODEABLE("WXS")),
-          `participant_count` = 1,
-          `file_count` = 6
-        ),
-        DATASET(
-          `name` = "dataset2",
-          `description` = Some("desc"),
-          `data_types` = Seq("GCNV"),
-          `experimental_strategies` = Nil,
-          `experimental_strategies_1` = Nil,
-          `participant_count` = 1,
-          `file_count` = 1
-        )
-      )
+      `datasets` = expectedDatasets
     )
 
     study_centric.as[STUDY_CENTRIC].collect() should contain theSameElementsAs
       Seq(studyCentricOutput)
+  }
+
+  it should "not count files without a dataset tag under any dataset" in {
+    // Same participant as document6 so that a wrongly counted file would change dataset counts
+    val documentEmptyDataset: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
+      `fhir_id` = "13",
+      `participant_id` = "PRT0000002",
+      `data_type` = "GSV",
+      `files` = Seq(FILE(`file_name` = "file13.vcf", `file_format` = "VCF")),
+      `dataset` = Seq.empty
+    )
+    val documentNullDataset: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
+      `fhir_id` = "14",
+      `participant_id` = "PRT0000002",
+      `data_type` = "ALIR",
+      `files` = Seq(FILE(`file_name` = "file14.cram", `file_format` = "CRAM")),
+      `dataset` = null
+    )
+
+    val output = new StudyCentric(List("STU0000001"))(conf)
+      .transform(inputData(documents ++ Seq(documentEmptyDataset, documentNullDataset)))
+
+    val studyCentric = output("es_index_study_centric").as[STUDY_CENTRIC].collect()
+
+    studyCentric.length shouldBe 1
+    studyCentric.head.`file_count` shouldBe 9 // untagged files still count at study level
+    studyCentric.head.`datasets` should contain theSameElementsAs expectedDatasets
   }
 
 }
