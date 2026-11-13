@@ -8,7 +8,7 @@ case class NORMALIZED_DOCUMENT_REFERENCE(
     `biospecimen_reference`: Seq[String] = Seq("SAM0000003", "SAM0000004", "SAM0000001"),
     `data_type`: String = "Annotated-SNV",
     `data_category`: String = "genomics",
-    `dataset`: String = "d1",
+    `dataset`: Seq[String] = Seq("d1", "d2"),
     `files`: Seq[FILES] = Seq(FILES()),
     `study_id`: String = "study1",
     `relates_to`: Option[String] = None,
