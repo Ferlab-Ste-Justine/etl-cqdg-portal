@@ -4,7 +4,7 @@ case class FILE_INPUT(
     `study_id`: String = "STU0000001",
     `fhir_id`: String = "FIL0081238",
     `participant_id`: String = "PRT0503531",
-    `biospecimen_reference`: String = "SAM0234037",
+    `biospecimen_reference`: Seq[String] = Seq("SAM0234037"),
     `data_type`: String = "Copy Number Variations (CNVs)",
     `data_category`: String = "Genomics",
     `relates_to`: Option[String] = None,
