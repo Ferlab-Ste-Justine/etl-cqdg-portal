@@ -59,6 +59,8 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
         )
         .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
+        // must stay after the participant's biospecimens are built: samples without files of their own stay listed
+        .filterFilesBiospecimensByReference()
         .withColumn("participant_2_id", col("participant_id")) // copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedParticipant)

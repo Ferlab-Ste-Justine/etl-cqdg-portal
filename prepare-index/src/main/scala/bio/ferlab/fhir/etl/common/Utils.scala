@@ -308,6 +308,19 @@ object Utils {
       df.join(filesGroupedPerParticipant, Seq("participant_id", "study_id"), "inner")
     }
 
+    def filterFilesBiospecimensByReference(): DataFrame =
+      df.withColumn(
+        "files",
+        transform(
+          col("files"),
+          file =>
+            file.withField(
+              "biospecimens",
+              filter(file("biospecimens"), b => array_contains(file("biospecimen_reference"), b("sample_id")))
+            )
+        )
+      )
+
     def explodeFilesAndRemoveRalatedTo: DataFrame = df
       .filter(!col("relates_to").isNotNull)
       .drop("relates_to")
