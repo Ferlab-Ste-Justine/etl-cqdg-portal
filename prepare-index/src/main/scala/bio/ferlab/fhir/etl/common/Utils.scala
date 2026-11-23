@@ -85,6 +85,13 @@ object Utils {
       val filesWithParticipants = df
         .join(participantsWithBiospecimens, Seq("participant_id"), "inner")
         .drop("participant_id")
+        .withColumn(
+          "participant",
+          col("participant").withField(
+            "biospecimens",
+            filter(col("participant.biospecimens"), b => array_contains(col("biospecimen_reference"), b("sample_id")))
+          )
+        )
 
       filesWithParticipants
         .groupBy(filesWithParticipants.columns.filterNot(Seq("participant").contains) map col: _*)
