@@ -41,6 +41,8 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
       lastRunDateTime: LocalDateTime = minDateTime,
       currentRunDateTime: LocalDateTime = LocalDateTime.now()
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    val documentReferenceDF = data(normalized_drs_document_reference.id).withDatasetColumn
+
     val patientDF = data(simple_participant.id).drop("study")
 
     val biospecimenDF = data(normalized_biospecimen.id)
@@ -53,7 +55,7 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
       patientDF
         .addStudy(data(es_index_study_centric.id))
         .addFilesWithBiospecimen(
-          data(normalized_drs_document_reference.id),
+          documentReferenceDF,
           biospecimenDF,
           data(normalized_sequencing_experiment.id),
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")

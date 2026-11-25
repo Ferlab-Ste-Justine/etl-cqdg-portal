@@ -51,6 +51,8 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       lastRunDateTime: LocalDateTime = minDateTime,
       currentRunDateTime: LocalDateTime = LocalDateTime.now()
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    val documentReferenceDF = data(normalized_drs_document_reference.id).withDatasetColumn
+
 
     val studyDF = data(normalized_researchstudy.id)
 
@@ -59,7 +61,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
         .select("fhir_id", "study_id")
         .withColumnRenamed("fhir_id", "participant_id")
         .addFilesWithBiospecimen(
-          data(normalized_drs_document_reference.id),
+          documentReferenceDF,
           data(normalized_biospecimen.id),
           data(normalized_sequencing_experiment.id),
           data(normalized_sample_registration.id)
@@ -74,7 +76,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
 
     val participantsWithFiles = data(normalized_patient.id)
       .withColumnRenamed("fhir_id", "subject")
-      .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
+      .addFiles(documentReferenceDF, data(normalized_sequencing_experiment.id))
 
     val dataTypesCount = participantsWithFiles
       .fieldCount("data_type", "data_types")
@@ -104,7 +106,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
     val participantsRenamed = data(normalized_patient.id).withColumnRenamed("fhir_id", "participant_id")
 
     val fileCount =
-      data(normalized_drs_document_reference.id)
+      documentReferenceDF
 //        .addAssociatedDocumentRef()
         .filter(!col("relates_to").isNotNull)
         .drop("relates_to")
@@ -133,7 +135,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
 
     val studyDatasets = studyDF
       .addDataSetToStudy(
-        data(normalized_drs_document_reference.id),
+        documentReferenceDF,
         participantsRenamed,
         data(normalized_sequencing_experiment.id)
       )
@@ -149,7 +151,7 @@ class StudyCentric(studyIds: List[String])(implicit configuration: Configuration
       .join(participantCount, Seq("study_id"), "left_outer")
       .join(fileCount, Seq("study_id"), "left_outer")
       .join(familyCount, Seq("study_id"), "left_outer")
-      .expStrategiesCountPerStudy(data(normalized_task.id), data(normalized_drs_document_reference.id))
+      .expStrategiesCountPerStudy(data(normalized_task.id), documentReferenceDF)
       .withColumn("family_data", col("family_count").gt(0))
       .withColumn(
         "access_limitations",

@@ -47,6 +47,8 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
       lastRunDateTime: LocalDateTime = minDateTime,
       currentRunDateTime: LocalDateTime = LocalDateTime.now()
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    val documentReferenceDF = data(normalized_drs_document_reference.id).withDatasetColumn
+
     val biospecimenDF = data(normalized_biospecimen.id)
 
     val transformedBiospecimen =
@@ -57,7 +59,7 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
         .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
         .addStudy(data(es_index_study_centric.id))
         .addParticipant(data(simple_participant.id))
-        .addFiles(data(normalized_drs_document_reference.id), data(normalized_sequencing_experiment.id))
+        .addFiles(documentReferenceDF, data(normalized_sequencing_experiment.id))
         .addSamplesToBiospecimen(
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
         )

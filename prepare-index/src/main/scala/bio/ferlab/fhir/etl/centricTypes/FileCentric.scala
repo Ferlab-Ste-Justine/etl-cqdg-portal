@@ -41,7 +41,7 @@ class FileCentric(studyIds: List[String])(implicit configuration: Configuration)
       lastRunDateTime: LocalDateTime = minDateTime,
       currentRunDateTime: LocalDateTime = LocalDateTime.now()
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
-    val fileDF = data(normalized_drs_document_reference.id)
+    val fileDF = data(normalized_drs_document_reference.id).withDatasetColumn
 
     val biospeciemDF = data(normalized_biospecimen.id)
       .joinNcitTerms(data(ncit_terms.id), "biospecimen_tissue_source")
