@@ -58,7 +58,7 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     `data_type` = "ALIR",
     `biospecimen_reference` = Seq("BIO1"),
     `files` = Seq(FILE(`file_name` = "file1.cram", `file_format` = "CRAM")),
-    `dataset` = Seq("dataset1")
+    `datasets` = Seq("dataset1")
   )
   val document7: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "7",
@@ -66,40 +66,40 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
     `biospecimen_reference` = Seq("BIO1"),
     `relates_to` = Some("1"),
     `files` = Seq(FILE(`file_name` = "file1.crai", `file_format` = "CRAI")),
-    `dataset` = Seq("dataset1")
+    `datasets` = Seq("dataset1")
   )
-  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `dataset` = Seq("dataset1"))
+  val document2: DOCUMENTREFERENCE = DOCUMENTREFERENCE(`files` = Seq(FILE()), `datasets` = Seq("dataset1"))
   val document3: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "2",
     `data_type` = "SNV",
     `biospecimen_reference` = Seq("BIO1"),
     `files` = Seq(FILE(`file_name` = "file2.vcf", `file_format` = "VCF")),
-    `dataset` = Seq("dataset1", "dataset2")
+    `datasets` = Seq("dataset1", "dataset2")
   )
   val document4: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "4",
     `data_type` = "GSV",
     `files` = Seq(FILE(`file_name` = "file4.vcf", `file_format` = "VCF")),
-    `dataset` = Seq("dataset1")
+    `datasets` = Seq("dataset1")
   )
   val document5: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "3",
     `data_type` = "GCNV",
     `files` = Seq(FILE(`file_name` = "file3.vcf", `file_format` = "VCF")),
-    `dataset` = Seq("dataset1")
+    `datasets` = Seq("dataset1")
   )
   val document12: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "12",
     `data_type` = "Annotated-SNV",
     `files` = Seq(FILE(`file_name` = "file12.vep", `file_format` = "VCF")),
-    `dataset` = Seq("dataset1")
+    `datasets` = Seq("dataset1")
   )
   val document6: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
     `fhir_id` = "6",
     `participant_id` = "PRT0000002",
     `data_type` = "GCNV",
     `files` = Seq(FILE(`file_name` = "file6.vcf", `file_format` = "VCF")),
-    `dataset` = Seq("dataset2")
+    `datasets` = Seq("dataset2")
   )
 
   val diagnosis1: DIAGNOSIS_INPUT = DIAGNOSIS_INPUT()
@@ -235,14 +235,14 @@ class StudyCentricSpec extends AnyFlatSpec with Matchers with WithSparkSession {
       `participant_id` = "PRT0000002",
       `data_type` = "GSV",
       `files` = Seq(FILE(`file_name` = "file13.vcf", `file_format` = "VCF")),
-      `dataset` = Seq.empty
+      `datasets` = Seq.empty
     )
     val documentNullDataset: DOCUMENTREFERENCE = DOCUMENTREFERENCE(
       `fhir_id` = "14",
       `participant_id` = "PRT0000002",
       `data_type` = "ALIR",
       `files` = Seq(FILE(`file_name` = "file14.cram", `file_format` = "CRAM")),
-      `dataset` = null
+      `datasets` = null
     )
 
     val output = new StudyCentric(List("STU0000001"))(conf)

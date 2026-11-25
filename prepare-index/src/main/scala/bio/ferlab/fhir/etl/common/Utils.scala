@@ -3,11 +3,20 @@ package bio.ferlab.fhir.etl.common
 import bio.ferlab.fhir.etl.common.OntologyUtils._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{when, _}
-import org.apache.spark.sql.types.StructType
+import org.apache.spark.sql.types.{StringType, StructType}
 
 object Utils {
 
   implicit class DataFrameOperations(df: DataFrame) {
+
+    def withDatasetColumn: DataFrame = {
+      val hasLegacyDataset = df.schema.find(_.name == "dataset").exists(_.dataType == StringType)
+      val datasets =
+        if (hasLegacyDataset) coalesce(col("datasets"), when(col("dataset").isNotNull, array(col("dataset"))))
+        else col("datasets")
+      df.withColumn("dataset", datasets).drop("datasets")
+    }
+
     def addStudy(studyDf: DataFrame): DataFrame = {
       val requiredStudyCols =
         Seq("study_code", "name", "population", "domain", "data_access_codes", "access_authority", "programs")
