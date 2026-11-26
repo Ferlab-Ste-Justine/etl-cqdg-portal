@@ -59,10 +59,10 @@ class BiospecimenCentric(studyIds: List[String])(implicit configuration: Configu
         .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
         .addStudy(data(es_index_study_centric.id))
         .addParticipant(data(simple_participant.id))
-        .addFiles(documentReferenceDF, data(normalized_sequencing_experiment.id))
         .addSamplesToBiospecimen(
           data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
         )
+        .addFilesBySample(documentReferenceDF, data(normalized_sequencing_experiment.id))
         .withColumnRenamed("fhir_id", "biospecimen_id")
         .drop("subject")
         .withColumn("study_code", col("study.study_code"))

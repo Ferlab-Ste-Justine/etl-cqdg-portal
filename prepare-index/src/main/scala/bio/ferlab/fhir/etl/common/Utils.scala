@@ -397,6 +397,30 @@ object Utils {
       df.join(filesWithSeqExpGrouped, Seq("subject", "study_id"), "inner")
     }
 
+    def addFilesBySample(filesDf: DataFrame, seqExperiment: DataFrame): DataFrame = {
+      val filesWithSeqExp = filesDf.explodeFilesAndRemoveRalatedTo
+        .addSequencingExperiment(seqExperiment)
+        .withColumnRenamed("participant_id", "subject")
+        .withColumnRenamed("fhir_id", "file_id")
+        .withColumn("file_2_id", col("file_id"))
+
+      val fileColumns = filesWithSeqExp.columns.filterNot(Seq("subject", "study_id").contains)
+
+      // Keeps the same set of samples as before: only those of participants with files
+      val subjectsWithFiles = filesWithSeqExp.select("subject", "study_id").distinct()
+
+      val filesPerSample = filesWithSeqExp
+        .withColumn("sample_id", explode(array_distinct(col("biospecimen_reference"))))
+        .groupBy("sample_id", "study_id")
+        .agg(collect_list(struct(fileColumns map col: _*)) as "files")
+
+      val emptyFiles = array().cast(filesPerSample.schema("files").dataType)
+
+      df.join(subjectsWithFiles, Seq("subject", "study_id"), "inner")
+        .join(filesPerSample, Seq("sample_id", "study_id"), "left_outer")
+        .withColumn("files", coalesce(col("files"), emptyFiles))
+    }
+
     def addDataSetToStudy(filesDf: DataFrame, participants: DataFrame, tasks: DataFrame): DataFrame = {
       val filesWithTaskAndParticipants = filesDf
         .addSequencingExperiment(tasks)
