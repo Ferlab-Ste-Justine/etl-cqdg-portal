@@ -22,8 +22,8 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
         SIMPLE_PARTICIPANT(`participant_id` = "P2")
       ).toDF(),
       "normalized_document_reference" -> Seq(
-        DOCUMENTREFERENCE(`fhir_id` = "1", `participant_id` = "P1"),
-        DOCUMENTREFERENCE(`fhir_id` = "2", `participant_id` = "P2")
+        DOCUMENTREFERENCE(`fhir_id` = "1", `participant_id` = "P1", `biospecimen_reference` = Seq("S1")),
+        DOCUMENTREFERENCE(`fhir_id` = "2", `participant_id` = "P2", `biospecimen_reference` = Seq("S2"))
       ).toDF(),
       "normalized_biospecimen" -> Seq(
         BIOSPECIMEN_INPUT(
@@ -87,7 +87,7 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
             `file_format` = Some("TGZ"),
             `file_size` = Some(56.0),
             `ferload_url` = Some("http://flerloadurl/outputPrefix/bc3aaa2a-63e4-4201-aec9-6b7b41a1e64a"),
-            `biospecimen_reference` = Seq("SAM0000001", "SAM0000002", "SAM0000003"),
+            `biospecimen_reference` = Seq("S1"),
             `data_type` = Some("SSUP"),
             `dataset` = Seq("Dataset1"),
             `biospecimens` = Seq(
@@ -112,6 +112,52 @@ class ParticipantCentricSpec extends AnyFlatSpec with Matchers with WithSparkSes
           )
         )
       )
+    )
+  }
+
+  it should "keep in each file only the samples of its biospecimen_reference" in {
+    val data: Map[String, DataFrame] = Map(
+      "simple_participant" -> Seq(SIMPLE_PARTICIPANT(`participant_id` = "P1")).toDF(),
+      "normalized_document_reference" -> Seq(
+        DOCUMENTREFERENCE(`fhir_id` = "1", `participant_id` = "P1", `biospecimen_reference` = Seq("S1")),
+        DOCUMENTREFERENCE(`fhir_id` = "2", `participant_id` = "P1", `biospecimen_reference` = Seq("S2"))
+      ).toDF(),
+      "normalized_biospecimen" -> Seq(
+        BIOSPECIMEN_INPUT(`fhir_id` = "B1", `subject` = "P1"),
+        BIOSPECIMEN_INPUT(`fhir_id` = "B2", `subject` = "P1"),
+        BIOSPECIMEN_INPUT(`fhir_id` = "B3", `subject` = "P1")
+      ).toDF(),
+      "normalized_task" -> Seq(TASK(fhir_id = "1")).toDF(),
+      "normalized_sample_registration" -> Seq(
+        SAMPLE_INPUT(fhir_id = "S1", `subject` = "P1", `parent` = "B1"),
+        SAMPLE_INPUT(fhir_id = "S2", `subject` = "P1", `parent` = "B2"),
+        // S3 has no file of its own
+        SAMPLE_INPUT(fhir_id = "S3", `subject` = "P1", `parent` = "B3")
+      ).toDF(),
+      "es_index_study_centric" -> Seq(STUDY_CENTRIC()).toDF(),
+      "ncit_terms" -> read(getClass.getResource("/ncit_terms").toString, "Parquet", Map(), None, None)
+    )
+
+    val output = new ParticipantCentric(List("STU0000001"))(conf).transform(data)
+    val participant_centric = output("es_index_participant_centric").as[PARTICIPANT_CENTRIC].collect()
+
+    participant_centric.map(_.`participant_id`) should contain theSameElementsAs Seq("P1")
+    val p1 = participant_centric.head
+
+    val samplesPerFile =
+      p1.`files`.map(f => f.`file_id`.get -> f.`biospecimens`.map(b => (b.`biospecimen_id`, b.`sample_id`)))
+    samplesPerFile should contain theSameElementsAs Seq("1" -> Seq(("B1", "S1")), "2" -> Seq(("B2", "S2")))
+
+    // files.biospecimens.sample_id matches files.biospecimen_reference exactly
+    p1.`files`.foreach(f =>
+      f.`biospecimens`.map(_.`sample_id`) should contain theSameElementsAs f.`biospecimen_reference`
+    )
+
+    // the participant's own biospecimens are not affected by the files filtering
+    p1.`biospecimens`.map(b => (b.`biospecimen_id`, b.`sample_id`)) should contain theSameElementsAs Seq(
+      ("B1", "S1"),
+      ("B2", "S2"),
+      ("B3", "S3")
     )
   }
 

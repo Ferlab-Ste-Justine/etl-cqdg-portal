@@ -68,6 +68,7 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
           sampleRegistrationDF
         )
         .join(participantBiospecimens, Seq("participant_id", "study_id"), "left_outer")
+        .filterFilesBiospecimensByReference()
         .withColumn("participant_2_id", col("participant_id")) // copy column/ front-end requirements
 
     Map(mainDestination.id -> transformedParticipant)
