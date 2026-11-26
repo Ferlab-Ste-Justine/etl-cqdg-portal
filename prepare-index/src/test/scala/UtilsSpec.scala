@@ -271,4 +271,31 @@ class UtilsSpec extends AnyFlatSpec with Matchers with WithSparkSession {
 
     output2 should contain theSameElementsAs Seq(("data_category2", Some(12), Some(30)))
   }
+
+  "withDatasetColumn" should "expose datasets as dataset, falling back to the legacy string column" in {
+    // normalized_document_reference after the rename: old `dataset` string column + new `datasets` array column
+    val input = Seq(
+      ("re-imported", Some(Seq("d1", "d2")), None),
+      ("not re-imported", None, Some("old")),
+      ("no dataset tag", Some(Seq.empty[String]), None),
+      ("nothing", None, None)
+    ).toDF("fhir_id", "datasets", "dataset")
+
+    val output = input.withDatasetColumn
+
+    output.columns should contain noElementsOf Seq("datasets")
+    output.select("fhir_id", "dataset").as[(String, Option[Seq[String]])].collect() should contain theSameElementsAs Seq(
+      ("re-imported", Some(Seq("d1", "d2"))),
+      ("not re-imported", Some(Seq("old"))),
+      ("no dataset tag", Some(Seq.empty)),
+      ("nothing", None)
+    )
+  }
+
+  it should "rename datasets to dataset when there is no legacy column" in {
+    val output = Seq(("f1", Seq("d1"))).toDF("fhir_id", "datasets").withDatasetColumn
+
+    output.columns should contain theSameElementsAs Seq("fhir_id", "dataset")
+    output.select("dataset").as[Seq[String]].collect() shouldBe Array(Seq("d1"))
+  }
 }
