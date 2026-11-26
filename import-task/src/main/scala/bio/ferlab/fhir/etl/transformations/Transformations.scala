@@ -666,8 +666,11 @@ object Transformations {
         .withColumn("file_name", col("content_exp")("attachment")("title"))
         .withColumn("file_format", col("content_exp")("format")("code"))
         .withColumn(
-          "dataset",
-          regexp_extract(filter(col("meta")("tag"), col => col("system") === DATASETS_CS)(0)("code"), datasetExtract, 1)
+          "datasets",
+          transform(
+            filter(col("meta")("tag"), tag => tag("system") === DATASETS_CS),
+            tag => regexp_extract(tag("code"), datasetExtract, 1)
+          )
         )
         .withColumn(
           "security",
@@ -681,7 +684,7 @@ object Transformations {
             "biospecimen_reference",
             "data_type",
             "data_category",
-            "dataset",
+            "datasets",
             "security",
             "relates_to"
           ): _*

@@ -4,7 +4,7 @@ import bio.ferlab.datalake.commons.config.{Configuration, DatasetConf}
 import bio.ferlab.datalake.spark3.etl.v2.ETL
 import bio.ferlab.datalake.spark3.implicits.DatasetConfImplicits.DatasetConfOperations
 import bio.ferlab.fhir.etl.common.Utils._
-import org.apache.spark.sql.functions.{array_distinct, col, flatten}
+import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import java.time.LocalDateTime
@@ -41,6 +41,8 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
       lastRunDateTime: LocalDateTime = minDateTime,
       currentRunDateTime: LocalDateTime = LocalDateTime.now()
   )(implicit spark: SparkSession): Map[String, DataFrame] = {
+    val documentReferenceDF = data(normalized_drs_document_reference.id).withDatasetColumn
+
     val patientDF = data(simple_participant.id).drop("study")
 
     val biospecimenDF = data(normalized_biospecimen.id)
@@ -49,17 +51,23 @@ class ParticipantCentric(studyIds: List[String])(implicit configuration: Configu
       .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "tumor_histological_type")
       .joinNcitTermsReplaceDisplay(data(ncit_terms.id), "cancer_anatomic_location")
 
+    val sampleRegistrationDF =
+      data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
+
+    // All biospecimens/samples of the participant, independent of its files: a sample without any file of its own
+    // must stay listed on the participant.
+    val participantBiospecimens = biospecimenDF.addSamplesGroupedToBiospecimen(sampleRegistrationDF)
+
     val transformedParticipant =
       patientDF
         .addStudy(data(es_index_study_centric.id))
         .addFilesWithBiospecimen(
-          data(normalized_drs_document_reference.id),
+          documentReferenceDF,
           biospecimenDF,
           data(normalized_sequencing_experiment.id),
-          data(normalized_sample_registration.id).joinNcitTerms(data(ncit_terms.id), "sample_type")
+          sampleRegistrationDF
         )
-        .withColumn("biospecimens", array_distinct(flatten(col("files.biospecimens"))))
-        // must stay after the participant's biospecimens are built: samples without files of their own stay listed
+        .join(participantBiospecimens, Seq("participant_id", "study_id"), "left_outer")
         .filterFilesBiospecimensByReference()
         .withColumn("participant_2_id", col("participant_id")) // copy column/ front-end requirements
 

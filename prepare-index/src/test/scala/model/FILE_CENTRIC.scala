@@ -6,7 +6,7 @@ case class FILE_CENTRIC(
     `security`: String = "U",
     biospecimen_reference: Seq[String] = Seq("SAM0247817"),
     data_type: String = "Structural Variations (SVs)",
-    dataset: Option[String] = Some("Dataset1"),
+    dataset: Seq[String] = Seq("Dataset1"),
     `relates_to`: Option[RELATES_TO] = None,
     data_category: String = "Genomics",
     file_name: String = "NS.1885.IDT_i7_87---IDT_i5_87.11137230.sv.vcf.gz",
